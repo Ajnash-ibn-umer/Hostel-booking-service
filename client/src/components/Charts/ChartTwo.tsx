@@ -17,7 +17,7 @@ const ChartTwo: React.FC = () => {
   //   },
   // ];
 
-  const options: ApexOptions = {
+  const options: any = {
     colors: ["#5750F1", "#0ABEF9"],
     chart: {
       fontFamily: "Satoshi, sans-serif",

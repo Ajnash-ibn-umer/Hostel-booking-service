@@ -16,7 +16,7 @@ const ChartOne: React.FC = () => {
   //   },
   // ];
 
-  const options: ApexOptions = {
+  const options: any = {
     legend: {
       show: false,
       position: "top",
@@ -87,7 +87,7 @@ const ChartOne: React.FC = () => {
       },
       y: {
         title: {
-          formatter: function (e) {
+          formatter: function (e:any) {
             return "";
           },
         },

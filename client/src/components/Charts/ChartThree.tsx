@@ -6,7 +6,7 @@ import DefaultSelectOption from "@/components/SelectOption/DefaultSelectOption";
 const ChartThree: React.FC = () => {
   const series = [65, 34, 12, 56];
 
-  const options: ApexOptions = {
+  const options: any = {
     chart: {
       fontFamily: "Satoshi, sans-serif",
       type: "donut",
