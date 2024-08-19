@@ -1,19 +1,20 @@
+"use client"
 import { ApexOptions } from "apexcharts";
 import React from "react";
 import ReactApexChart from "react-apexcharts";
 import DefaultSelectOption from "@/components/SelectOption/DefaultSelectOption";
 
 const ChartOne: React.FC = () => {
-  const series = [
-    {
-      name: "Received Amount",
-      data: [0, 20, 35, 45, 35, 55, 65, 50, 65, 75, 60, 75],
-    },
-    {
-      name: "Due Amount",
-      data: [15, 9, 17, 32, 25, 68, 80, 68, 84, 94, 74, 62],
-    },
-  ];
+  // const series = [
+  //   {
+  //     name: "Received Amount",
+  //     data: [0, 20, 35, 45, 35, 55, 65, 50, 65, 75, 60, 75],
+  //   },
+  //   {
+  //     name: "Due Amount",
+  //     data: [15, 9, 17, 32, 25, 68, 80, 68, 84, 94, 74, 62],
+  //   },
+  // ];
 
   const options: ApexOptions = {
     legend: {
@@ -143,14 +144,14 @@ const ChartOne: React.FC = () => {
         </div>
       </div>
       <div>
-        <div className="-ml-4 -mr-5">
+        {/* <div className="-ml-4 -mr-5">
           <ReactApexChart
             options={options}
             series={series}
             type="area"
             height={310}
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="flex flex-col gap-2 text-center xsm:flex-row xsm:gap-0">

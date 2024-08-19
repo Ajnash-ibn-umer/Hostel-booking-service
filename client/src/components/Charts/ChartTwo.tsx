@@ -1,19 +1,21 @@
+"use client";
+
 import { ApexOptions } from "apexcharts";
 import React from "react";
 import ReactApexChart from "react-apexcharts";
 import DefaultSelectOption from "@/components/SelectOption/DefaultSelectOption";
 
 const ChartTwo: React.FC = () => {
-  const series = [
-    {
-      name: "Sales",
-      data: [44, 55, 41, 67, 22, 43, 65],
-    },
-    {
-      name: "Revenue",
-      data: [13, 23, 20, 8, 13, 27, 15],
-    },
-  ];
+  // const series = [
+  //   {
+  //     name: "Sales",
+  //     data: [44, 55, 41, 67, 22, 43, 65],
+  //   },
+  //   {
+  //     name: "Revenue",
+  //     data: [13, 23, 20, 8, 13, 27, 15],
+  //   },
+  // ];
 
   const options: ApexOptions = {
     colors: ["#5750F1", "#0ABEF9"],
@@ -107,14 +109,19 @@ const ChartTwo: React.FC = () => {
       </div>
 
       <div>
-        <div id="chartTwo" className="-ml-3.5">
+        {/* <div id="chartTwo" className="-ml-3.5">
           <ReactApexChart
             options={options}
-            series={series}
+            series={
+             [ {
+                    name: "Sales",
+                    data: [44, 55, 41, 67, 22, 43, 65],
+                  },]
+            }
             type="bar"
             height={370}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
