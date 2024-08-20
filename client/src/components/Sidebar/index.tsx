@@ -142,7 +142,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           
           
           <Link href="/">
-            <Image
+            {/* <Image
               width={176}
               height={32}
               src={"/images/logo/logo-dark.svg"}
@@ -159,7 +159,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               priority
               className="hidden dark:block"
               style={{ width: "auto", height: "auto" }}
-            />
+            /> */}
+            <h3 style={{fontSize:"50px"}} role="heading" className={"x-el x-el-h3 c1-3a c1-3b c1-2f c1-2g c1-3c c1-26 c1-24 c1-23 c1-25 c1-33 c1-2r c1-3d c1-2m c1-3e c1-3f c1-3g c1-3h c1-3i c1-3j"}>OXTEL</h3>
+
           </Link>
 
           <button
