@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 
-export const USER_LIST_QUERY=gql`
+export const USER_LIST_QUERY = gql`
 query UserQuery($listUserInput: ListUserInput!) {
   User_List(listUserInput: $listUserInput) {
     totalCount
@@ -24,3 +24,28 @@ query UserQuery($listUserInput: ListUserInput!) {
   }
 }
 `
+
+export const ADMIN_LOGIN_GQL = gql`
+mutation User_Admin_Login($loginAdminInput: LoginAdminInput!) {
+  User_Admin_Login(loginAdminInput: $loginAdminInput) {
+    message
+    token
+    user {
+      _id
+      bookingId
+      createdAt
+      createdUserId
+      email
+      name
+      
+      phoneNumber
+      profileImgUrl
+      roleId
+      status
+      updatedAt
+      updatedUserId
+      userNo
+      userType
+    }
+  }
+}`

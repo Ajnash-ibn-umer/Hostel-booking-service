@@ -5,9 +5,10 @@ import "@/css/satoshi.css";
 import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
-import GraphqlProvider from "../graphql/graphql-client.config";
+import GraphqlProvider, { GraphqlClient } from "../graphql/graphql-client.config";
+import { USER_LIST_QUERY } from "@/graphql/queries/main.quiries";
 
-export default function RootLayout({
+export default  function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export default function RootLayout({
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
   }, []);
+  
 
   return (
     <html lang="en">

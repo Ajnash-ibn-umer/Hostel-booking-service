@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserResolver } from '../user.resolver';
+import { UserResolver } from '../graphql/user.resolver';
 import { UserService } from '../service/user.service';
 
 describe('UserResolver', () => {

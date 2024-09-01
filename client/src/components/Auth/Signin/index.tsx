@@ -7,28 +7,15 @@ import SigninWithPassword from "../SigninWithPassword";
 export default function Signin() {
   return (
     <>
-      <GoogleSigninButton text="Sign in" />
-
-      <div className="my-6 flex items-center justify-center">
-        <span className="block h-px w-full bg-stroke dark:bg-dark-3"></span>
-        <div className="block w-full min-w-fit bg-white px-3 text-center font-medium dark:bg-gray-dark">
-          Or sign in with email
-        </div>
-        <span className="block h-px w-full bg-stroke dark:bg-dark-3"></span>
-      </div>
+    <div className="flex justify-center items-center mb-20">
+      <h3 style={{fontSize:"50px"}} role="heading" className={"x-el x-el-h3 c1-3a c1-3b c1-2f c1-2g c1-3c c1-26 c1-24 c1-23 c1-25 c1-33 c1-2r c1-3d c1-2m c1-3e c1-3f c1-3g c1-3h c1-3i c1-3j"}>OXTEL</h3>
+    </div>
+   
 
       <div>
         <SigninWithPassword />
       </div>
 
-      <div className="mt-6 text-center">
-        <p>
-          Don’t have any account?{" "}
-          <Link href="/auth/signup" className="text-primary">
-            Sign Up
-          </Link>
-        </p>
-      </div>
     </>
   );
 }

@@ -15,7 +15,7 @@ export class User extends PartialType(Base){
   @Field({nullable:true})
   email:string 
   
-  @Field({nullable:true})
+  // @Field({nullable:true})
   password:string 
   
   @Field({nullable:true})
@@ -31,7 +31,7 @@ export class User extends PartialType(Base){
   profileImgUrl:string  
   
   @Field(()=>ID,{nullable:true})
-  admissionFormId:string 
+  bookingId:string 
 }
 
 
@@ -45,4 +45,16 @@ export class ListUsersResponse{
 
   @Field({nullable:true})
   totalCount:number
+}
+
+@ObjectType()
+export class LoginResponse {
+  @Field({ nullable: true })
+  message: string;
+
+  @Field({ nullable: true })
+  token: string;
+
+  @Field(() => User, { nullable: true })
+  user: User;
 }

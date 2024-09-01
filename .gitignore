@@ -35,6 +35,8 @@ client/*.tsbuildinfo
 client/next-env.d.ts
 
 
+.vscode
+
 
 server/dist
 server/node_modules

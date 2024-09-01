@@ -1,51 +1,45 @@
-import mongoose ,{ Model } from 'mongoose';
-import { STATUS_NAMES, USER_TYPES } from 'src/shared/variables/main.variable';
-import { MODEL_NAMES } from '../modelNames';
 import { HydratedDocument, SchemaTypes } from 'mongoose';
-import { Prop, SchemaFactory,Schema } from '@nestjs/mongoose';
+import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 import { Base } from './base.model';
+import { USER_TYPES } from 'src/shared/variables/main.variable';
 
 export type UserDocument = HydratedDocument<User>;
 
-
 @Schema()
-export class User extends Base{
+export class User extends Base {
+  @Prop({ default: '', required: true })
+  userNo?: string;
 
-  @Prop({default:"",required:true})
-  userNo:string 
-  
-  @Prop({default:"",required:true})
-  name:string 
-  
-  @Prop({default:"",required:false})
-  email:string 
-  
-  @Prop({default:"",required:false})
-  password:string 
-  
-  @Prop({default:"",required:false})
-  phoneNumber:string  
-  
-  @Prop({type:Number,enum:USER_TYPES,default:-1})
-  userType:number            
-  
-  @Prop({type:SchemaTypes.ObjectId,default:null})
-  roleId:string 
-  
-  @Prop({type:String,default:""})
-  profileImgUrl:string  
-  
-  @Prop({type:SchemaTypes.ObjectId,default:null})
-  admissionFormId:string 
+  @Prop({ default: '', required: true })
+  name?: string;
 
+  @Prop({ default: '', required: false })
+  email?: string;
+
+  @Prop({ default: '', required: false })
+  password?: string;
+
+  @Prop({ default: '', required: false })
+  phoneNumber?: string;
+
+  @Prop({ type: Number, enum: USER_TYPES, default: -1 })
+  userType?: number;
+
+  @Prop({ type: SchemaTypes.ObjectId, default: null })
+  roleId?: string;
+
+  @Prop({ type: String, default: '' })
+  profileImgUrl?: string;
+
+  @Prop({ type: SchemaTypes.ObjectId, default: null })
+  bookingId?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-
 UserSchema.index({ name: 1, _id: 1 });
 UserSchema.index({ userNo: 1 });
-UserSchema.index({ phoneNumber: 1,_id:1 });
+UserSchema.index({ phoneNumber: 1, _id: 1 });
 UserSchema.index({ email: 1, _id: 1 });
 
 UserSchema.index({ _userType: 1 });

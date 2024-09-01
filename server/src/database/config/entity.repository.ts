@@ -39,12 +39,13 @@ export class EntityRepository<T extends Document> {
     filterQuery: FilterQuery<T>,
     updateQuery:UpdateQuery<unknown>,
     transaction: ClientSession = null,
-    upsert:boolean=false
+    upsert: boolean = false
   ): Promise<T | null> {
     return this.entityModel
-      .findOneAndUpdate(filterQuery,updateQuery,{new:true,upsert})
+      .findOneAndUpdate(filterQuery, updateQuery, { new: true, upsert })
       .session(transaction)
-      .exec();
+      .lean({ virtuals: true })
+      .exec() as Promise<T | null>;
   }
 
   async insertMany(

@@ -8,5 +8,11 @@ export enum STATUS_NAMES {
 export enum USER_TYPES {
   ADMIN = 1,
   USER = 2,
-  DEFAULT=-1
+  DEFAULT = -1,
+}
+
+export enum BED_POSITION {
+  LOWER = 1,
+  UPPER = 2,
+  DEFAULT = -1,
 }

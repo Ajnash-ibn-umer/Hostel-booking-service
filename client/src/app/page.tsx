@@ -9,7 +9,7 @@ import { GraphqlClient } from "@/graphql/graphql-client.config";
 import { USER_LIST_QUERY } from "@/graphql/queries/main.quiries";
 import Dashboard from "./dashboard/page";
 import Link from "next/link";
-import {useRouter}  from "next/navigation";
+import { useRouter } from "next/navigation";
 import Auth from "@/components/Verifiy";
 
 
@@ -20,12 +20,12 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
- 
-  
+
+
   return (
     <>
-<Auth/>
-    
+      <Auth />
+
     </>
   );
 }

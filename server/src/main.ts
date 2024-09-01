@@ -32,7 +32,7 @@ async function bootstrap() {
     },
   });
 
-  //   const dev = process.env.NODE_ENV !== 'production';
+  //   const dev = ENV.NODE_ENV !== 'production';
 
   //   const nextApp = next({ dev, conf: { distDir: '.next' } });
   // const handle = nextApp.getRequestHandler();
