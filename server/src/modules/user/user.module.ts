@@ -14,9 +14,8 @@ import { CounterService } from '../counter/counter.service';
   imports: [
     MongooseModule.forFeature([
       ModelDefinitions.userModel,
-      ModelDefinitions.counterModel
+      ModelDefinitions.counterModel,
     ]),
- 
-  ]
+  ],
 })
-export class UserModule { }
+export class UserModule {}

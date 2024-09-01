@@ -42,9 +42,6 @@ export class Hostel extends Base {
   @Prop({ type: SchemaTypes.ObjectId, default: null })
   locationId: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, default: null })
-  categoryId: string;
-
   @Prop({ type: Number, default: 0 })
   totalRooms: number;
 
@@ -68,7 +65,6 @@ HostelSchema.index({ propertyNo: 1 });
 HostelSchema.index({ slug: 1 });
 HostelSchema.index({ availabilityStatus: 1 });
 HostelSchema.index({ locationId: 1 });
-HostelSchema.index({ categoryId: 1 });
 HostelSchema.index(
   { name: 1 },
   { unique: true, partialFilterExpression: { status: { $lt: 2 } } },

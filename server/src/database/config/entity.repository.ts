@@ -1,5 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Model, Document, FilterQuery, ClientSession ,UpdateQuery,AnyBulkWriteOperation, AggregateOptions, PipelineStage} from 'mongoose';
+import {
+  Model,
+  Document,
+  FilterQuery,
+  ClientSession,
+  UpdateQuery,
+  AnyBulkWriteOperation,
+  AggregateOptions,
+  PipelineStage,
+} from 'mongoose';
 
 export class EntityRepository<T extends Document> {
   constructor(protected entityModel: Model<T>) {}
@@ -37,9 +46,9 @@ export class EntityRepository<T extends Document> {
 
   async findOneAndUpdate(
     filterQuery: FilterQuery<T>,
-    updateQuery:UpdateQuery<unknown>,
+    updateQuery: UpdateQuery<unknown>,
     transaction: ClientSession = null,
-    upsert: boolean = false
+    upsert: boolean = false,
   ): Promise<T | null> {
     return this.entityModel
       .findOneAndUpdate(filterQuery, updateQuery, { new: true, upsert })
@@ -50,35 +59,34 @@ export class EntityRepository<T extends Document> {
 
   async insertMany(
     docs: T[],
-    updateQuery:UpdateQuery<unknown>,
     transaction: ClientSession = null,
-    upsert:boolean=false
   ): Promise<T[] | null> {
-    return this.entityModel.insertMany(docs,{session:transaction})
+    return this.entityModel.insertMany(docs, { session: transaction });
   }
 
   async deleteMany(
     filterQuery: FilterQuery<T>,
     transaction: ClientSession = null,
-
   ): Promise<number> {
-  const resp=  await this.entityModel.deleteMany(filterQuery,{session:transaction})
-    return  resp.deletedCount
-
+    const resp = await this.entityModel.deleteMany(filterQuery, {
+      session: transaction,
+    });
+    return resp.deletedCount;
   }
-
 
   async bulkWriteMany(
     updateOperation: AnyBulkWriteOperation[],
     transaction: ClientSession = null,
-  ): Promise<unknown| null> {
-    return this.entityModel.bulkWrite(updateOperation,{session:transaction})
+  ): Promise<unknown | null> {
+    return this.entityModel.bulkWrite(updateOperation, {
+      session: transaction,
+    });
   }
 
   async aggregate(
-    pipelineStages:PipelineStage[],
+    pipelineStages: PipelineStage[],
     aggregationOption?: AggregateOptions,
-  ): Promise<unknown| null> {
-    return this.entityModel.aggregate(pipelineStages,aggregationOption)
+  ): Promise<unknown | null> {
+    return this.entityModel.aggregate(pipelineStages, aggregationOption);
   }
 }

@@ -1,35 +1,32 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { HostelsService } from './hostels.service';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  Context,
+  GraphQLExecutionContext,
+  GqlContextType,
+} from '@nestjs/graphql';
+import { HostelsService } from './services/hostels.service';
 import { Hostel } from './entities/hostel.entity';
 import { CreateHostelInput } from './dto/create-hostel.input';
 import { UpdateHostelInput } from './dto/update-hostel.input';
-
+import { UserTypes } from 'src/shared/decorators';
+import { USER_TYPES } from 'src/shared/variables/main.variable';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/guards/auth.guard';
+@UseGuards(AuthGuard)
 @Resolver(() => Hostel)
 export class HostelsResolver {
   constructor(private readonly hostelsService: HostelsService) {}
-
-  @Mutation(() => Hostel)
-  createHostel(@Args('createHostelInput') createHostelInput: CreateHostelInput) {
-    return this.hostelsService.create(createHostelInput);
-  }
-
-  @Query(() => [Hostel], { name: 'hostels' })
-  findAll() {
-    return this.hostelsService.findAll();
-  }
-
-  @Query(() => Hostel, { name: 'hostel' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.hostelsService.findOne(id);
-  }
-
-  @Mutation(() => Hostel)
-  updateHostel(@Args('updateHostelInput') updateHostelInput: UpdateHostelInput) {
-    return this.hostelsService.update(updateHostelInput.id, updateHostelInput);
-  }
-
-  @Mutation(() => Hostel)
-  removeHostel(@Args('id', { type: () => Int }) id: number) {
-    return this.hostelsService.remove(id);
+  @Mutation(() => Hostel, { name: 'Hostel_Create' })
+  @UserTypes([USER_TYPES.ADMIN])
+  createHostel(
+    @Args('createHostelInput') createHostelInput: CreateHostelInput,
+    @Context() context,
+  ) {
+    console.log({ req: context.req.userId });
+    return this.hostelsService.create(createHostelInput, context.req.userId);
   }
 }
