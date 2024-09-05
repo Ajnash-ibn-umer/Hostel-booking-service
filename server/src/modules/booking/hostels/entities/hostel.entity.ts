@@ -81,6 +81,9 @@ export class Hostel extends PartialType(Base) {
 
   @Field(() => [Room], { nullable: true })
   rooms: Room[];
+
+  // TODO: Gallery Entity Link
+  // TODO: Amenity Entity link
 }
 @ObjectType()
 export class ListHostelsResponse {

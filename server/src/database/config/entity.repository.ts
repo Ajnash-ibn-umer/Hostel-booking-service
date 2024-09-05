@@ -74,6 +74,15 @@ export class EntityRepository<T extends Document> {
     return resp.deletedCount;
   }
 
+  async updateMany(
+    filterQuery: FilterQuery<T>,
+    updateQuery: UpdateQuery<unknown>,
+    transaction: ClientSession = null,
+  ): Promise<any> {
+    return this.entityModel.updateMany(filterQuery, updateQuery, {
+      session: transaction,
+    });
+  }
   async bulkWriteMany(
     updateOperation: AnyBulkWriteOperation[],
     transaction: ClientSession = null,

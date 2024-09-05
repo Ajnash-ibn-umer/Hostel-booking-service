@@ -33,4 +33,7 @@ export class Room extends PartialType(Base) {
 
   @Field(() => [Bed], { nullable: true })
   beds: Bed[];
+
+  // TODO: Gallery Entity Link
+  // TODO: Amenity Entity link
 }

@@ -8,7 +8,10 @@ import { BED_POSITION } from 'src/shared/variables/main.variable';
 
 @InputType()
 export class CreateBedInput {
-  @Field(() => String, { description: 'Name of the bed', nullable: false })
+  @Field(() => ID, { nullable: true, description: 'Only Use in Update' })
+  _id: string;
+
+  @Field(() => String, { description: 'Name  of the bed', nullable: false })
   name: string;
 
   @Field(() => Int, {
@@ -41,6 +44,9 @@ export class CreateBedInput {
 
 @InputType()
 export class CreateRoomInput {
+  @Field(() => ID, { nullable: true, description: 'Only Use in Update' })
+  _id: string;
+
   @Field(() => String, { description: 'Name of the room', nullable: false })
   name: string;
 
@@ -69,7 +75,7 @@ export class CreateRoomInput {
   galleryIds: string[];
 
   @Field(() => [ID], { nullable: true })
-  aminities: string[];
+  aminityIds: string[];
 }
 
 @InputType()
@@ -132,7 +138,7 @@ export class CreateHostelInput {
   priceBaseMode: number;
 
   @Field(() => [CreateRoomInput], { nullable: true })
-  rooms: CreateRoomInput[];
+  rooms?: CreateRoomInput[];
 
   @Field(() => ID, { nullable: true })
   categoryId: string;
@@ -141,5 +147,5 @@ export class CreateHostelInput {
   galleryIds: string[];
 
   @Field(() => [ID], { nullable: true })
-  aminities: string[];
+  aminityIds: string[];
 }
