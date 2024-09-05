@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
@@ -8,14 +13,16 @@ import { USER_TYPES } from 'src/shared/variables/main.variable';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService, private readonly reflector: Reflector) { }
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly reflector: Reflector,
+  ) {}
 
   canActivate(
     context: GqlExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-
     const ctx = GqlExecutionContext.create(context);
-    const token = this.extractTokenFromHeader(ctx)
+    const token = this.extractTokenFromHeader(ctx);
     if (!token) {
       throw new UnauthorizedException();
     }
@@ -29,14 +36,14 @@ export class AuthGuard implements CanActivate {
     if (userTypes && !userTypes.includes(decoded.userType)) {
       throw new UnauthorizedException();
     }
-    console.log({decoded})
+    console.log({ decoded });
     ctx.getContext().req['user'] = decoded;
     return true;
   }
 
-  private extractTokenFromHeader(ctx: GqlExecutionContext,): string | undefined {
-    const str = ctx.getContext().req.headers.authorization
-    if(!str || str ==="") return undefined;
+  private extractTokenFromHeader(ctx: GqlExecutionContext): string | undefined {
+    const str = ctx.getContext().req.headers.authorization;
+    if (!str || str === '') return undefined;
     const [type, token] = str.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }

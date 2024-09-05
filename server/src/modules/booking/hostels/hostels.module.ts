@@ -7,6 +7,9 @@ import { HostelRepository } from './repositories/hostel.repository';
 import { RoomRepository } from './repositories/room.repository';
 import { BedRepository } from './repositories/bed.repository';
 import { CounterService } from 'src/modules/counter/counter.service';
+import { HostelAmenitiesLink } from 'src/database/models/join_tables/hostel_x_amenities.model';
+import { HostelAmenityLinksRepository } from './repositories/hostel_amenity_link.repository';
+import { HostelGalleryLinksRepository } from './repositories/hostel_gallery_link.repository';
 
 @Module({
   providers: [
@@ -16,12 +19,17 @@ import { CounterService } from 'src/modules/counter/counter.service';
     HostelRepository,
     RoomRepository,
     BedRepository,
+    HostelAmenityLinksRepository,
+    HostelGalleryLinksRepository,
   ],
   imports: [
     MongooseModule.forFeature([
       ModelDefinitions.bedModel,
       ModelDefinitions.hostelModel,
       ModelDefinitions.roomModel,
+      ModelDefinitions.galleryModel,
+      ModelDefinitions.galleryHostelLinksModel,
+      ModelDefinitions.hostelAmenitiesLinksModel,
     ]),
   ],
 })

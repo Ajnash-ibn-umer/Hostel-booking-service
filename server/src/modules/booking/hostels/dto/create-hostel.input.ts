@@ -64,6 +64,12 @@ export class CreateRoomInput {
     nullable: true,
   })
   beds: CreateBedInput[];
+
+  @Field(() => [ID], { nullable: true })
+  galleryIds: string[];
+
+  @Field(() => [ID], { nullable: true })
+  aminities: string[];
 }
 
 @InputType()
@@ -127,4 +133,13 @@ export class CreateHostelInput {
 
   @Field(() => [CreateRoomInput], { nullable: true })
   rooms: CreateRoomInput[];
+
+  @Field(() => ID, { nullable: true })
+  categoryId: string;
+
+  @Field(() => [ID], { nullable: true })
+  galleryIds: string[];
+
+  @Field(() => [ID], { nullable: true })
+  aminities: string[];
 }

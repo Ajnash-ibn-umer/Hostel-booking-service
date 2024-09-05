@@ -26,7 +26,10 @@ export class HostelsResolver {
     @Args('createHostelInput') createHostelInput: CreateHostelInput,
     @Context() context,
   ) {
-    console.log({ req: context.req.userId });
-    return this.hostelsService.create(createHostelInput, context.req.userId);
+    console.log({ req: context.req.user });
+    return this.hostelsService.create(
+      createHostelInput,
+      context.req.user.userId,
+    );
   }
 }

@@ -13,12 +13,18 @@ import { CounterService } from 'src/modules/counter/counter.service';
 import { MODEL_NAMES } from 'src/database/modelNames';
 import { generateSlug } from 'src/shared/utils/slug_gen';
 import { BedRepository } from '../repositories/bed.repository';
+import { HostelAmenityLinksRepository } from '../repositories/hostel_amenity_link.repository';
+import { HostelAmenitiesLinkDocument } from 'src/database/models/join_tables/hostel_x_amenities.model';
+import { HostelGalleryLinksRepository } from '../repositories/hostel_gallery_link.repository';
 @Injectable()
 export class HostelsService {
   constructor(
     private readonly hostelRepository: HostelRepository,
     private readonly roomRepository: RoomRepository,
     private readonly bedRepository: BedRepository,
+    private readonly hostelAmenityLinkRepo: HostelAmenityLinksRepository,
+    private readonly hostelgalleryLinkRepo: HostelGalleryLinksRepository,
+
     private readonly counterService: CounterService,
     @InjectConnection()
     private readonly connection: mongoose.Connection,
@@ -77,6 +83,7 @@ export class HostelsService {
               paymentBase: bed.paymentBase,
               roomId: roomId.toString(),
               roomTypeId: bed.roomTypeId,
+              propertyId: newhostel._id,
 
               status: STATUS_NAMES.ACTIVE,
               createdAt: time,
@@ -84,6 +91,27 @@ export class HostelsService {
             });
           }
         }
+      }
+
+      if (dto.aminities && dto.aminities.length > 0) {
+        const amenitiesLinks: any = dto.aminities.map((id) => ({
+          hostelId: newhostel._id,
+          amenityId: id,
+          status: STATUS_NAMES.ACTIVE,
+          createdAt: time,
+          createdUserId: userId,
+        }));
+        await this.hostelAmenityLinkRepo.insertMany(amenitiesLinks, txnSession);
+      }
+      if (dto.galleryIds && dto.galleryIds.length > 0) {
+        const galleriesLinks: any = dto.galleryIds.map((id) => ({
+          hostelId: newhostel._id,
+          galleryId: id,
+          status: STATUS_NAMES.ACTIVE,
+          createdAt: time,
+          createdUserId: userId,
+        }));
+        await this.hostelgalleryLinkRepo.insertMany(galleriesLinks, txnSession);
       }
       const roomResp = await this.roomRepository.insertMany(
         instertingRooms,
@@ -93,6 +121,9 @@ export class HostelsService {
         insertingBeds,
         txnSession,
       );
+      console.log({ bedsResp });
+      roomResp['beds'] = bedsResp;
+      newhostel['rooms'] = roomResp;
 
       await txnSession.commitTransaction();
       return newhostel;

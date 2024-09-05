@@ -23,6 +23,9 @@ export class Bed extends Base {
   @Prop({ type: SchemaTypes.ObjectId, required: true, default: null })
   roomId: string;
 
+  @Prop({ type: SchemaTypes.ObjectId, required: true, default: null })
+  propertyId: string;
+
   @Prop({ type: SchemaTypes.ObjectId, required: false, default: null })
   roomTypeId: string;
 
@@ -37,7 +40,7 @@ BedSchema.index({ room_id: 1 });
 BedSchema.index({ roomTypeId: 1 });
 BedSchema.index({ availability_status: 1 });
 BedSchema.index(
-  { name: 1 },
+  { name: 1, propertyId: 1, roomId: 1 },
   { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
 );
 BedSchema.post('save', async function (error, doc, next) {

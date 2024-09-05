@@ -39,6 +39,9 @@ export class Hostel extends PartialType(Base) {
   })
   availabilityStatus: number;
 
+  @Field(() => ID, { nullable: true })
+  categoryId: string;
+
   @Field(() => ID, {
     description: 'Location ID of the hostel',
     nullable: true,

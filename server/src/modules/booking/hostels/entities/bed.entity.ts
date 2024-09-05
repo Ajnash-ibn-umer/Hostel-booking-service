@@ -33,6 +33,9 @@ export class Bed extends PartialType(Base) {
   @Field(() => ID, { description: 'Room ID of the bed', nullable: true })
   roomId: string;
 
+  @Field(() => ID, { description: 'Hostel ID of the bed', nullable: true })
+  propertyId: string;
+
   @Field(() => ID, { description: 'Room type ID of the bed', nullable: true })
   roomTypeId: string;
 

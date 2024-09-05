@@ -3,6 +3,7 @@ import { BedSchema } from './models/bed.model';
 import { CounterSchema } from './models/counter.model';
 import { GallerySchema } from './models/gallery.model';
 import { HostelSchema } from './models/hostel.model';
+import { HostelAmenitiesLinkSchema } from './models/join_tables/hostel_x_amenities.model';
 import { HostelGalleryLinkSchema } from './models/join_tables/hostel_x_gallery.model';
 import { RoomSchema } from './models/room.model';
 import { UserSchema } from './models/user.model';
@@ -35,5 +36,13 @@ export const ModelDefinitions = {
   roomModel: {
     name: MODEL_NAMES.ROOM,
     schema: RoomSchema,
+  },
+  // amenitiesModel: {
+  //   name: MODEL_NAMES.AMENITIES,
+  //   schema: AmenitySchema,
+  // },
+  hostelAmenitiesLinksModel: {
+    name: MODEL_NAMES.HOSTEL_X_AMENITIES,
+    schema: HostelAmenitiesLinkSchema,
   },
 };

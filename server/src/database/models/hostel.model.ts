@@ -33,6 +33,9 @@ export class Hostel extends Base {
   @Prop({ default: '' })
   shortDescription: string;
 
+  @Prop({ required: true, default: '',index:true })
+  categoryId: string;
+
   @Prop({ default: '' })
   description: string;
 
