@@ -2,6 +2,7 @@ import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 import enumToString from 'src/shared/utils/enumTostring';
 import { STATUS_NAMES } from 'src/shared/variables/main.variable';
 import mongoose from 'mongoose';
+import { User } from 'src/modules/user/entities/user.entity';
 @ObjectType()
 export class generalResponse {
   @Field()

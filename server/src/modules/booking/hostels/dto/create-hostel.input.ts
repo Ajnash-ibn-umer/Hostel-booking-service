@@ -8,9 +8,6 @@ import { BED_POSITION } from 'src/shared/variables/main.variable';
 
 @InputType()
 export class CreateBedInput {
-  @Field(() => ID, { nullable: true, description: 'Only Use in Update' })
-  _id: string;
-
   @Field(() => String, { description: 'Name  of the bed', nullable: false })
   name: string;
 
@@ -44,9 +41,6 @@ export class CreateBedInput {
 
 @InputType()
 export class CreateRoomInput {
-  @Field(() => ID, { nullable: true, description: 'Only Use in Update' })
-  _id: string;
-
   @Field(() => String, { description: 'Name of the room', nullable: false })
   name: string;
 

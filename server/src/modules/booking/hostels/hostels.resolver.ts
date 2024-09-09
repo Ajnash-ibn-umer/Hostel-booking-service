@@ -7,9 +7,10 @@ import {
   Context,
   GraphQLExecutionContext,
   GqlContextType,
+  Info,
 } from '@nestjs/graphql';
 import { HostelsService } from './services/hostels.service';
-import { Hostel } from './entities/hostel.entity';
+import { Hostel, ListHostelsResponse } from './entities/hostel.entity';
 import { CreateHostelInput } from './dto/create-hostel.input';
 import { UpdateHostelInput } from './dto/update-hostel.input';
 import { UserTypes } from 'src/shared/decorators';
@@ -17,6 +18,9 @@ import { USER_TYPES } from 'src/shared/variables/main.variable';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { statusChangeInput } from 'src/shared/graphql/entities/main.dto';
+import { ListInputHostel } from './dto/list-hostel.input';
+import { GraphQLResolveInfo } from 'graphql';
+import getProjection from 'src/shared/graphql/queryProjection';
 @UseGuards(AuthGuard)
 @Resolver(() => Hostel)
 export class HostelsResolver {
@@ -57,5 +61,16 @@ export class HostelsResolver {
       statusChangeInput,
       context.req.user.userId,
     );
+  }
+
+  @Query(() => ListHostelsResponse, { name: 'Hostel_List' })
+  @UserTypes([USER_TYPES.ADMIN, USER_TYPES.USER])
+  listHostels(
+    @Args('listInputHostel') listInputHostel: ListInputHostel,
+    @Info() info: GraphQLResolveInfo,
+  ) {
+    const projection = getProjection(info.fieldNodes[0]);
+
+    return this.hostelsService.listHostels(listInputHostel, projection);
   }
 }

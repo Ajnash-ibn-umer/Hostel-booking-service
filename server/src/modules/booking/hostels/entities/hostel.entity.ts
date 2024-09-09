@@ -6,6 +6,8 @@ import {
 import { Base } from 'src/shared/graphql/entities/main.entity';
 import enumToString from 'src/shared/utils/enumTostring';
 import { Room } from './room.entity';
+import { User } from 'src/modules/user/entities/user.entity';
+import { Amenity } from '../../amenities/entities/amenity.entity';
 
 @ObjectType()
 export class Hostel extends PartialType(Base) {
@@ -82,6 +84,17 @@ export class Hostel extends PartialType(Base) {
   @Field(() => [Room], { nullable: true })
   rooms: Room[];
 
+  @Field(() => User, { nullable: true })
+  createdUser?: User;
+
+  @Field(() => User, { nullable: true })
+  updatedUser?: User;
+
+  @Field(() => [Amenity], { nullable: true })
+  amenities: Amenity[];
+
+  // @Field(() => [Gallery], { nullable: true })
+  // galleries: Gallery[];
   // TODO: Gallery Entity Link
   // TODO: Amenity Entity link
 }

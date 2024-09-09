@@ -10,4 +10,6 @@ export enum MODEL_NAMES {
   ROOM_X_AMENITIES = 'room_amenities_links',
   BED = 'beds',
   ROOM = 'rooms',
+  LOCATION = 'locations',
+  CATEGORY = 'categories',
 }

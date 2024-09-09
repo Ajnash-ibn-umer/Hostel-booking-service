@@ -13,3 +13,55 @@ export class statusChangeInput {
   })
   _status: STATUS_NAMES;
 }
+
+@InputType()
+export class GenericListInput {
+  @Field(() => Number, {
+    nullable: true,
+    description: `createdAt = 0,
+  status = 1,`,
+  })
+  sortType: number;
+
+  @Field({
+    nullable: true,
+    description: '1: Ascending order,-1 : Descending order',
+  })
+  sortOrder: number;
+
+  @Field(() => [Int], {
+    description: `DEFAULT=-1,
+  ACTIVE = 1,
+  DELETE = 2,
+  INACTIVE = 0,`,
+  })
+  statusArray: number[];
+
+  @Field(() => Int, {
+    description: 'if limit or skip is -1 : unlimited fetching',
+  })
+  limit: number;
+
+  @Field(() => Int, { nullable: true })
+  skip: number;
+
+  @Field({ nullable: true })
+  searchingText: string;
+}
+
+@InputType()
+export class RangeInput {
+  @Field(() => Number, { nullable: false, description: 'Start date' })
+  from: number;
+
+  @Field(() => Number, { nullable: false, description: 'End date' })
+  to: number;
+}
+@InputType()
+export class DateRangeInput {
+  @Field(() => Date, { nullable: false, description: 'Start date' })
+  from: Date;
+
+  @Field(() => Date, { nullable: false, description: 'End date' })
+  to: Date;
+}

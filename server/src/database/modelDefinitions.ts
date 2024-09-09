@@ -1,5 +1,7 @@
 import { MODEL_NAMES } from './modelNames';
+import { AmenitySchema } from './models/amenity.model';
 import { BedSchema } from './models/bed.model';
+import { CategorySchema } from './models/category.model';
 import { CounterSchema } from './models/counter.model';
 import { GallerySchema } from './models/gallery.model';
 import { HostelSchema } from './models/hostel.model';
@@ -7,6 +9,7 @@ import { HostelAmenitiesLinkSchema } from './models/join_tables/hostel_x_ameniti
 import { HostelGalleryLinkSchema } from './models/join_tables/hostel_x_gallery.model';
 import { RoomAmenitiesLinkSchema } from './models/join_tables/room_x_amenities.model';
 import { RoomGalleryLinkSchema } from './models/join_tables/room_x_gallery.model';
+import { LocationSchema } from './models/location.model';
 import { RoomSchema } from './models/room.model';
 import { UserSchema } from './models/user.model';
 
@@ -43,10 +46,10 @@ export const ModelDefinitions = {
     name: MODEL_NAMES.ROOM,
     schema: RoomSchema,
   },
-  // amenitiesModel: {
-  //   name: MODEL_NAMES.AMENITIES,
-  //   schema: AmenitySchema,
-  // },
+  amenitiesModel: {
+    name: MODEL_NAMES.AMENITIES,
+    schema: AmenitySchema,
+  },
   hostelAmenitiesLinksModel: {
     name: MODEL_NAMES.HOSTEL_X_AMENITIES,
     schema: HostelAmenitiesLinkSchema,
@@ -54,5 +57,13 @@ export const ModelDefinitions = {
   roomAmenitiesLinksModel: {
     name: MODEL_NAMES.ROOM_X_AMENITIES,
     schema: RoomAmenitiesLinkSchema,
+  },
+  locationModel: {
+    name: MODEL_NAMES.LOCATION,
+    schema: LocationSchema,
+  },
+  categoryModel: {
+    name: MODEL_NAMES.CATEGORY,
+    schema: CategorySchema,
   },
 };

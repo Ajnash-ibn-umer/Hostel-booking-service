@@ -21,10 +21,10 @@ export type HostelDocument = HydratedDocument<Hostel>;
 
 @Schema()
 export class Hostel extends Base {
-  @Prop({ required: true, unique: true, default: '' })
+  @Prop({ required: true, default: '' })
   name: string;
 
-  @Prop({ required: true, unique: true, default: '' })
+  @Prop({ required: true, default: '' })
   propertyNo: string;
 
   @Prop({ required: true, default: '' })
@@ -33,7 +33,7 @@ export class Hostel extends Base {
   @Prop({ default: '' })
   shortDescription: string;
 
-  @Prop({ required: true, default: '',index:true })
+  @Prop({ required: true, default: '', index: true })
   categoryId: string;
 
   @Prop({ default: '' })

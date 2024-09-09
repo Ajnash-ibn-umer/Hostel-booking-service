@@ -2,7 +2,7 @@ import { STATUS_NAMES } from 'src/shared/variables/main.variable';
 import { MODEL_NAMES } from './../../../database/modelNames';
 
 interface lookupInterface {
-  modelName:  MODEL_NAMES;
+  modelName: MODEL_NAMES;
   responseName: string;
   params: Object;
   conditions: {
@@ -10,14 +10,13 @@ interface lookupInterface {
   };
   conditionWithArray?: {
     [key: string]: any;
-  },
+  };
   isStatusNullable?: boolean;
   project?: object;
   status?: STATUS_NAMES;
   isNeedUnwind?: boolean;
   innerPipeline?: object[];
 }
-
 
 export const Lookup = (
   {
@@ -40,22 +39,22 @@ export const Lookup = (
 
   if (!isStatusNullable) {
     conditionsList.push({
-      $eq: ['$_status', status],
+      $eq: ['$status', status],
     });
   }
-  
+
   if (conditionWithArray) {
     // console.log("with array",conditionWithArray);
-    
-    conditionsList.push(...Object.entries(conditionWithArray).map((value, idx) => ({
-      $in: [value[0], value[1]],
-    })))
-  // console.log("conditions with array:--",conditionsList);
 
+    conditionsList.push(
+      ...Object.entries(conditionWithArray).map((value, idx) => ({
+        $in: [value[0], value[1]],
+      })),
+    );
+    // console.log("conditions with array:--",conditionsList);
   }
   // console.log("conditions:--",conditionsList);
-  
- 
+
   // console.log(Object.entries(conditions));
   const pipeline: any = [
     {
@@ -68,7 +67,8 @@ export const Lookup = (
   ];
   if (project) pipeline.push(project);
 
-  if (innerPipeline && innerPipeline.length > 0) pipeline.push(...innerPipeline);
+  if (innerPipeline && innerPipeline.length > 0)
+    pipeline.push(...innerPipeline);
 
   const array: any[] = [
     {
@@ -83,11 +83,11 @@ export const Lookup = (
 
   isNeedUnwind
     ? array.push({
-      $unwind: {
-        path: `$${responseName}`,
-        preserveNullAndEmptyArrays: true,
-      },
-    })
+        $unwind: {
+          path: `$${responseName}`,
+          preserveNullAndEmptyArrays: true,
+        },
+      })
     : '';
 
   //TODO: push if need extra pipes

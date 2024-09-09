@@ -5,7 +5,7 @@ import { GraphQLError } from 'graphql';
 import { HostelRepository } from '../repositories/hostel.repository';
 import { RoomRepository } from '../repositories/room.repository';
 import { InjectConnection } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import mongoose, { PipelineStage } from 'mongoose';
 import { Room } from 'src/database/models/room.model';
 import { Bed } from 'src/database/models/bed.model';
 import { STATUS_NAMES } from 'src/shared/variables/main.variable';
@@ -19,6 +19,16 @@ import { HostelGalleryLinksRepository } from '../repositories/hostel_gallery_lin
 import { RoomAmenitiesLinksRepository } from '../repositories/room_amenity_link.repository';
 import { RoomGalleryLinksRepository } from '../repositories/room_gallery_link.repository';
 import { statusChangeInput } from 'src/shared/graphql/entities/main.dto';
+import { ListInputHostel } from '../dto/list-hostel.input';
+import { ListHostelsResponse } from '../entities/hostel.entity';
+import {
+  MatchList,
+  Paginate,
+  Search,
+} from 'src/shared/utils/mongodb/filtration.util';
+import { Lookup } from 'src/shared/utils/mongodb/lookupGenerator';
+import { responseFormat } from 'src/shared/graphql/queryProjection';
+
 @Injectable()
 export class HostelsService {
   constructor(
@@ -440,5 +450,157 @@ export class HostelsService {
         },
       });
     }
+  }
+
+  async listHostels(
+    dto: ListInputHostel,
+    projection: Record<string, any>,
+  ): Promise<ListHostelsResponse> {
+    const pipeline: any[] = [];
+    if (dto.searchingText && dto.searchingText !== '') {
+      pipeline.push(
+        Search(
+          [
+            'propertyNo',
+            'slug',
+            'name',
+            'shortDescription',
+            'description',
+            'totalRooms',
+          ],
+          dto.searchingText,
+        ),
+      );
+    }
+
+    pipeline.push(
+      ...MatchList([
+        {
+          match: { status: dto.statusArray },
+          _type_: 'number',
+          required: true,
+        },
+        {
+          match: { _id: dto.hostelIds },
+          _type_: 'string',
+          required: false,
+        },
+        {
+          match: { categoryId: dto.categoryIds },
+          _type_: 'string',
+          required: false,
+        },
+        {
+          match: { locationId: dto.locationIds },
+          _type_: 'string',
+          required: false,
+        },
+        {
+          match: { propertyNo: dto.propertyNumberFilter },
+          _type_: 'string',
+          required: false,
+        },
+        {
+          match: { availabilityStatus: dto.availblityStatusFilter },
+          _type_: 'number',
+          required: false,
+        },
+        {
+          match: { priceBaseMode: dto.priceBaseModeFilter },
+          _type_: 'number',
+          required: false,
+        },
+      ]),
+    );
+
+    if (dto.amenityIds && dto.amenityIds.length > 0) {
+      const aIds = dto.amenityIds.map((id) => new mongoose.Types.ObjectId(id));
+      pipeline.push(
+        ...Lookup({
+          modelName: MODEL_NAMES.HOSTEL_X_AMENITIES,
+          params: { id: '$_id' },
+          conditions: { $hostelId: '$$id' },
+          responseName: 'amenityLink',
+          conditionWithArray: {
+            $amenityId: aIds,
+          },
+        }),
+
+        {
+          $match: {
+            amenityLink: { $ne: null },
+          },
+        },
+      );
+    }
+    switch (dto.sortType) {
+      case 0:
+        pipeline.push({
+          $sort: {
+            createdAt: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 1:
+        pipeline.push({
+          $sort: {
+            name: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 2:
+        pipeline.push({
+          $sort: {
+            status: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      default:
+        pipeline.push({
+          $sort: {
+            _id: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+    }
+
+    pipeline.push(...Paginate(dto.skip, dto.limit));
+
+    projection && pipeline.push(responseFormat(projection['list']));
+
+    if (projection['list']['amenities']) {
+      pipeline.push(
+        ...Lookup({
+          modelName: MODEL_NAMES.HOSTEL_X_AMENITIES,
+          params: { id: '$_id' },
+          conditions: { $hostelId: '$$id' },
+          responseName: 'amenities',
+          isNeedUnwind: false,
+          innerPipeline: [
+            ...Lookup({
+              modelName: MODEL_NAMES.AMENITIES,
+              params: { id: '$amenityId' },
+              project: responseFormat(projection['list']['amenities']),
+              conditions: { $_id: '$$id' },
+              responseName: 'amenitiesData',
+            }),
+          ],
+        }),
+        {
+          $addFields: {
+            amenities: '$amenities.amenitiesData',
+          },
+        },
+      );
+    }
+    const list =
+      ((await this.hostelRepository.aggregate(
+        pipeline as PipelineStage[],
+      )) as any[]) || [];
+    console.log(list);
+    return {
+      list,
+      totalCount: list.length,
+    };
   }
 }
