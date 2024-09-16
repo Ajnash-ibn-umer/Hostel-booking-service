@@ -15,6 +15,23 @@ export class statusChangeInput {
 }
 
 @InputType()
+export class RangeInput {
+  @Field(() => Number, { nullable: false, description: 'Start date' })
+  from: number;
+
+  @Field(() => Number, { nullable: false, description: 'End date' })
+  to: number;
+}
+@InputType()
+export class DateRangeInput {
+  @Field(() => Date, { nullable: false, description: 'Start date' })
+  from: Date;
+
+  @Field(() => Date, { nullable: false, description: 'End date' })
+  to: Date;
+}
+
+@InputType()
 export class GenericListInput {
   @Field(() => Number, {
     nullable: true,
@@ -22,6 +39,11 @@ export class GenericListInput {
   status = 1,`,
   })
   sortType: number;
+
+  @Field(() => DateRangeInput, {
+    nullable: true,
+  })
+  dateFilter: DateRangeInput;
 
   @Field({
     nullable: true,
@@ -47,21 +69,4 @@ export class GenericListInput {
 
   @Field({ nullable: true })
   searchingText: string;
-}
-
-@InputType()
-export class RangeInput {
-  @Field(() => Number, { nullable: false, description: 'Start date' })
-  from: number;
-
-  @Field(() => Number, { nullable: false, description: 'End date' })
-  to: number;
-}
-@InputType()
-export class DateRangeInput {
-  @Field(() => Date, { nullable: false, description: 'Start date' })
-  from: Date;
-
-  @Field(() => Date, { nullable: false, description: 'End date' })
-  to: Date;
 }

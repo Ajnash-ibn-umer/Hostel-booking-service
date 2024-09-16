@@ -1,4 +1,5 @@
 import { ObjectType, Field, Int, ID, PartialType } from '@nestjs/graphql';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Base } from 'src/shared/graphql/entities/main.entity';
 
 @ObjectType()
@@ -26,6 +27,11 @@ export class Amenity extends PartialType(Base) {
     nullable: true,
   })
   icon: string;
+
+  @Field(() => User, {
+    nullable: true,
+  })
+  createdUser: User;
 }
 @ObjectType()
 export class AmenityListResponse {

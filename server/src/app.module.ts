@@ -10,6 +10,7 @@ import { UserModule } from './modules/user/user.module';
 import { CounterModule } from './modules/counter/counter.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { LocationModule } from './modules/location/location.module';
+import { GalleryModule } from './modules/gallery/gallery.module';
 import ENV from './shared/variables/env.variables';
 
 const configService = new ConfigService()
@@ -30,7 +31,8 @@ const configService = new ConfigService()
     UserModule,
     CounterModule,
     BookingModule,
-    LocationModule
+    LocationModule,
+    GalleryModule
     ,
   ],
   controllers: [AppController],

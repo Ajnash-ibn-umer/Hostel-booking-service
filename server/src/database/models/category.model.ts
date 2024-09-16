@@ -33,7 +33,13 @@ CategorySchema.index(
     partialFilterExpression: { status: { $lt: 2 } },
   },
 );
-
+CategorySchema.index(
+  { slug: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { status: { $lt: 2 } },
+  },
+);
 CategorySchema.post('save', async function (error, doc, next) {
   schemaPostFunctionForDuplicate(error, doc, next);
 });

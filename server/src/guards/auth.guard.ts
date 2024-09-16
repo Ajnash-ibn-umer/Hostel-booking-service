@@ -22,6 +22,12 @@ export class AuthGuard implements CanActivate {
     context: GqlExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const ctx = GqlExecutionContext.create(context);
+
+    const userTypes = this.reflector.get(UserTypes, context.getHandler());
+
+    if (userTypes && userTypes.includes(USER_TYPES.PUBLIC)) {
+      return true;
+    }
     const token = this.extractTokenFromHeader(ctx);
     if (!token) {
       throw new UnauthorizedException();
@@ -30,8 +36,6 @@ export class AuthGuard implements CanActivate {
     if (!decoded) {
       throw new UnauthorizedException();
     }
-
-    const userTypes = this.reflector.get(UserTypes, context.getHandler());
 
     if (userTypes && !userTypes.includes(decoded.userType)) {
       throw new UnauthorizedException();

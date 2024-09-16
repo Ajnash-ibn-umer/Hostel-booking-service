@@ -1,63 +1,82 @@
-import { Package } from "@/types/templateTypes/package";
+"use client";
 
-interface HostelTableProps {
-  headings: string[];
-  data: Record<string, any>[];
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  //   @ts-ignore
+} from "@/components/ui/table";
+import React from "react";
+
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
 }
 
-const HostelTable = (props: HostelTableProps) => {
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+}: DataTableProps<TData, TValue>) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
-    <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
-      <div className="max-w-full overflow-x-auto">
-        <table className="w-full table-auto">
-          <thead>
-            <tr className="bg-[#F7F9FC] text-left dark:bg-dark-2">
-              {props.headings &&
-                props.headings.map((head, index) => (
-                  <th
-                    key={index + Number(Date.now())}
-                    className="min-w-[220px] px-4 py-4 font-medium text-dark dark:text-white xl:pl-7.5"
-                  >
-                    {head}
-                  </th>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows && table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
                 ))}
-            </tr>
-          </thead>
-          <tbody>
-            {props.data.map((itemData, index) => (
-              <tr key={index}>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pl-7.5 ${index === props.data.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  {itemData.name || ""}
-                </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pl-7.5 ${index === props.data.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  {itemData.propertyNo || ""}
-                </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pl-7.5 ${index === props.data.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  {itemData.sellingPrice || ""}
-                </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pl-7.5 ${index === props.data.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  {itemData.standardPrice || ""}
-                </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pl-7.5 ${index === props.data.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  {itemData.totalRooms || ""}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
-};
-
-export default HostelTable;
+}

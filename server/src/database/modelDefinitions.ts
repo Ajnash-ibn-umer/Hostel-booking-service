@@ -11,6 +11,7 @@ import { RoomAmenitiesLinkSchema } from './models/join_tables/room_x_amenities.m
 import { RoomGalleryLinkSchema } from './models/join_tables/room_x_gallery.model';
 import { LocationSchema } from './models/location.model';
 import { RoomSchema } from './models/room.model';
+import { RoomTypeSchema } from './models/roomTytpe.model';
 import { UserSchema } from './models/user.model';
 
 export const ModelDefinitions = {
@@ -65,5 +66,9 @@ export const ModelDefinitions = {
   categoryModel: {
     name: MODEL_NAMES.CATEGORY,
     schema: CategorySchema,
+  },
+  roomTypeModel: {
+    name: MODEL_NAMES.ROOM_TYPES,
+    schema: RoomTypeSchema,
   },
 };

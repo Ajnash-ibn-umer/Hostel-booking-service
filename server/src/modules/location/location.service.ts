@@ -8,6 +8,12 @@ import { GraphQLError } from 'graphql';
 import { dot } from 'node:test/reporters';
 import { statusChangeInput } from 'src/shared/graphql/entities/main.dto';
 import { STATUS_NAMES } from 'src/shared/variables/main.variable';
+import { ListInputLocation } from './dto/list-locaitoninput';
+import { Location, LocationListResponse } from './entities/location.entity';
+import { Paginate, Search } from 'src/shared/utils/mongodb/filtration.util';
+import { responseFormat } from 'src/shared/graphql/queryProjection';
+import { Lookup } from 'src/shared/utils/mongodb/lookupGenerator';
+import { MODEL_NAMES } from 'src/database/modelNames';
 @Injectable()
 export class LocationService {
   constructor(
@@ -18,13 +24,15 @@ export class LocationService {
   async create(createLocationInput: CreateLocationInput, userId: string) {
     const time = new Date();
     try {
+      console.log({ createLocationInput });
       const location = await this.locationRepository.create({
-        ...createLocationInput,
+        name: createLocationInput.name,
+        gps_location: createLocationInput.gps_location,
         status: STATUS_NAMES.ACTIVE,
         createdAt: time,
         createdUserId: userId,
       });
-
+      console.log({ location });
       if (!location) {
         throw 'Location creation failed';
       }
@@ -86,5 +94,85 @@ export class LocationService {
         },
       });
     }
+  }
+
+  async list(
+    dto: ListInputLocation,
+    projection: Record<string, any>,
+  ): Promise<LocationListResponse> {
+    const pipeline: any[] = [];
+
+    if (dto.searchingText && dto.searchingText !== '') {
+      pipeline.push(
+        Search(['name', 'slug', 'name', 'description'], dto.searchingText),
+      );
+    }
+
+    // Add match conditions based on dto
+    if (dto.locationIds && dto.locationIds.length > 0) {
+      pipeline.push({
+        $match: {
+          _id: {
+            $in: dto.locationIds.map((id) => new mongoose.Types.ObjectId(id)),
+          },
+          _status: {
+            $in: dto.statusArray,
+          },
+        },
+      });
+    }
+
+    switch (dto.sortType) {
+      case 0:
+        pipeline.push({
+          $sort: {
+            createdAt: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 1:
+        pipeline.push({
+          $sort: {
+            name: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 2:
+        pipeline.push({
+          $sort: {
+            status: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      default:
+        pipeline.push({
+          $sort: {
+            _id: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+    }
+    pipeline.push(...Paginate(dto.skip, dto.limit));
+    projection && pipeline.push(responseFormat(projection['list']));
+    if (projection['list']['createduser']) {
+      pipeline.push(
+        ...Lookup({
+          modelName: MODEL_NAMES.USER,
+          params: { id: '$createdUserId' },
+          conditions: { $_id: '$$id' },
+          responseName: 'createdUser',
+        }),
+      );
+    }
+    // Execute the aggregation pipeline
+    const list = (await this.locationRepository.aggregate(
+      pipeline,
+    )) as Location[];
+
+    const totalCount = await this.locationRepository.totalCount(pipeline);
+    return {
+      list,
+      totalCount: totalCount,
+    };
   }
 }

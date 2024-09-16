@@ -98,4 +98,27 @@ export class EntityRepository<T extends Document> {
   ): Promise<unknown | null> {
     return this.entityModel.aggregate(pipelineStages, aggregationOption);
   }
+
+  async totalCount(
+    pipelineStages: PipelineStage[],
+    aggregationOption?: AggregateOptions,
+  ): Promise<number> {
+    const idx = pipelineStages.findIndex((data) =>
+      data.hasOwnProperty('$limit'),
+    );
+    if (idx !== -1) {
+      pipelineStages.splice(idx, 1);
+    }
+    const idx2 = pipelineStages.findIndex((data) =>
+      data.hasOwnProperty('$skip'),
+    );
+    if (idx2 !== -1) {
+      pipelineStages.splice(idx2, 1);
+    }
+
+    const count = await this.entityModel
+      .aggregate(pipelineStages)
+      .count('totalCount');
+    return count[0]?.totalCount || 0;
+  }
 }

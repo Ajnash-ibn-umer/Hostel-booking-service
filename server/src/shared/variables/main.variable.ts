@@ -8,6 +8,7 @@ export enum STATUS_NAMES {
 export enum USER_TYPES {
   ADMIN = 1,
   USER = 2,
+  PUBLIC = 3,
   DEFAULT = -1,
 }
 

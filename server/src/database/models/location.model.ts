@@ -13,7 +13,7 @@ export type LocationDocument = HydratedDocument<Location>;
 
 @Schema()
 export class Point {
-  @Prop({ type: String, enum: ['Point'], default: 'Point' })
+  @Prop({ type: String, enum: ['Point'] })
   type: string;
 
   @Prop({ type: [Number] })
@@ -26,7 +26,15 @@ export class Location extends Base {
   name: string;
 
   @Prop({
-    type: Point,
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true,
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
   })
   gps_location: Point;
 }

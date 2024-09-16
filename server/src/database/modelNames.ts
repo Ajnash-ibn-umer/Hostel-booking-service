@@ -12,4 +12,5 @@ export enum MODEL_NAMES {
   ROOM = 'rooms',
   LOCATION = 'locations',
   CATEGORY = 'categories',
+  ROOM_TYPES = 'room_types',
 }

@@ -1,14 +1,19 @@
 "use client";
 
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import Button from "@/components/Button/Button";
+import { Button } from "@/components/ui/button";
 import ButtonDefault from "@/components/Button/Button";
 import MainTable from "@/components/Tables/MainTable";
-import { HOSTEL_LIST_DASHBOARD } from "@/graphql/queries/main.quiries";
+import {
+  HOSTEL_LIST_DASHBOARD,
+  PROPERTY_CATEGORY_LIST,
+} from "@/graphql/queries/main.quiries";
 import { useQuery } from "@apollo/client";
 import React, { useEffect, useMemo, useState } from "react";
-import HostelTable from "./hostel-table";
-import {useRouter} from 'next/navigation'
+import { DataTable } from "./hostel-table";
+import { useRouter } from "next/navigation";
+import { hostelColumns } from "./column";
+
 interface hostelListInterface {
   name: string;
   propertyNo: string;
@@ -17,12 +22,12 @@ interface hostelListInterface {
   totalRooms: number;
 }
 const HostelList: React.FC = () => {
-  const router=useRouter()
+  const router = useRouter();
   const [hostelListData, setHostelListData] = useState<
     Array<hostelListInterface>
   >([]);
 
-  const headings = ["Name", "UID", "SellingPrice", "StandardPrice","TotalRooms"];
+
 
   const inputVaribales = {
     listInputHostel: {
@@ -50,9 +55,7 @@ const HostelList: React.FC = () => {
   useEffect(() => {
     console.log(data);
     if (data) {
-      const hostelList = data.
-      Hostel_List?.list
-       || [];
+      const hostelList = data.Hostel_List?.list || [];
       console.log("inner", hostelList);
       setHostelListData(hostelList);
     }
@@ -60,8 +63,6 @@ const HostelList: React.FC = () => {
       alert(error.message);
     }
   }, [data]);
-
-  
 
   return (
     <div>
@@ -73,17 +74,10 @@ const HostelList: React.FC = () => {
 
       <div className="flex flex-col gap-10">
         <div className="flex justify-end ">
-          <Button
-            background="primary"
-            fontColor="white"
-            buttonType="rounded-corner"
-            onClick={()=>router.push('hostels/create')}
-          >
-            Create
-          </Button>
+          <Button onClick={() => router.push("hostels/create")}>Create</Button>
         </div>
 
-        <HostelTable headings={headings} data={hostelListData} />
+        <DataTable columns={hostelColumns} data={hostelListData || []} />
       </div>
     </div>
   );

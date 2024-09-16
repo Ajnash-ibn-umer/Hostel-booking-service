@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RoomTypeResolver } from './room-type.resolver';
-import { RoomTypeService } from './room-type.service';
+import { RoomTypeResolver } from '../room-type.resolver';
+import { RoomTypeService } from '../room-type.service';
 
 describe('RoomTypeResolver', () => {
   let resolver: RoomTypeResolver;
