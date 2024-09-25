@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import GraphqlProvider, { GraphqlClient } from "../graphql/graphql-client.config";
 import { USER_LIST_QUERY } from "@/graphql/queries/main.quiries";
-
+import { Toaster } from "@/components/ui/toaster"
 export default  function RootLayout({
   children,
 }: Readonly<{
@@ -29,6 +29,8 @@ export default  function RootLayout({
       <body suppressHydrationWarning={true}>
 
         {loading ? <Loader /> : children}
+
+        <Toaster />
       </body>
       </GraphqlProvider>
     </html>

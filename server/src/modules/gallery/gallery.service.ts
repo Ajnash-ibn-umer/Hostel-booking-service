@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGalleryInput } from './dto/create-gallery.input';
+import {
+  CreateGalleryInput,
+  CreateGalleryMultipleInput,
+} from './dto/create-gallery.input';
 import { UpdateGalleryInput } from './dto/update-gallery.input';
 import { GalleryRepository } from './repository/gallery.respository';
 import { InjectConnection } from '@nestjs/mongoose';
@@ -49,7 +52,47 @@ export class GalleryService {
       await txnSession.endSession();
     }
   }
+  async createMulti(dto: CreateGalleryMultipleInput, userId: string) {
+    const txnSession = await this.connection.startSession();
+    const time = new Date();
+    await txnSession.startTransaction();
+    try {
+      const counterData = await this.counterService.getCounterByEntityName({
+        entityName: MODEL_NAMES.GALLERY,
+      });
 
+      const insertionData = dto.galleryData.map((gallery) => {
+        counterData.count += 1;
+        return {
+          ...gallery,
+          uid: `${counterData.prefix}${counterData.count}`,
+          status: STATUS_NAMES.ACTIVE,
+          createdAt: time,
+          createdUserId: userId,
+        };
+      });
+
+      const finalCount = counterData.count;
+      const newCountData = await this.counterService.getAndIncrementCounter(
+        {
+          entityName: MODEL_NAMES.GALLERY,
+        },
+        finalCount,
+        txnSession,
+      );
+      const newGallery = await this.galleryRepository.insertMany(
+        insertionData as any,
+        txnSession,
+      );
+      await txnSession.commitTransaction();
+      return newGallery;
+    } catch (error) {
+      await txnSession.abortTransaction();
+      throw new Error(error);
+    } finally {
+      await txnSession.endSession();
+    }
+  }
   async update(dto: UpdateGalleryInput, userId: string) {
     const txnSession = await this.connection.startSession();
     const time = new Date();

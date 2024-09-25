@@ -6,7 +6,7 @@ export const GraphqlClient = new ApolloClient({
   uri: `${variables.backend_url}/${variables.api_endpoint}`,
   cache: new InMemoryCache(),
   headers:{
-    Authorization:`${ window !== undefined && localStorage.getItem("authToken")}`
+    Authorization:`${ typeof window !==  "undefined" && localStorage.getItem("authToken")}`
   }
 });
 

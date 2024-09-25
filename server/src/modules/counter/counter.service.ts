@@ -67,11 +67,13 @@ export class CounterService {
   async getAndIncrementCounter(
     dto: GetCounterByEntityNameInput,
     increment: number = 1,
+    session: ClientSession = null,
   ): Promise<Counter> {
     try {
       const counter = await this.counterRepository.findOneAndUpdate(
         { entityName: dto.entityName },
         { $inc: { count: increment } },
+        session,
       );
       if (!counter) {
         throw 'Failed to get or create counter';

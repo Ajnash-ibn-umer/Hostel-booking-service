@@ -293,3 +293,19 @@ export const GALLERY_CREATE_GQL=gql`mutation Gallery_Create($createGalleryInput:
     url
   }
 }`
+
+export const GALLERY_CREATE_MULTIPLE_GQL=gql`
+mutation Gallery_Multi_Create($createGalleryInput: CreateGalleryMultipleInput!) {
+  Gallery_Multi_Create(createGalleryInput: $createGalleryInput) {
+    _id
+    createdAt
+    createdUserId
+    docType
+    name
+    status
+    uid
+    updatedAt
+    updatedUserId
+    url
+  }
+}`

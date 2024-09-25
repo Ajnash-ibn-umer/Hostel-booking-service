@@ -14,7 +14,7 @@ import { UpdateRoomTypeInput } from './dto/update-room-type.input';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { statusChangeInput } from 'src/shared/graphql/entities/main.dto';
-import { ListInputRoomType } from './dto/list-room-tyoe.input';
+import { ListInputRoomType } from './dto/list-room-type.input';
 import { GraphQLResolveInfo } from 'graphql';
 import getProjection from 'src/shared/graphql/queryProjection';
 

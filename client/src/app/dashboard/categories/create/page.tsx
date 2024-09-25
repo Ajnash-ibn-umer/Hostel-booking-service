@@ -120,7 +120,7 @@ function CreateCategory() {
                     <FormItem>
                       <FormLabel>Icon</FormLabel>
                       <FormControl>
-                        <Input type="file" {...field} />
+                        {/* <Input {...field} /> */}
                       </FormControl>
                       <FormMessage />
                     </FormItem>

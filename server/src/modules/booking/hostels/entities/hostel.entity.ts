@@ -8,6 +8,9 @@ import enumToString from 'src/shared/utils/enumTostring';
 import { Room } from './room.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Amenity } from '../../amenities/entities/amenity.entity';
+import { Gallery } from 'src/modules/gallery/entities/gallery.entity';
+import { Location } from 'src/modules/location/entities/location.entity';
+import { PropertyCategory } from '../../property-category/entities/property-category.entity';
 
 @ObjectType()
 export class Hostel extends PartialType(Base) {
@@ -87,16 +90,20 @@ export class Hostel extends PartialType(Base) {
   @Field(() => User, { nullable: true })
   createdUser?: User;
 
+  @Field(() => Location, { nullable: true })
+  location?: Location;
+
+  @Field(() => PropertyCategory, { nullable: true })
+  category?: PropertyCategory;
+
   @Field(() => User, { nullable: true })
   updatedUser?: User;
 
   @Field(() => [Amenity], { nullable: true })
   amenities: Amenity[];
 
-  // @Field(() => [Gallery], { nullable: true })
-  // galleries: Gallery[];
-  // TODO: Gallery Entity Link
-  // TODO: Amenity Entity link
+  @Field(() => [Gallery], { nullable: true })
+  galleries: Gallery[];
 }
 @ObjectType()
 export class ListHostelsResponse {

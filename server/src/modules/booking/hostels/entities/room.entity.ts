@@ -1,6 +1,10 @@
 import { ObjectType, Field, ID, PartialType } from '@nestjs/graphql';
 import { Base } from 'src/shared/graphql/entities/main.entity';
 import { Bed } from './bed.entity';
+import { Gallery } from 'src/modules/gallery/entities/gallery.entity';
+import { Amenity } from '../../amenities/entities/amenity.entity';
+import { RoomType } from '../../room-type/entities/room-type.entity';
+import { Hostel } from './hostel.entity';
 
 @ObjectType()
 export class Room extends PartialType(Base) {
@@ -34,6 +38,27 @@ export class Room extends PartialType(Base) {
   @Field(() => [Bed], { nullable: true })
   beds: Bed[];
 
-  // TODO: Gallery Entity Link
-  // TODO: Amenity Entity link
+  @Field(() => [Gallery], { nullable: true })
+  galleries: Gallery[];
+
+  @Field(() => [Amenity], { nullable: true })
+  amenities: Amenity[];
+
+  @Field(() => RoomType, { description: 'Room type ID', nullable: true })
+  roomType: RoomType;
+
+  @Field(() => Hostel, {
+    description: 'Property ID of the room',
+    nullable: true,
+  })
+  property: Hostel;
+}
+
+@ObjectType()
+export class RoomListResponse {
+  @Field(() => [Room], { nullable: true })
+  list: Room[];
+
+  @Field(() => Number, { nullable: true })
+  totalRooms: number;
 }

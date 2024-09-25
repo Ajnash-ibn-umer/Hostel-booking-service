@@ -33,6 +33,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import {
   AMENITY_LIST_MINIMAL_GQL,
   GALLERY_CREATE_GQL,
+  GALLERY_CREATE_MULTIPLE_GQL,
   HOSTEL_CREATE_GQL,
   LOCATION_LIST_MINIMAL_GQL,
   PROPERTY_CATEGORY_LIST,
@@ -47,6 +48,11 @@ import MultiFileUploader from "@/components/MultiFileUploader/file-uploader";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { s3Upload } from "@/config/aws";
+import galleryUpload from "./_lib/gallery-upload";
+import { Hotel } from "lucide-react";
+import Loader from "@/components/common/Loader";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 interface CreateHostelInput {
   totalBeds: number | null;
@@ -134,7 +140,7 @@ interface RoomTypeinputVariables {
     sortOrder: number;
   };
 }
-export const formSchema = z.object({
+const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
@@ -216,7 +222,7 @@ type Room = {
   name: string;
   roomTypeId: string;
   totalBeds: number;
-  galleryIds: string[];
+  files: File[];
 };
 type Hostel = {
   rooms: Room[];
@@ -229,14 +235,17 @@ const baseListInput = {
   sortOrder: 1,
 };
 function CreateHostelForm() {
+  const { toast } = useToast();
+
   const router = useRouter();
   const [hostel, setHostel] = useState<Hostel>({
     rooms: [],
   });
+  const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [createHostel, { loading, error }] = useMutation(HOSTEL_CREATE_GQL);
   const [createGallery, { loading: galleryLoading, error: galleryError }] =
-    useMutation(GALLERY_CREATE_GQL);
+    useMutation(GALLERY_CREATE_MULTIPLE_GQL);
 
   const [catinputVariables, setCatInputVariables] = useState<CatinputVariables>(
     {
@@ -295,18 +304,18 @@ function CreateHostelForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "Default Hostel Name",
+      name: "",
       sellingPrice: "0",
       standardPrice: "0",
       totalRooms: "0",
-      shortDescription: "Default Short Description",
+      shortDescription: "",
       totalBeds: "0",
-      categoryId: "Default Category",
-      locationId: "Default Location",
+      categoryId: undefined,
+      locationId: undefined,
       availabilityStatus: "0",
-      purchaseBaseMode: "0",
+      purchaseBaseMode: "1",
       amenityIds: [],
-      description: "Default Description",
+      description: "",
       galleryIds: [],
       // rooms: [
       //   {
@@ -332,22 +341,58 @@ function CreateHostelForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({ formData: values });
-    console.log("room Data", hostel);
-
-    // upload files
-
+ 
     try {
-      const fileUploadReponses: any[] = (await s3Upload(images)) as any;
-      console.log("file UploadReponses", fileUploadReponses);
-      const fileUrls = fileUploadReponses.map((resp: any) => resp.location);
-      console.log({ images });
+      setIsLoading(true);
 
-      // const { data: galleryResponse, errors: galleryErr } = await createHostel({
-      //   variables: ,
-      // });
-    
+      const rooms: any[] = [];
 
+      if(hostel.rooms.length===0){
+        throw("Rooms is Required")
+      }
+      for (const room of hostel.rooms) {
+        let beds: any[] = [];
+        if (hostel.rooms.length !== Number(values.totalRooms)) {
+          throw `Room Count doent match `;
+        }
+        let roomGalleries: string[] = [];
+        if (room.files && room.files.length > 0) {
+          roomGalleries = await galleryUpload({
+            images: room.files,
+            createGallery,
+          });
+        }
+        if (room.beds && room.beds.length > 0) {
+          if (room.beds.length !== Number(room.totalBeds)) {
+            throw `Bed  Count doent match in room ${room.name}`;
+          }
+
+          room.beds.map((bed) => {
+            beds.push({
+              availabilityStatus: Number(bed.availabilityStatus),
+              bedPosition: Number(bed.bedPosition),
+              floor: room.floor,
+              paymentBase: Number(bed.paymentBase),
+              roomTypeId: room.roomTypeId,
+            });
+          });
+        }
+
+        rooms.push({
+          name: room.name,
+          aminityIds: room.aminityIds,
+          floor: room.floor,
+          roomTypeId: room.roomTypeId,
+          totalBeds: Number(room.totalBeds),
+          galleryIds: roomGalleries,
+          beds: beds,
+        });
+      }
+
+      let galleryIds: string[] = [];
+      if (images && images.length > 0) {
+        galleryIds = await galleryUpload({ images, createGallery });
+      }
       const inputData = {
         createHostelInput: {
           totalBeds: Number(values.totalBeds),
@@ -358,38 +403,48 @@ function CreateHostelForm() {
           priceBaseMode: Number(values.purchaseBaseMode),
           name: values.name,
           locationId: values.locationId,
-          galleryIds: [],
+          galleryIds: galleryIds,
           description: values.description,
           categoryId: values.categoryId,
           availabilityStatus: Number(values.availabilityStatus),
           aminityIds: values.amenityIds,
-          rooms: hostel.rooms.map((room) => {
-            return {
-              name: room.name,
-              aminityIds: room.aminityIds,
-              floor: room.floor,
-              roomTypeId: room.roomTypeId,
-              totalBeds: Number(room.totalBeds),
-              galleryIds: room.galleryIds,
-            };
-          }),
+          rooms: rooms,
         },
       };
       const { data, errors } = await createHostel({
         variables: inputData,
       });
+
+      setIsLoading(false);
+
       console.log({ data });
       if (data && data.Hostel_Create) {
         router.push("/dashboard/hostels");
       } else {
-        alert("response not found");
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Response not found",
+          description: "Response not found from hostel creation",
+          // action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
       }
     } catch (err: any) {
-      console.error("Category Creation error:", err);
+      setIsLoading(false);
+
       if (Array.isArray(err)) {
-        alert(err.toString());
+        toast({
+          variant: "destructive",
+          title: `Uh oh! ${err.toString() || err}.`,
+          description: err.toString(),
+          // action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
       }
-      alert(err);
+      toast({
+        variant: "destructive",
+        title: `Uh oh! ${err.message || err}.`,
+        description: err.message || err,
+        // action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
       // Handle login error (e.g., show error message)
     }
   }
@@ -404,8 +459,10 @@ function CreateHostelForm() {
               onSubmit={form.handleSubmit(onSubmit)}
               className="relative flex w-full flex-col space-y-8"
             >
-              <div className="w-full flex-row">
-                <Card className=" flex w-full flex-col p-4">
+              <div className="relative z-10 w-full flex-row">
+                {isLoading ? <Loader></Loader> : <></>}
+
+                <Card className=" relative -z-10 flex w-full flex-col p-4">
                   <Card className="mb-10 flex w-full flex-col p-5">
                     <MultiFileUploader
                       onChange={(files: File[]) => {

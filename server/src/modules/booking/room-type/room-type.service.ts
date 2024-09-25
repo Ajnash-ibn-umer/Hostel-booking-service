@@ -5,7 +5,7 @@ import { InjectConnection } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { RoomTypeRepository } from './reposiotries/roomType.repository';
 import { generalResponse } from 'src/shared/graphql/entities/main.entity';
-import { ListInputRoomType } from './dto/list-room-tyoe.input';
+import { ListInputRoomType } from './dto/list-room-type.input';
 import { STATUS_NAMES } from 'src/shared/variables/main.variable';
 import { RoomType, RoomTypeListResponse } from './entities/room-type.entity';
 import { statusChangeInput } from 'src/shared/graphql/entities/main.dto';

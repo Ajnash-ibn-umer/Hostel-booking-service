@@ -12,6 +12,7 @@ import { HostelAmenityLinksRepository } from './repositories/hostel_amenity_link
 import { HostelGalleryLinksRepository } from './repositories/hostel_gallery_link.repository';
 import { RoomAmenitiesLinksRepository } from './repositories/room_amenity_link.repository';
 import { RoomGalleryLinksRepository } from './repositories/room_gallery_link.repository';
+import { RoomsService } from './services/rooms.service';
 
 @Module({
   providers: [
@@ -25,6 +26,7 @@ import { RoomGalleryLinksRepository } from './repositories/room_gallery_link.rep
     HostelGalleryLinksRepository,
     RoomAmenitiesLinksRepository,
     RoomGalleryLinksRepository,
+    RoomsService,
   ],
   imports: [
     MongooseModule.forFeature([

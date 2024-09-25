@@ -24,10 +24,11 @@ export class AuthGuard implements CanActivate {
     const ctx = GqlExecutionContext.create(context);
 
     const userTypes = this.reflector.get(UserTypes, context.getHandler());
-
+    console.log({ userTypes });
     if (userTypes && userTypes.includes(USER_TYPES.PUBLIC)) {
       return true;
     }
+    console.log('this is not public');
     const token = this.extractTokenFromHeader(ctx);
     if (!token) {
       throw new UnauthorizedException();

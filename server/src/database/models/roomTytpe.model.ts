@@ -6,11 +6,29 @@ export type RoomTypeDocument = HydratedDocument<RoomType>;
 
 @Schema()
 export class RoomType extends Base {
-  @Prop({ required: true })
+  @Prop({ required: true, default: '' })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: '' })
   description: string;
+
+  @Prop({ required: true, default: 0 })
+  bedCount: number;
+
+  @Prop({ required: true, default: 0 })
+  securityDeposit: number;
+
+  @Prop({ required: true, default: 0 })
+  rentMonthlyUpper: number;
+
+  @Prop({ required: true, default: 0 })
+  rentMonthlyLower: number;
+
+  @Prop({ required: true, default: 0 })
+  rentDailyLower: number;
+
+  @Prop({ required: true, default: 0 })
+  rentDailyUpper: number;
 }
 
 export const RoomTypeSchema = SchemaFactory.createForClass(RoomType);

@@ -32,7 +32,7 @@ export default function MultiFileUploader({
 
   useEffect(() => {
     onChange(files);
-  }, [files, onChange]);
+  }, [files]);
 
   const removeFile = (fileToRemove: FileWithPreview) => {
     setFiles(files.filter((file) => file !== fileToRemove));

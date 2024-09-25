@@ -16,15 +16,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormField, FormMessage } from "@/components/ui/form";
 import MultiSelect from "@/components/MultiSelect/multi-selector";
 import { UseFormReturn } from "react-hook-form";
-import { formSchema } from "./page";
 import MultiFileUploader from "@/components/MultiFileUploader/file-uploader";
 export type Bed = {
   availabilityStatus: number;
   bedPosition: number;
-  floor: string;
-  name: string;
+  floor?: string;
+  name?: string;
   paymentBase: number;
-  roomTypeId: string;
+  roomTypeId?: string;
 };
 
 type Room = {
@@ -34,7 +33,7 @@ type Room = {
   name: string;
   roomTypeId: string;
   totalBeds: number;
-  galleryIds: string[];
+  files: File[];
 };
 
 type Hostel = {
@@ -55,10 +54,6 @@ export default function RoomCreationForm({
   hostel,
   setHostel,
 }: RoomCreationProps) {
-  //   const [hostel, setHostel] = useState<Hostel>({
-  //     rooms: [],
-  //   });
-
   const addRoom = () => {
     setHostel((prev: { rooms: any }) => ({
       ...prev,
@@ -71,7 +66,7 @@ export default function RoomCreationForm({
           floor: 0,
           roomTypeId: "",
           totalBeds: 0,
-          galleryIds: [],
+          files: [],
         },
       ],
     }));
@@ -102,7 +97,11 @@ export default function RoomCreationForm({
     }));
   };
 
-  const updateRoom = (index: number, field: keyof Room, value: string) => {
+  const updateRoom = (
+    index: number,
+    field: keyof Room,
+    value: string | File[] | string[],
+  ) => {
     setHostel((prev) => ({
       ...prev,
       rooms: prev.rooms.map((room, idx) =>
@@ -225,14 +224,7 @@ export default function RoomCreationForm({
                           <MultiSelect
                             selectedValues={hostel.rooms[roomIndex].aminityIds}
                             onChange={(val: string[]) => {
-                              setHostel((prev) => ({
-                                ...prev,
-                                rooms: prev.rooms.map((room, rIdx) =>
-                                  rIdx === roomIndex
-                                    ? { ...room, aminityIds: val }
-                                    : room,
-                                ),
-                              }));
+                              updateRoom(roomIndex, "aminityIds", val);
                             }}
                             values={
                               amenityData &&
@@ -252,7 +244,7 @@ export default function RoomCreationForm({
 
                           <Select
                             value={room.roomTypeId}
-                            defaultValue={"Upper"}
+                            // defaultValue={"Upper"}
                             onValueChange={(e) => {
                               console.log({ e });
                               return updateRoom(roomIndex, "roomTypeId", e);
@@ -285,44 +277,59 @@ export default function RoomCreationForm({
                       <Card className="mb-10 flex w-full flex-col p-5">
                         <MultiFileUploader
                           onChange={(files: File[]) => {
-                            console.log({ files });
-                            setInterval(() => {
-                              console.log({ files });
-                            }, 1000);
+                            updateRoom(roomIndex, "files", files);
                           }}
                         ></MultiFileUploader>
                       </Card>
-                      {/* <div className="space-y-2">
-                        <Label className="font-bold:300">Beds</Label> <br />
+                      <div className="space-y-2">
+                        <CardTitle className="font-bold:300">Beds</CardTitle>{" "}
+                        <br />
                         {room.beds.map((bed, bedIndex) => (
                           <div
                             key={bedIndex}
-                            className="flex items-center space-x-2 gap-2 justify-between align-baseline"
+                            className="grid grid-cols-3 gap-2"
                           >
                             <div className="item-between flex flex-col gap-1">
-                              <Label htmlFor={`roomRoomTypeId-${roomIndex}`}>
-                                Room Type
+                              <Label htmlFor={`roomAvailablity-${roomIndex}-${bedIndex}`}>
+                                Availablity Status
                               </Label>
-                              <Input
-                                value={bed.roomTypeId}
-                                onChange={(e) =>
-                                  updateBed(
+                              <Select
+                                value={bed.availabilityStatus.toString()}
+                                onValueChange={(e) => {
+                                  console.log({ e });
+                                  return updateBed(
                                     roomIndex,
                                     bedIndex,
-                                    "roomTypeId",
-                                    e.target.value,
-                                  )
-                                }
-                                placeholder="Room Type"
-                              />
+                                    "availabilityStatus",
+                                    e,
+                                  );
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue
+                                    id={`roomAvailablity-${roomIndex}-${bedIndex}`}
+                                    placeholder="Select a Availablity Status"
+                                  />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="0">Available</SelectItem>
+                                  <SelectItem value="1">Engaged</SelectItem>
+                                  <SelectItem value="2">Occupied</SelectItem>
+                                  <SelectItem value="3">
+                                    Not Available
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                             <div className="item-between flex flex-col gap-1">
-                              <Label htmlFor={`bedPosition-${roomIndex}`}>
+                              <Label
+                                htmlFor={`bedPosition-${roomIndex}-${bedIndex}`}
+                              >
                                 BedPosition
                               </Label>
                               <Select
                                 value={bed.bedPosition.toString()}
-                                defaultValue={"Upper"}
+                                // defaultValue="1"
                                 onValueChange={(e) => {
                                   console.log({ e });
                                   return updateBed(
@@ -337,12 +344,44 @@ export default function RoomCreationForm({
                                   <SelectValue placeholder="Select a bedPosition" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem  defaultChecked value="1">Upper</SelectItem>
+                                  <SelectItem  value="1">
+                                    Upper
+                                  </SelectItem>
                                   <SelectItem value="2">Lower</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
-
+                            <div className="item-between flex flex-col gap-1">
+                              <Label
+                                htmlFor={`paymentBase-${roomIndex}-${bedIndex}`}
+                              >
+                                Payment Base
+                              </Label>
+                              <Select
+                                value={bed.paymentBase.toString()}
+                                defaultValue="1"
+                                onValueChange={(e) => {
+                                  console.log({ e });
+                                  return updateBed(
+                                    roomIndex,
+                                    bedIndex,
+                                    "paymentBase",
+                                    e,
+                                  );
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue
+                                  // defaultValue={"1"}
+                                  placeholder="Select a Payment Base" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1">Daily</SelectItem>
+                                  <SelectItem value="2">Monthly</SelectItem>
+                                  <SelectItem value="3">Both</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -362,7 +401,7 @@ export default function RoomCreationForm({
                           <PlusCircle className="mr-2 h-4 w-4" />
                           Add Bed
                         </Button>
-                      </div> */}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}

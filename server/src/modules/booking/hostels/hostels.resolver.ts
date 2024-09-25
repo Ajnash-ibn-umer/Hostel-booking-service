@@ -21,10 +21,17 @@ import { statusChangeInput } from 'src/shared/graphql/entities/main.dto';
 import { ListInputHostel } from './dto/list-hostel.input';
 import { GraphQLResolveInfo } from 'graphql';
 import getProjection from 'src/shared/graphql/queryProjection';
+import { RoomsService } from './services/rooms.service';
+import { RoomListResponse } from './entities/room.entity';
+import { ListInputRoom } from './dto/list-room.input';
+
 @UseGuards(AuthGuard)
 @Resolver(() => Hostel)
 export class HostelsResolver {
-  constructor(private readonly hostelsService: HostelsService) {}
+  constructor(
+    private readonly hostelsService: HostelsService,
+    private readonly roomService: RoomsService,
+  ) {}
 
   @Mutation(() => Hostel, { name: 'Hostel_Create' })
   @UserTypes([USER_TYPES.ADMIN])
@@ -64,7 +71,7 @@ export class HostelsResolver {
   }
 
   @Query(() => ListHostelsResponse, { name: 'Hostel_List' })
-  @UserTypes([USER_TYPES.ADMIN, USER_TYPES.USER])
+  @UserTypes([USER_TYPES.ADMIN, USER_TYPES.USER, USER_TYPES.PUBLIC])
   listHostels(
     @Args('listInputHostel') listInputHostel: ListInputHostel,
     @Info() info: GraphQLResolveInfo,
@@ -72,5 +79,16 @@ export class HostelsResolver {
     const projection = getProjection(info.fieldNodes[0]);
 
     return this.hostelsService.listHostels(listInputHostel, projection);
+  }
+
+  @Query(() => RoomListResponse, { name: 'Room_List' })
+  @UserTypes([USER_TYPES.ADMIN, USER_TYPES.USER, USER_TYPES.PUBLIC])
+  listRooms(
+    @Args('listInputRoom') listInputRoom: ListInputRoom,
+    @Info() info: GraphQLResolveInfo,
+  ) {
+    const projection = getProjection(info.fieldNodes[0]);
+
+    return this.roomService.listRoom(listInputRoom, projection);
   }
 }

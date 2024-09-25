@@ -14,21 +14,20 @@ const config = {
 };
 
 export const s3Upload = async (files: File[]) => {
-  const responses: any[] = [];
-
   return new Promise(async (resolve, reject) => {
     console.log({ config });
+    const responses: any[] = [];
+
     try {
       for (let file of files) {
-        console.log({ file });
-        const resp = await uploadFile(file, config);
-
-        responses.push(resp);
+        responses.push(uploadFile(file, config));
       }
+      const resp = await Promise.all(responses);
+      console.log({ resp });
+      resolve(resp);
     } catch (error) {
+      console.log({error})
       reject(error);
     }
-
-    resolve(responses);
   });
 };

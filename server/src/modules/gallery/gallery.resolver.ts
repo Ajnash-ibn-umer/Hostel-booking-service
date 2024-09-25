@@ -9,7 +9,10 @@ import {
 } from '@nestjs/graphql';
 import { GalleryService } from './gallery.service';
 import { Gallery } from './entities/gallery.entity';
-import { CreateGalleryInput } from './dto/create-gallery.input';
+import {
+  CreateGalleryInput,
+  CreateGalleryMultipleInput,
+} from './dto/create-gallery.input';
 import { UpdateGalleryInput } from './dto/update-gallery.input';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -33,6 +36,19 @@ export class GalleryResolver {
     @Context() context,
   ) {
     return this.galleryService.create(
+      createGalleryInput,
+      context.req.user.userId,
+    );
+  }
+
+  @UserTypes([USER_TYPES.ADMIN, USER_TYPES.USER])
+  @Mutation(() => [Gallery], { name: 'Gallery_Multi_Create' })
+  createMultiGallery(
+    @Args('createGalleryInput')
+    createGalleryInput: CreateGalleryMultipleInput,
+    @Context() context,
+  ) {
+    return this.galleryService.createMulti(
       createGalleryInput,
       context.req.user.userId,
     );

@@ -1,6 +1,8 @@
 import { MODEL_NAMES } from './modelNames';
 import { AmenitySchema } from './models/amenity.model';
 import { BedSchema } from './models/bed.model';
+import { BookingStatusHistorySchema } from './models/booking-status.model';
+import { BookingSchema } from './models/booking.model';
 import { CategorySchema } from './models/category.model';
 import { CounterSchema } from './models/counter.model';
 import { GallerySchema } from './models/gallery.model';
@@ -70,5 +72,14 @@ export const ModelDefinitions = {
   roomTypeModel: {
     name: MODEL_NAMES.ROOM_TYPES,
     schema: RoomTypeSchema,
+  },
+
+  bookingModel: {
+    name: MODEL_NAMES.BOOKING,
+    schema: BookingSchema,
+  },
+  bookingStatusHistoryModel: {
+    name: MODEL_NAMES.BOOKING_STATUS_HISTORY,
+    schema: BookingStatusHistorySchema,
   },
 };

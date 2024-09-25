@@ -26,7 +26,7 @@ export class Bed extends Base {
   @Prop({ type: SchemaTypes.ObjectId, required: true, default: null })
   propertyId: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, required: false, default: null })
+  @Prop({ type: SchemaTypes.ObjectId, required: true, default: null })
   roomTypeId: string;
 
   @Prop({ required: false, default: '' })

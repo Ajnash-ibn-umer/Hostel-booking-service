@@ -16,3 +16,9 @@ export class CreateGalleryInput {
   @Field(() => Int, { description: enumToString(DOC_TYPE) })
   docType: DOC_TYPE;
 }
+
+@InputType()
+export class CreateGalleryMultipleInput {
+  @Field(() => [CreateGalleryInput])
+  galleryData: CreateGalleryInput[];
+}
