@@ -442,4 +442,24 @@ export class BookingService {
       await txnSession.endSession();
     }
   }
+
+  async verifyPayment() {
+    const startTime = Date.now();
+    const txnSession = await this.connection.startSession();
+
+    await txnSession.startTransaction();
+    try {
+      return {
+        message: 'Booking status updated successfully',
+      };
+    } catch (error) {
+      return new GraphQLError(error, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    } finally {
+      await txnSession.endSession();
+    }
+  }
 }

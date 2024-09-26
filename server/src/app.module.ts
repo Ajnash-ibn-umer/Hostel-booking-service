@@ -11,6 +11,7 @@ import { CounterModule } from './modules/counter/counter.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { LocationModule } from './modules/location/location.module';
 import { GalleryModule } from './modules/gallery/gallery.module';
+import { PaymentGatewayModule } from './modules/payment-gateway/service/payment-gateway.module';
 import ENV from './shared/variables/env.variables';
 
 const configService = new ConfigService()
@@ -32,7 +33,8 @@ const configService = new ConfigService()
     CounterModule,
     BookingModule,
     LocationModule,
-    GalleryModule
+    GalleryModule,
+    PaymentGatewayModule
     ,
   ],
   controllers: [AppController],

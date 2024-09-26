@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as compression from 'compression';
 import * as express from 'express';
 import { join } from 'path';
+
 import next from 'next';
 
 async function bootstrap() {
@@ -31,19 +32,17 @@ async function bootstrap() {
       operationsSorter: 'alpha',
     },
   });
+  console.log({ __dirname });
 
-  //   const dev = ENV.NODE_ENV !== 'production';
-
-  //   const nextApp = next({ dev, conf: { distDir: '.next' } });
+  // const nextApp = next({ dev: true, conf: { distDir: '.next' } });
   // const handle = nextApp.getRequestHandler();
 
   // await nextApp.prepare();
 
   // app.use((req, res, next) => handle(req, res));
-
-  //   // Serve static files
-  //   app.use('/public', express.static(join(__dirname, '../../your-nextjs-project/public')));
-  //   app.use('/_next', express.static(join(__dirname, '../../your-nextjs-project/.next')));
+  // // Serve static files
+  // app.use('/public', express.static(join(__dirname, '../../client/public')));
+  // app.use('/_next', express.static(join(__dirname, '../../client/.next')));
 
   ///
   await app
