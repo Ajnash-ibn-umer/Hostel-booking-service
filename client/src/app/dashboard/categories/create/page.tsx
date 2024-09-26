@@ -29,7 +29,7 @@ const formSchema = z.object({
     message: "Slug must be at least 2 characters.",
   }),
   description: z.string().optional(),
-  icon: z.instanceof(File).optional(),
+  // icon: z.instanceof(File).optional(),
 });
 
 function CreateCategory() {
@@ -40,7 +40,6 @@ function CreateCategory() {
       name: "",
       slug: "",
       description: "",
-      icon: undefined,
     },
   });
   const [createcategory, { loading, error }] = useMutation(CATEGORY_CREATE_GQL);
@@ -113,19 +112,7 @@ function CreateCategory() {
                 />
               </div>
               <div className="flex flex-col space-y-4">
-                <FormField
-                  control={form.control}
-                  name="icon"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Icon</FormLabel>
-                      <FormControl>
-                        {/* <Input {...field} /> */}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+             
                 <FormField
                   control={form.control}
                   name="description"
