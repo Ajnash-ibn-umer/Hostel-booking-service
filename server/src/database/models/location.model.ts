@@ -24,6 +24,8 @@ export class Point {
 export class Location extends Base {
   @Prop({ required: true })
   name: string;
+  @Prop({ required: false })
+  locationLink: string;
 
   @Prop({
     type: {

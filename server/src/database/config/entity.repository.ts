@@ -36,7 +36,7 @@ export class EntityRepository<T extends Document> {
   }
 
   async create(
-    createEntityData?: unknown,
+    createEntityData?: UpdateQuery<T>,
     transaction: ClientSession = null,
   ): Promise<T> {
     return new this.entityModel(createEntityData).save({
@@ -46,7 +46,7 @@ export class EntityRepository<T extends Document> {
 
   async findOneAndUpdate(
     filterQuery: FilterQuery<T>,
-    updateQuery: UpdateQuery<unknown>,
+    updateQuery: UpdateQuery<T>,
     transaction: ClientSession = null,
     upsert: boolean = false,
   ): Promise<T | null> {
@@ -76,7 +76,7 @@ export class EntityRepository<T extends Document> {
 
   async updateMany(
     filterQuery: FilterQuery<T>,
-    updateQuery: UpdateQuery<unknown>,
+    updateQuery: UpdateQuery<T>,
     transaction: ClientSession = null,
   ): Promise<any> {
     return this.entityModel.updateMany(filterQuery, updateQuery, {

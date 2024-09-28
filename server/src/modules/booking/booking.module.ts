@@ -20,6 +20,10 @@ import { ModelDefinitions } from 'src/database/modelDefinitions';
 import { BookingResolver } from './booking.resolver';
 import { BookingRepository } from './repositories/booking.repository';
 import { BookingStatusHistoryRepository } from './repositories/booking-status.repository';
+import { InvoiceRepository } from 'src/repositories/invoice.repository';
+import { InvoiceItemRepository } from 'src/repositories/invoice-item.repository';
+import { ContractRepository } from 'src/repositories/contract.repository';
+import { TranasactionRepository } from 'src/repositories/transaction.repository';
 
 @Module({
   imports: [
@@ -38,6 +42,10 @@ import { BookingStatusHistoryRepository } from './repositories/booking-status.re
       ModelDefinitions.galleryRoomLinksModel,
       ModelDefinitions.bookingModel,
       ModelDefinitions.bookingStatusHistoryModel,
+      ModelDefinitions.invoiceItemsModel,
+      ModelDefinitions.invoicesModel,
+      ModelDefinitions.contractsModel,
+      ModelDefinitions.transactionsModel,
     ]),
   ],
   providers: [
@@ -56,6 +64,10 @@ import { BookingStatusHistoryRepository } from './repositories/booking-status.re
     BookingRepository,
     RoomsService,
     BookingResolver,
+    InvoiceRepository,
+    InvoiceItemRepository,
+    ContractRepository,
+    TranasactionRepository,
   ],
 })
 export class BookingModule {}

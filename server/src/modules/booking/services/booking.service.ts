@@ -30,6 +30,11 @@ import { generalResponse } from 'src/shared/graphql/entities/main.entity';
 import { BookingStatusHistoryRepository } from '../repositories/booking-status.repository';
 import { BookingCreateInput } from '../dto/create-booking.input';
 import { UpdateBookingInput } from '../dto/update-booking.input';
+import { VerifyPaymentInput } from '../dto/verify-booking.input';
+import { ContractRepository } from 'src/repositories/contract.repository';
+import { InvoiceRepository } from 'src/repositories/invoice.repository';
+import { InvoiceItemRepository } from 'src/repositories/invoice-item.repository';
+import { TranasactionRepository } from 'src/repositories/transaction.repository';
 @Injectable()
 export class BookingService {
   constructor(
@@ -38,6 +43,10 @@ export class BookingService {
     private readonly bedRepository: BedRepository,
     private readonly bookingRepository: BookingRepository,
     private readonly bookingStatusHistoryRepository: BookingStatusHistoryRepository,
+    private readonly contractRepository: ContractRepository,
+    private readonly invoiceRepository: InvoiceRepository,
+    private readonly invoiceItemRepository: InvoiceItemRepository,
+    private readonly transactionRepository: TranasactionRepository,
 
     private readonly counterService: CounterService,
     @InjectConnection()
@@ -400,34 +409,40 @@ export class BookingService {
       if (dto.bookingIds.length === 0) {
         throw 'No booking ids provided';
       }
-      const updatedBooking = await this.bookingRepository.updateMany(
+      const updateData = {
+        bookingStatus: dto.status,
+        updatedAt: startTime,
+        updatedBy: userId,
+      };
+      if (
+        (dto.selectedBedId && dto.status === BOOKING_STATUS.ADMIN_APPROVED) ||
+        dto.status === BOOKING_STATUS.CHECK_IN
+      ) {
+        updateData['bedId'] = dto.selectedBedId;
+      }
+      const updatedBooking = await this.bookingRepository.findOneAndUpdate(
         {
-          _id: { $in: dto.bookingIds },
+          _id: dto.bookingIds,
         },
-        {
-          bookingStatus: dto.status,
-          updatedAt: startTime,
-          updatedBy: userId,
-        },
+        updateData,
         txnSession,
       );
       console.log({ updatedBooking });
       if (!updatedBooking) {
         throw 'Booking Status update failed';
       }
-      const bookingStatusHistoryEntries = dto.bookingIds.map((bookingId) => ({
-        bookingId,
+      const bookingStatusHistoryEntries = {
+        bookingId: dto.bookingIds,
         bookingStatus: dto.status,
         description: dto.remark,
         createdAt: startTime,
         createdUserId: userId,
-      }));
+      };
 
-      const bookingStatus =
-        await this.bookingStatusHistoryRepository.insertMany(
-          bookingStatusHistoryEntries as any,
-          txnSession,
-        );
+      const bookingStatus = await this.bookingStatusHistoryRepository.create(
+        bookingStatusHistoryEntries,
+        txnSession,
+      );
       return {
         message: 'Booking status updated successfully',
       };
@@ -443,12 +458,33 @@ export class BookingService {
     }
   }
 
-  async verifyPayment() {
-    const startTime = Date.now();
+  async verifyPayment(dto: VerifyPaymentInput) {
+    const startTime = Date.now().toLocaleString();
     const txnSession = await this.connection.startSession();
 
     await txnSession.startTransaction();
     try {
+      let paymentStatus: boolean;
+      // TODO: Payment verfication
+
+      // TODO: update admission book form status
+
+      if (paymentStatus === true) {
+        const updatedBooking = await this.bookingApprovalStatusChange(
+          {
+            bookingIds: dto.bookingId,
+            date: startTime,
+            status: BOOKING_STATUS.PAYMENT_SUCCESS,
+            remark: `payment successful`,
+          },
+          null,
+        );
+      }
+      //  TODO:create transaction
+      // TODO: create invoice
+      //  TODO: create new user and contract
+      //  send notification
+
       return {
         message: 'Booking status updated successfully',
       };

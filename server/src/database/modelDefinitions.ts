@@ -4,9 +4,12 @@ import { BedSchema } from './models/bed.model';
 import { BookingStatusHistorySchema } from './models/booking-status.model';
 import { BookingSchema } from './models/booking.model';
 import { CategorySchema } from './models/category.model';
+import { ContractSchema } from './models/contract.model';
 import { CounterSchema } from './models/counter.model';
 import { GallerySchema } from './models/gallery.model';
 import { HostelSchema } from './models/hostel.model';
+import { InvoiceItemSchema } from './models/invoice-item.model';
+import { InvoiceSchema } from './models/invoice.model';
 import { HostelAmenitiesLinkSchema } from './models/join_tables/hostel_x_amenities.model';
 import { HostelGalleryLinkSchema } from './models/join_tables/hostel_x_gallery.model';
 import { RoomAmenitiesLinkSchema } from './models/join_tables/room_x_amenities.model';
@@ -14,6 +17,7 @@ import { RoomGalleryLinkSchema } from './models/join_tables/room_x_gallery.model
 import { LocationSchema } from './models/location.model';
 import { RoomSchema } from './models/room.model';
 import { RoomTypeSchema } from './models/roomTytpe.model';
+import { PaymentTransactionSchema } from './models/transaction.model';
 import { UserSchema } from './models/user.model';
 
 export const ModelDefinitions = {
@@ -81,5 +85,21 @@ export const ModelDefinitions = {
   bookingStatusHistoryModel: {
     name: MODEL_NAMES.BOOKING_STATUS_HISTORY,
     schema: BookingStatusHistorySchema,
+  },
+  invoiceItemsModel: {
+    name: MODEL_NAMES.INVOICE_ITEMS,
+    schema: InvoiceItemSchema,
+  },
+  invoicesModel: {
+    name: MODEL_NAMES.INVOICES,
+    schema: InvoiceSchema,
+  },
+  contractsModel: {
+    name: MODEL_NAMES.CONTRACTS,
+    schema: ContractSchema,
+  },
+  transactionsModel: {
+    name: MODEL_NAMES.TRANSACTIONS,
+    schema: PaymentTransactionSchema,
   },
 };

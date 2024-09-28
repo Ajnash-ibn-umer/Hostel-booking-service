@@ -22,6 +22,11 @@ export class Location extends PartialType(Base) {
   })
   gps_location: Point;
 
+  @Field(() => String, {
+    nullable: true,
+  })
+  locationLink: string;
+
   @Field(() => User, {
     nullable: true,
   })

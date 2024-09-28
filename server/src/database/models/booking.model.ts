@@ -49,8 +49,14 @@ export class Booking extends Base {
   @Prop({ default: '' })
   city: string;
 
+  @Prop({ default: '' })
+  address: string;
+
   @Prop({ default: new Date() })
   arrivalTime: Date;
+
+  @Prop({ default: '' })
+  idProofDocUrl?: string;
 
   @Prop({ default: '' })
   fatherName: string;
@@ -69,6 +75,9 @@ export class Booking extends Base {
 
   @Prop({ default: '' })
   emergenyRelation: string;
+
+  @Prop({ default: '' })
+  bloodGroup: string;
 
   @Prop({ default: false })
   canteenFacility: boolean;

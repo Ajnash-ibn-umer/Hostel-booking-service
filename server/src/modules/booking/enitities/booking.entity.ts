@@ -79,6 +79,12 @@ export class Booking extends PartialType(Base) {
   @Field({ description: enumToString(BED_POSITION) })
   bedPosition: number;
 
+  @Field({ description: 'Blood Group', nullable: true })
+  bloodGroup?: string;
+
+  @Field({ description: 'Address', nullable: true })
+  address?: string;
+
   @Field(() => ID, { nullable: true })
   roomId: string;
 

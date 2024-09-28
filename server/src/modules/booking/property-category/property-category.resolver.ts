@@ -69,7 +69,7 @@ export class PropertyCategoryResolver {
   }
 
   @Query(() => ListCategoryResponse, { name: 'PropertyCategory_List' })
-  @UserTypes([USER_TYPES.ADMIN])
+  @UserTypes([USER_TYPES.ADMIN, USER_TYPES.PUBLIC])
   async listPropertyCategories(
     @Args('listInput') listInput: ListInputCategory,
     @Context() context,

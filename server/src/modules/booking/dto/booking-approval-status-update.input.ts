@@ -4,8 +4,11 @@ import enumToString from 'src/shared/utils/enumTostring';
 
 @InputType()
 export class AdminBookingStatusChangeInput {
-  @Field(() => [ID])
-  bookingIds: string[];
+  @Field(() => ID)
+  bookingIds: string;
+
+  @Field(() => ID)
+  selectedBedId?: string;
 
   @Field({ description: enumToString(BOOKING_STATUS), nullable: false })
   status: BOOKING_STATUS;

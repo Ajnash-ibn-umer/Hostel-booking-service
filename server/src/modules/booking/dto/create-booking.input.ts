@@ -32,6 +32,12 @@ export class BookingCreateInput {
   @Field({ description: 'City', nullable: true })
   city?: string;
 
+  @Field({ description: 'Blood Group', nullable: true })
+  bloodGroup?: string;
+
+  @Field({ description: 'Address', nullable: true })
+  address?: string;
+
   @Field(() => Date, { description: 'Arrival Time', nullable: true })
   arrivalTime?: Date;
 
@@ -112,4 +118,7 @@ export class BookingCreateInput {
 
   @Field(() => Number, { description: 'Other Amount', nullable: true })
   otherAmount?: number;
+
+  @Field(() => String, { description: 'ID Proof Document', nullable: true })
+  idProofDocUrl?: string;
 }

@@ -28,6 +28,7 @@ export class LocationService {
       const location = await this.locationRepository.create({
         name: createLocationInput.name,
         gps_location: createLocationInput.gps_location,
+        locationLink: createLocationInput.locationLink,
         status: STATUS_NAMES.ACTIVE,
         createdAt: time,
         createdUserId: userId,
@@ -51,7 +52,11 @@ export class LocationService {
     try {
       const location = await this.locationRepository.findOneAndUpdate(
         { _id: dto._id },
-        { ...dto, updatedAt: time, updatedUserId: userId },
+        {
+          ...dto,
+          updatedAt: time,
+          updatedUserId: userId,
+        },
       );
 
       if (!location) {

@@ -20,4 +20,9 @@ export class CreateLocationInput {
     nullable: true,
   })
   gps_location: PointInput;
+
+  @Field(() => String, {
+    nullable: true,
+  })
+  locationLink: string;
 }

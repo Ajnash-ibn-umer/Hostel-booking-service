@@ -15,4 +15,9 @@ export enum MODEL_NAMES {
   ROOM_TYPES = 'room_types',
   BOOKING = 'bookings',
   BOOKING_STATUS_HISTORY = 'booking_status_histories',
+
+  INVOICE_ITEMS = 'invoice_items',
+  INVOICES = 'invoices',
+  CONTRACTS = 'contracts',
+  TRANSACTIONS = 'transactions',
 }
