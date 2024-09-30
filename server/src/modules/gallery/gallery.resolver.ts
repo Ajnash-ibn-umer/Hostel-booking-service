@@ -23,6 +23,7 @@ import { ListHostelsResponse } from '../booking/hostels/entities/hostel.entity';
 import { GraphQLResolveInfo } from 'graphql';
 import { ListInputGallery } from './dto/list-gallery.input';
 import getProjection from 'src/shared/graphql/queryProjection';
+import { generalResponse } from 'src/shared/graphql/entities/main.entity';
 
 @UseGuards(AuthGuard)
 @Resolver(() => Gallery)
@@ -67,7 +68,7 @@ export class GalleryResolver {
   }
 
   @UserTypes([USER_TYPES.ADMIN, USER_TYPES.USER])
-  @Mutation(() => String, { name: 'Gallery_StatusChange' })
+  @Mutation(() => generalResponse, { name: 'Gallery_StatusChange' })
   statusChange(
     @Args('statusChangeInput') statusChangeInput: statusChangeInput,
     @Context() context,

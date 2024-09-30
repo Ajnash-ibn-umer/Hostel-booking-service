@@ -19,6 +19,7 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { LoginAdminInput } from '../dto/login-amin.input';
 import { JwtService } from '@nestjs/jwt';
+import { InjectConnection } from '@nestjs/mongoose';
 
 @Injectable()
 export class UserService {
@@ -27,26 +28,49 @@ export class UserService {
     private readonly counterService: CounterService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
+
   async create(dto: CreateUserInput): Promise<User> {
+    const session = await this.connection.startSession();
+    session.startTransaction();
     try {
-      // TODO: Create counter
-      const userNumberData = await this.counterService.getAndIncrementCounter({
-        entityName: MODEL_NAMES.USER,
+      const user = await this.createUser(dto, session);
+      await session.commitTransaction();
+      return user;
+    } catch (error) {
+      await session.abortTransaction();
+      throw new GraphQLError(error, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
       });
+    } finally {
+      session.endSession();
+    }
+  }
+  async createUser(
+    dto: CreateUserInput,
+    session: mongoose.ClientSession = null,
+  ): Promise<User> {
+    try {
+      //  Create counter
+      const userNumberData = await this.counterService.getAndIncrementCounter(
+        {
+          entityName: MODEL_NAMES.USER,
+        },
+        1,
+        session,
+      );
 
       const userNo = `${userNumberData.prefix}${userNumberData.count}${userNumberData.suffix}`;
-      // TODO: Create user
+      //  Create user
 
       // TODO : appsword generation
-      const saltOrRounds = Number(this.configService.get<number>('HASH_SALT'));
-      const hash = await bcrypt.hash(dto.password, saltOrRounds);
-
       const userData: UserModel = {
         userNo: userNo,
         name: dto.name,
         email: dto.email,
-        password: hash,
         phoneNumber: dto.phoneNumber,
         userType: dto.userType,
         roleId: dto.roleId,
@@ -54,7 +78,15 @@ export class UserService {
         status: STATUS_NAMES.ACTIVE,
         createdAt: new Date(),
       };
-      const newUser = await this.userRepo.create(userData);
+      if (dto.userType === USER_TYPES.ADMIN) {
+        const saltOrRounds = Number(
+          this.configService.get<number>('HASH_SALT'),
+        );
+        const hash = await bcrypt.hash(dto.password, saltOrRounds);
+        userData['password'] = hash;
+      }
+
+      const newUser = await this.userRepo.create(userData, session);
       return newUser as User;
     } catch (error) {
       throw new GraphQLError(error, {
@@ -162,51 +194,6 @@ export class UserService {
       };
     } catch (error) {
       return new GraphQLError(error.message ?? error, {
-        extensions: {
-          code: HttpStatus.INTERNAL_SERVER_ERROR,
-        },
-      });
-    }
-  }
-
-  async loginAdmin(dto: LoginAdminInput): Promise<LoginResponse> {
-    try {
-      const user = (await this.userRepo.findOne({
-        email: dto.email,
-        userType: USER_TYPES.ADMIN,
-      })) as unknown as User;
-
-      if (!user) {
-        throw new GraphQLError('Invalid email or password', {
-          extensions: {
-            code: HttpStatus.UNAUTHORIZED,
-          },
-        });
-      }
-
-      const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-
-      if (!isPasswordValid) {
-        throw new GraphQLError('Invalid email or password', {
-          extensions: {
-            code: HttpStatus.UNAUTHORIZED,
-          },
-        });
-      }
-
-      const token = this.jwtService.sign({
-        userId: user._id,
-        email: user.email,
-        userType: USER_TYPES.ADMIN,
-      });
-
-      return {
-        message: 'Login successful',
-        token: token,
-        user: user,
-      };
-    } catch (error) {
-      throw new GraphQLError(error.message ?? 'Login failed', {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },

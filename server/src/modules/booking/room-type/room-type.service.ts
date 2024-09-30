@@ -15,6 +15,8 @@ import {
   Search,
 } from 'src/shared/utils/mongodb/filtration.util';
 import { responseFormat } from 'src/shared/graphql/queryProjection';
+import { Lookup } from 'src/shared/utils/mongodb/lookupGenerator';
+import { MODEL_NAMES } from 'src/database/modelNames';
 @Injectable()
 export class RoomTypeService {
   constructor(
@@ -148,7 +150,16 @@ export class RoomTypeService {
     pipeline.push(...Paginate(dto.skip, dto.limit));
 
     projection && pipeline.push(responseFormat(projection['list']));
-
+    if (projection['list']['createdUser']) {
+      pipeline.push(
+        ...Lookup({
+          modelName: MODEL_NAMES.USER,
+          params: { id: '$createdUserId' },
+          conditions: { $_id: '$$id' },
+          responseName: 'createdUser',
+        }),
+      );
+    }
     const list =
       ((await this.roomTypeRepository.aggregate(pipeline as any[])) as any[]) ||
       [];

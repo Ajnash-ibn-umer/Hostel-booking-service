@@ -152,6 +152,9 @@ export class Booking extends Base {
 
   @Prop({ default: 0 })
   otherAmount: number;
+
+  @Prop({ default: 0 })
+  version: number;
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);

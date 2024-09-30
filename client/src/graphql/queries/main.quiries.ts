@@ -109,6 +109,11 @@ export const LOCATION_LIST_GQL = gql`
         status
         updatedAt
         updatedUserId
+        gps_location {
+          coordinates
+          type
+        }
+        locationLink
         createdUser {
           _id
           bookingId
@@ -130,6 +135,28 @@ export const LOCATION_LIST_GQL = gql`
   }
 `;
 
+export const LOCATION_LIST_FOR_TABLE_GQL = gql`
+  query Location_List($listInputLocation: ListInputLocation!) {
+    Location_List(listInputLocation: $listInputLocation) {
+      totalCount
+      list {
+        _id
+        createdAt
+        createdUserId
+        name
+        status
+        updatedAt
+        locationLink
+        createdUser {
+          _id
+          name
+          phoneNumber
+        }
+      }
+    }
+  }
+`;
+
 export const LOCATION_LIST_MINIMAL_GQL = gql`
   query Location_List($listInputLocation: ListInputLocation!) {
     Location_List(listInputLocation: $listInputLocation) {
@@ -138,6 +165,7 @@ export const LOCATION_LIST_MINIMAL_GQL = gql`
         createdAt
         name
         status
+        locationLink
       }
     }
   }
@@ -155,47 +183,8 @@ export const PROPERTY_CATEGORY_MINIMAL_LIST = gql`
     }
   }
 `;
-
-export const CATEGORY_CREATE_GQL = gql`
-  mutation PropertyCategory_Create(
-    $createPropertyCategoryInput: CreatePropertyCategoryInput!
-  ) {
-    PropertyCategory_Create(
-      createPropertyCategoryInput: $createPropertyCategoryInput
-    ) {
-      description
-      icon
-      name
-      slug
-    }
-  }
-`;
-
-export const HOSTEL_CREATE_GQL = gql`
-  mutation Hostel_Create($createHostelInput: CreateHostelInput!) {
-    Hostel_Create(createHostelInput: $createHostelInput) {
-      _id
-      availabilityStatus
-      categoryId
-      createdAt
-      createdUserId
-      description
-      locationId
-      name
-      priceBaseMode
-      propertyNo
-      sellingPrice
-      shortDescription
-      slug
-      standardPrice
-      status
-      totalBeds
-      totalRooms
-      updatedAt
-      updatedUserId
-    }
-  }
-`;
+//---------------
+// AMENITY
 
 export const AMENITY_LIST_GQL = gql`
   query Amenity_List($listInput: ListInpuAmenity!) {
@@ -245,7 +234,8 @@ export const AMENITY_LIST_MINIMAL_GQL = gql`
     }
   }
 `;
-
+// ------------------
+// ROOM TYPE
 export const ROOM_TYPE_LIST_GQL = gql`
   query RoomType_List($listInput: ListInputRoomType!) {
     RoomType_List(listInput: $listInput) {
@@ -259,6 +249,11 @@ export const ROOM_TYPE_LIST_GQL = gql`
         status
         updatedAt
         updatedUserId
+        createdUser{
+          _id
+          name
+          status
+        }
       }
     }
   }
@@ -277,35 +272,3 @@ export const ROOM_TYPE_LIST_MINIMAL_GQL = gql`
     }
   }
 `;
-
-
-export const GALLERY_CREATE_GQL=gql`mutation Gallery_Create($createGalleryInput: CreateGalleryInput!) {
-  Gallery_Create(createGalleryInput: $createGalleryInput) {
-    _id
-    createdAt
-    createdUserId
-    docType
-    name
-    status
-    uid
-    updatedAt
-    updatedUserId
-    url
-  }
-}`
-
-export const GALLERY_CREATE_MULTIPLE_GQL=gql`
-mutation Gallery_Multi_Create($createGalleryInput: CreateGalleryMultipleInput!) {
-  Gallery_Multi_Create(createGalleryInput: $createGalleryInput) {
-    _id
-    createdAt
-    createdUserId
-    docType
-    name
-    status
-    uid
-    updatedAt
-    updatedUserId
-    url
-  }
-}`

@@ -3,17 +3,103 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { DataTableCategory } from "./data-table";
-import { columns } from "./column";
 
 import React, { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { PROPERTY_CATEGORY_LIST } from "@/graphql/queries/main.quiries";
 import Link from "next/link";
-import Pageniation from "./pagniation";
+import Pageniation from "../../../components/pagination/pagination";
+import { DataTable } from "../../../components/Datatables/data-table";
+import { ColumnDef } from "@tanstack/react-table";
+import { AlertConfirm } from "@/components/Alerts/alert";
+import { useToast } from "@/hooks/use-toast";
+import { CATEGORY_DELETE_GQL } from "@/graphql/queries/main.mutations";
+
+export type Category = {
+  _id: string;
+  name: number;
+  description: string;
+  createdDate: Date;
+};
 
 function Category() {
   const router = useRouter();
+  const { toast } = useToast();
+
+  const columns: ColumnDef<Category>[] = [
+    {
+      accessorKey: "slug",
+      header: "UID",
+    },
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created Date",
+      cell: ({ row }) =>
+        new Date(row.getValue("createdAt")).toLocaleDateString(),
+    },
+    {
+      id: "operations",
+      cell: ({ row }) => {
+        const [deleteData, { loading, error }] =
+          useMutation(CATEGORY_DELETE_GQL);
+
+        const deleteCategory = async () => {
+          try {
+            const { data, errors } = await deleteData({
+              variables: {
+                statusChangeInput: {
+                  _status: 2,
+                  ids: [row.original._id],
+                },
+              },
+            });
+
+            if (data) {
+              toast({
+                variant: "default",
+                title: `Delete successful`,
+                description: `Category deleted successfully`,
+              });
+              refetch(inputVariables);
+            }
+          } catch (error: any) {
+            toast({
+              variant: "destructive",
+              title: `Delete Failed`,
+              description: error.toString(),
+            });
+          }
+        };
+
+        return (
+          <>
+            <div className="flex gap-2">
+              <AlertConfirm
+                cancel="Cancel"
+                confirm="Delete"
+                description=""
+                title="Do you want to delete this category?"
+                onContinue={deleteCategory}
+              >
+                <Button variant={"destructive"}>Delete</Button>
+              </AlertConfirm>
+              <Link href={`categories/update/${row.original._id}`}>
+                <Button variant={"link"}>Edit</Button>
+              </Link>
+            </div>
+          </>
+        );
+      },
+    },
+  ];
 
   const [inputVariables, setInputVariables] = useState<{
     listInput: {
@@ -26,7 +112,7 @@ function Category() {
   }>({
     listInput: {
       statusArray: [1],
-      limit: 2,
+      limit: 10,
       skip: 0,
       searchingText: null,
       sortOrder: 1,
@@ -70,7 +156,7 @@ function Category() {
             <Link href={"categories/create"}>Create</Link>
           </Button>
         </div>
-        <DataTableCategory
+        <DataTable
           columns={columns}
           data={data?.PropertyCategory_List?.list || []}
         />

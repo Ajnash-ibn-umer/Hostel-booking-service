@@ -8,14 +8,16 @@ import { UserSchema } from 'src/database/models/user.model';
 import { ModelDefinitions } from 'src/database/modelDefinitions';
 import { CounterModule } from '../counter/counter.module';
 import { CounterService } from '../counter/counter.service';
+import { AuthService } from './service/auth.service';
 
 @Module({
-  providers: [UserResolver, UserService, UserRepository],
+  providers: [UserResolver, UserService, UserRepository, AuthService],
   imports: [
     MongooseModule.forFeature([
       ModelDefinitions.userModel,
       ModelDefinitions.counterModel,
     ]),
   ],
+  exports: [UserService],
 })
 export class UserModule {}

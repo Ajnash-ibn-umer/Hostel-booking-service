@@ -22,6 +22,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { ListInputCategory } from './dto/list-property-category.input';
 import { GraphQLResolveInfo } from 'graphql';
 import getProjection from 'src/shared/graphql/queryProjection';
+import { generalResponse } from 'src/shared/graphql/entities/main.entity';
 
 @UseGuards(AuthGuard)
 @Resolver(() => PropertyCategory)
@@ -56,7 +57,7 @@ export class PropertyCategoryResolver {
     );
   }
 
-  @Mutation(() => String, { name: 'PropertyCategory_StatusChange' })
+  @Mutation(() => generalResponse, { name: 'PropertyCategory_StatusChange' })
   @UserTypes([USER_TYPES.ADMIN])
   statusChangePropertyCategory(
     @Args('statusChangeInput') statusChangeInput: statusChangeInput,

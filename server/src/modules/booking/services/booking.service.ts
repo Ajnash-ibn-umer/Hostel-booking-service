@@ -16,7 +16,11 @@ import { Lookup } from 'src/shared/utils/mongodb/lookupGenerator';
 import { MODEL_NAMES } from 'src/database/modelNames';
 import { responseFormat } from 'src/shared/graphql/queryProjection';
 import { Bed } from '../hostels/entities/bed.entity';
-import { BED_POSITION, STATUS_NAMES } from 'src/shared/variables/main.variable';
+import {
+  BED_POSITION,
+  STATUS_NAMES,
+  USER_TYPES,
+} from 'src/shared/variables/main.variable';
 import { BookingRepository } from '../repositories/booking.repository';
 import { BOOKING_STATUS } from 'src/database/models/booking.model';
 import { ListInputBooking } from '../dto/list-booking.input';
@@ -35,10 +39,15 @@ import { ContractRepository } from 'src/repositories/contract.repository';
 import { InvoiceRepository } from 'src/repositories/invoice.repository';
 import { InvoiceItemRepository } from 'src/repositories/invoice-item.repository';
 import { TranasactionRepository } from 'src/repositories/transaction.repository';
+import { PAYMENT_STATUS } from 'src/database/models/transaction.model';
+import { UserService } from 'src/modules/user/service/user.service';
+import { VACCATE_STATUS } from 'src/database/models/contract.model';
 @Injectable()
 export class BookingService {
   constructor(
     private readonly hostelRepository: HostelRepository,
+    private readonly userService: UserService,
+
     private readonly roomRepository: RoomRepository,
     private readonly bedRepository: BedRepository,
     private readonly bookingRepository: BookingRepository,
@@ -419,6 +428,23 @@ export class BookingService {
         dto.status === BOOKING_STATUS.CHECK_IN
       ) {
         updateData['bedId'] = dto.selectedBedId;
+        const bedUpdate = await this.bedRepository.findOneAndUpdate(
+          {
+            _id: dto.selectedBedId,
+            status: STATUS_NAMES.ACTIVE,
+            availabilityStatus: AVAILABILITY_STATUS.AVAILABLE,
+          },
+          {
+            availabilityStatus: AVAILABILITY_STATUS.OCCUPIED,
+            updatedAt: startTime,
+            updatedUserId: userId,
+          },
+          txnSession,
+        );
+
+        if (bedUpdate) {
+          throw 'Selected Bed not found Or This bed already Booked!';
+        }
       }
       const updatedBooking = await this.bookingRepository.findOneAndUpdate(
         {
@@ -469,21 +495,78 @@ export class BookingService {
 
       // TODO: update admission book form status
 
+      const bookingData = await this.bookingRepository.findOne({
+        _id: dto.bookingId,
+      });
+      if (!bookingData) {
+        throw 'Booking Not Found';
+      }
+      if (paymentStatus === false) {
+        const transaction = await this.transactionRepository.create(
+          {
+            amount: dto.amount,
+            bookingId: dto.bookingId,
+            transactionId: dto.orderId,
+            remark: 'Payment failed',
+            paymentType: 1,
+            invoiceId: null,
+            paymentStatus: PAYMENT_STATUS.FAILED,
+            createdAt: startTime,
+            updatedAt: startTime,
+          },
+          txnSession,
+        );
+      }
+
       if (paymentStatus === true) {
         const updatedBooking = await this.bookingApprovalStatusChange(
           {
             bookingIds: dto.bookingId,
             date: startTime,
             status: BOOKING_STATUS.PAYMENT_SUCCESS,
+
             remark: `payment successful`,
           },
           null,
         );
+        if (!updatedBooking) {
+          throw ` Booking Update Failed!`;
+        }
+
+        // TODO: create invoice
+        //  create new user and contract
+
+        const newUser = await this.userService.createUser(
+          {
+            email: bookingData.email,
+            password: '',
+            name: bookingData.name,
+            phoneNumber: bookingData.phone,
+            profileImgUrl: null,
+            roleId: null,
+            userType: USER_TYPES.USER,
+          },
+          txnSession,
+        );
+
+        const newContract = await this.contractRepository.create(
+          {
+            userId: newUser._id,
+            bookingId: bookingData._id,
+            roomId: bookingData.roomId,
+            bedId: bookingData.bedId,
+            propertyId: bookingData.propertyId,
+            contractFrom: bookingData.contractFrom,
+            contractTo: bookingData.contractTo,
+            vaccatStatus: VACCATE_STATUS.IN_CONTRACT,
+            laundryMonthlyCount: 4,
+            createdAt: startTime,
+            status: STATUS_NAMES.ACTIVE,
+          },
+          txnSession,
+        );
+        //  TODO: send notification
       }
-      //  TODO:create transaction
-      // TODO: create invoice
-      //  TODO: create new user and contract
-      //  send notification
 
       return {
         message: 'Booking status updated successfully',

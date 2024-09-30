@@ -475,19 +475,7 @@ export class HostelsService {
     try {
       const pipeline: any[] = [];
       if (dto.searchingText && dto.searchingText !== '') {
-        pipeline.push(
-          Search(
-            [
-              'propertyNo',
-              'slug',
-              'name',
-              'shortDescription',
-              'description',
-              'totalRooms',
-            ],
-            dto.searchingText,
-          ),
-        );
+        pipeline.push(Search(['propertyNo', 'name'], dto.searchingText));
       }
 
       pipeline.push(
