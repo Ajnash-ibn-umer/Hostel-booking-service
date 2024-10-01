@@ -19,6 +19,7 @@ import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { Type } from "lucide-react";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -68,10 +69,10 @@ const menuGroups = [
       },
       {
         icon: (
-          <GrGallery/>
+          <Type/>
         ),
-        label: "Gallery",
-        route: "/dashboard/gallery",
+        label: "RoomType",
+        route: "/dashboard/room-types",
      
       },
       {
@@ -82,14 +83,15 @@ const menuGroups = [
         route: "/dashboard/users",
      
       },
-      {
-        icon: (
-         <IoMdSettings/>
-        ),
-        label: "Settings",
-        route: "/dashboard/settings",
-     
-      },
+
+      // {
+      //   icon: (
+      //    <IoMdSettings/>
+      //   ),
+      //   label: "Settings",
+      //   route: "/dashboard/settings",
+      // },
+      
     ],
   },
   {

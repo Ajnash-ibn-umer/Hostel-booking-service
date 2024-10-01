@@ -5,7 +5,7 @@ const nextConfig = {
   },
 
   images: {
-    domains: ["localhost"],
+    domains: ["localhost","ajn-p1-2024.s3.amazonaws.com"],
     remotePatterns: [
       {
         protocol: "https",
@@ -24,7 +24,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "pub-b7fd9c30cdbf439183b75041f5f71b92.r2.dev",
+        hostname: "ajn-p1-2024.s3.ap-south-1.amazonaws.com",
         port: "",
       },
     ],

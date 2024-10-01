@@ -31,11 +31,11 @@ export class Location extends Base {
     type: {
       type: String,
       enum: ['Point'],
-      required: true,
+      required: false,
     },
     coordinates: {
       type: [Number],
-      required: true,
+      required: false,
     },
   })
   gps_location: Point;

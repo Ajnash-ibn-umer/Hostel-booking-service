@@ -18,8 +18,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@apollo/client";
-import { CATEGORY_CREATE_GQL } from "@/graphql/queries/main.quiries";
+import { CATEGORY_CREATE_GQL } from "@/graphql/queries/main.mutations";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -33,6 +34,7 @@ const formSchema = z.object({
 });
 
 function CreateCategory() {
+  const { toast } = useToast();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,14 +64,21 @@ function CreateCategory() {
       if (data && data.PropertyCategory_Create) {
         router.push("/dashboard/categories");
       } else {
-        alert("response not found");
+       
+        toast({
+          variant: "destructive",
+          title: `Creation Failed`,
+          description: `Response Not found`,
+        });
       }
     } catch (err: any) {
       console.error("Category Creation error:", err);
-      if (Array.isArray(err)) {
-        alert(err.toString());
-      }
-      alert(err);
+
+      toast({
+        variant: "destructive",
+        title: `Creation Failed`,
+        description: err.toString(),
+      });
       // Handle login error (e.g., show error message)
     }
   }
@@ -112,7 +121,6 @@ function CreateCategory() {
                 />
               </div>
               <div className="flex flex-col space-y-4">
-             
                 <FormField
                   control={form.control}
                   name="description"

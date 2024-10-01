@@ -47,3 +47,13 @@ export default ({ images,createGallery }: IfileUploadLib):Promise<string[]> => {
     }
   });
 };
+
+
+
+
+
+
+
+
+
+

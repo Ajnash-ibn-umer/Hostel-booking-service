@@ -23,9 +23,13 @@ import { LoginAdminInput } from '../dto/login-amin.input';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { UserTypes } from 'src/shared/decorators';
+import { AuthService } from '../service/auth.service';
 @Resolver(() => User)
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
   @UseGuards(AuthGuard)
   @Mutation(() => User, { name: 'User_Create' })
@@ -58,6 +62,6 @@ export class UserResolver {
 
   @Mutation(() => LoginResponse, { name: 'User_Admin_Login' })
   loginAdmin(@Args('loginAdminInput') dto: LoginAdminInput) {
-    return this.userService.loginAdmin(dto);
+    return this.authService.loginAdmin(dto);
   }
 }

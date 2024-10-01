@@ -32,14 +32,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@apollo/client";
 import {
   AMENITY_LIST_MINIMAL_GQL,
-  GALLERY_CREATE_GQL,
-  GALLERY_CREATE_MULTIPLE_GQL,
-  HOSTEL_CREATE_GQL,
   LOCATION_LIST_MINIMAL_GQL,
   PROPERTY_CATEGORY_LIST,
   PROPERTY_CATEGORY_MINIMAL_LIST,
   ROOM_TYPE_LIST_MINIMAL_GQL,
 } from "@/graphql/queries/main.quiries";
+import {
+  GALLERY_CREATE_GQL,
+  GALLERY_CREATE_MULTIPLE_GQL,
+  HOSTEL_CREATE_GQL,
+} from "@/graphql/queries/main.mutations";
 import { useRouter } from "next/navigation";
 import MultiSelect from "@/components/MultiSelect/multi-selector";
 import RoomCreationForm, { Bed } from "./room-form";
@@ -48,7 +50,7 @@ import MultiFileUploader from "@/components/MultiFileUploader/file-uploader";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { s3Upload } from "@/config/aws";
-import galleryUpload from "./_lib/gallery-upload";
+import galleryUpload from "../../../../_lib/gallery-upload";
 import { Hotel } from "lucide-react";
 import Loader from "@/components/common/Loader";
 import { useToast } from "@/hooks/use-toast";
@@ -341,14 +343,13 @@ function CreateHostelForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
- 
     try {
       setIsLoading(true);
 
       const rooms: any[] = [];
 
-      if(hostel.rooms.length===0){
-        throw("Rooms is Required")
+      if (hostel.rooms.length === 0) {
+        throw "Rooms is Required";
       }
       for (const room of hostel.rooms) {
         let beds: any[] = [];

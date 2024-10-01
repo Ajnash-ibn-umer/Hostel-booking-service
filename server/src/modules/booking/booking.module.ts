@@ -24,6 +24,8 @@ import { InvoiceRepository } from 'src/repositories/invoice.repository';
 import { InvoiceItemRepository } from 'src/repositories/invoice-item.repository';
 import { ContractRepository } from 'src/repositories/contract.repository';
 import { TranasactionRepository } from 'src/repositories/transaction.repository';
+import { UserRepository } from '../user/repository/user.repository';
+import { UserService } from '../user/service/user.service';
 
 @Module({
   imports: [
@@ -46,6 +48,7 @@ import { TranasactionRepository } from 'src/repositories/transaction.repository'
       ModelDefinitions.invoicesModel,
       ModelDefinitions.contractsModel,
       ModelDefinitions.transactionsModel,
+      ModelDefinitions.userModel,
     ]),
   ],
   providers: [
@@ -56,6 +59,7 @@ import { TranasactionRepository } from 'src/repositories/transaction.repository'
     HostelRepository,
     RoomRepository,
     BedRepository,
+    UserRepository,
     HostelAmenityLinksRepository,
     HostelGalleryLinksRepository,
     RoomAmenitiesLinksRepository,
@@ -68,6 +72,7 @@ import { TranasactionRepository } from 'src/repositories/transaction.repository'
     InvoiceItemRepository,
     ContractRepository,
     TranasactionRepository,
+    UserService,
   ],
 })
 export class BookingModule {}

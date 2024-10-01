@@ -120,13 +120,16 @@ export class LocationService {
           _id: {
             $in: dto.locationIds.map((id) => new mongoose.Types.ObjectId(id)),
           },
-          _status: {
-            $in: dto.statusArray,
-          },
         },
       });
     }
-
+    pipeline.push({
+      $match: {
+        status: {
+          $in: dto.statusArray,
+        },
+      },
+    });
     switch (dto.sortType) {
       case 0:
         pipeline.push({
@@ -159,7 +162,7 @@ export class LocationService {
     }
     pipeline.push(...Paginate(dto.skip, dto.limit));
     projection && pipeline.push(responseFormat(projection['list']));
-    if (projection['list']['createduser']) {
+    if (projection['list']['createdUser']) {
       pipeline.push(
         ...Lookup({
           modelName: MODEL_NAMES.USER,
@@ -173,7 +176,7 @@ export class LocationService {
     const list = (await this.locationRepository.aggregate(
       pipeline,
     )) as Location[];
-
+    console.log(list);
     const totalCount = await this.locationRepository.totalCount(pipeline);
     return {
       list,

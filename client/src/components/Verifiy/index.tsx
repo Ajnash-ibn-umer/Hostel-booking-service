@@ -8,13 +8,12 @@ function Auth() {
 
   useEffect(() => {
     if (localStorage.getItem("authToken")) {
-      console.log("it have authToken");
       setSigned(true);
       router.push("/dashboard");
     } else {
       router.push("/auth/signin");
     }
-  }, []);
+  }, [signed]);
 
   return <div></div>;
 }

@@ -19,6 +19,7 @@ import getProjection from 'src/shared/graphql/queryProjection';
 import { ListInputLocation } from './dto/list-locaitoninput';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { generalResponse } from 'src/shared/graphql/entities/main.entity';
 
 @UseGuards(AuthGuard)
 @Resolver(() => Location)
@@ -50,7 +51,7 @@ export class LocationResolver {
     );
   }
 
-  @Mutation(() => String, { name: 'Location_StatusChange' })
+  @Mutation(() => generalResponse, { name: 'Location_StatusChange' })
   @UserTypes([USER_TYPES.ADMIN])
   statusChange(
     @Args('statusChangeInput') statusChangeInput: statusChangeInput,

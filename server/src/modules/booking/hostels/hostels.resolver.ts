@@ -24,6 +24,7 @@ import getProjection from 'src/shared/graphql/queryProjection';
 import { RoomsService } from './services/rooms.service';
 import { RoomListResponse } from './entities/room.entity';
 import { ListInputRoom } from './dto/list-room.input';
+import { generalResponse } from 'src/shared/graphql/entities/main.entity';
 
 @UseGuards(AuthGuard)
 @Resolver(() => Hostel)
@@ -58,7 +59,7 @@ export class HostelsResolver {
     );
   }
 
-  @Mutation(() => String, { name: 'Hostel_StatusChange' })
+  @Mutation(() => generalResponse, { name: 'Hostel_StatusChange' })
   @UserTypes([USER_TYPES.ADMIN])
   statusChange(
     @Args('statusChangeInput') statusChangeInput: statusChangeInput,

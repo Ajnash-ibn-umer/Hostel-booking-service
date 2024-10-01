@@ -17,6 +17,7 @@ import { statusChangeInput } from 'src/shared/graphql/entities/main.dto';
 import { ListInputRoomType } from './dto/list-room-type.input';
 import { GraphQLResolveInfo } from 'graphql';
 import getProjection from 'src/shared/graphql/queryProjection';
+import { generalResponse } from 'src/shared/graphql/entities/main.entity';
 
 @UseGuards(AuthGuard)
 @Resolver(() => RoomType)
@@ -44,7 +45,7 @@ export class RoomTypeResolver {
     );
   }
 
-  @Mutation(() => String, { name: 'RoomType_StatusChange' })
+  @Mutation(() => generalResponse, { name: 'RoomType_StatusChange' })
   statusChangeRoomType(
     @Args('statusChangeInput') statusChangeInput: statusChangeInput,
     @Context() context,

@@ -475,19 +475,7 @@ export class HostelsService {
     try {
       const pipeline: any[] = [];
       if (dto.searchingText && dto.searchingText !== '') {
-        pipeline.push(
-          Search(
-            [
-              'propertyNo',
-              'slug',
-              'name',
-              'shortDescription',
-              'description',
-              'totalRooms',
-            ],
-            dto.searchingText,
-          ),
-        );
+        pipeline.push(Search(['propertyNo', 'name'], dto.searchingText));
       }
 
       pipeline.push(
@@ -499,17 +487,17 @@ export class HostelsService {
           },
           {
             match: { _id: dto.hostelIds },
-            _type_: 'string',
+            _type_: 'objectId',
             required: false,
           },
           {
             match: { categoryId: dto.categoryIds },
-            _type_: 'string',
+            _type_: 'objectId',
             required: false,
           },
           {
             match: { locationId: dto.locationIds },
-            _type_: 'string',
+            _type_: 'objectId',
             required: false,
           },
           {

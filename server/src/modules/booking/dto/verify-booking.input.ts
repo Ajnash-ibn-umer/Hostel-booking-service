@@ -7,4 +7,7 @@ export class VerifyPaymentInput {
 
   @Field()
   orderId: string;
+
+  @Field()
+  amount: number;
 }

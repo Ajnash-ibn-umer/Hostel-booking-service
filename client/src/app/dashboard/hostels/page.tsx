@@ -10,9 +10,10 @@ import {
 } from "@/graphql/queries/main.quiries";
 import { useQuery } from "@apollo/client";
 import React, { useEffect, useMemo, useState } from "react";
-import { DataTable } from "./hostel-table";
+import { DataTable } from "../../../components/Datatables/data-table";
 import { useRouter } from "next/navigation";
 import { hostelColumns } from "./column";
+import { useToast } from "@/hooks/use-toast";
 
 interface hostelListInterface {
   name: string;
@@ -22,6 +23,7 @@ interface hostelListInterface {
   totalRooms: number;
 }
 const HostelList: React.FC = () => {
+  const { toast } = useToast();
   const router = useRouter();
   const [hostelListData, setHostelListData] = useState<
     Array<hostelListInterface>
@@ -60,7 +62,13 @@ const HostelList: React.FC = () => {
       setHostelListData(hostelList);
     }
     if (error) {
-      alert(error.message);
+   
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Response not found",
+        description: error.message,
+        // action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
     }
   }, [data]);
 

@@ -12,6 +12,7 @@ import { BookingModule } from './modules/booking/booking.module';
 import { LocationModule } from './modules/location/location.module';
 import { GalleryModule } from './modules/gallery/gallery.module';
 import { PaymentGatewayModule } from './modules/payment-gateway/service/payment-gateway.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
 import ENV from './shared/variables/env.variables';
 
 const configService = new ConfigService()
@@ -34,7 +35,8 @@ const configService = new ConfigService()
     BookingModule,
     LocationModule,
     GalleryModule,
-    PaymentGatewayModule
+    PaymentGatewayModule,
+    InvoiceModule
     ,
   ],
   controllers: [AppController],
