@@ -487,17 +487,17 @@ export class HostelsService {
           },
           {
             match: { _id: dto.hostelIds },
-            _type_: 'string',
+            _type_: 'objectId',
             required: false,
           },
           {
             match: { categoryId: dto.categoryIds },
-            _type_: 'string',
+            _type_: 'objectId',
             required: false,
           },
           {
             match: { locationId: dto.locationIds },
-            _type_: 'string',
+            _type_: 'objectId',
             required: false,
           },
           {
