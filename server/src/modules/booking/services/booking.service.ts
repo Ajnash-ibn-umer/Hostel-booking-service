@@ -73,11 +73,11 @@ export class BookingService {
               { roomId: roomId },
 
               {
-                paymentBase: dto.paymentBase,
+                paymentBase: { $in: [dto.paymentBase, PRICE_BASE_MODE.BOTH] },
               },
 
               {
-                bedPosition: { $in: [dto.bedPosition, PRICE_BASE_MODE.BOTH] },
+                bedPosition: dto.bedPosition,
               },
               {
                 availabilityStatus: AVAILABILITY_STATUS.AVAILABLE,
@@ -92,6 +92,7 @@ export class BookingService {
           responseName: 'roomType',
         }),
       ]);
+      console.log({ bed });
       if (!bed || bed.length === 0) {
         return {
           bedAvailablity: false,

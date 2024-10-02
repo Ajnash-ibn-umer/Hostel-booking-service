@@ -18,12 +18,15 @@ import { ListInputRoomType } from './dto/list-room-type.input';
 import { GraphQLResolveInfo } from 'graphql';
 import getProjection from 'src/shared/graphql/queryProjection';
 import { generalResponse } from 'src/shared/graphql/entities/main.entity';
+import { UserTypes } from 'src/shared/decorators';
+import { USER_TYPES } from 'src/shared/variables/main.variable';
 
 @UseGuards(AuthGuard)
 @Resolver(() => RoomType)
 export class RoomTypeResolver {
   constructor(private readonly roomTypeService: RoomTypeService) {}
   @Mutation(() => RoomType, { name: 'RoomType_Create' })
+  @UserTypes([USER_TYPES.ADMIN])
   createRoomType(
     @Args('createRoomTypeInput') createRoomTypeInput: CreateRoomTypeInput,
     @Context() context,
@@ -34,6 +37,7 @@ export class RoomTypeResolver {
     );
   }
 
+  @UserTypes([USER_TYPES.ADMIN])
   @Mutation(() => RoomType, { name: 'RoomType_Update' })
   updateRoomType(
     @Args('updateRoomTypeInput') updateRoomTypeInput: UpdateRoomTypeInput,
@@ -45,6 +49,7 @@ export class RoomTypeResolver {
     );
   }
 
+  @UserTypes([USER_TYPES.ADMIN])
   @Mutation(() => generalResponse, { name: 'RoomType_StatusChange' })
   statusChangeRoomType(
     @Args('statusChangeInput') statusChangeInput: statusChangeInput,
@@ -56,6 +61,7 @@ export class RoomTypeResolver {
     );
   }
 
+  @UserTypes([USER_TYPES.PUBLIC, USER_TYPES.ADMIN, USER_TYPES.USER])
   @Query(() => RoomTypeListResponse, { name: 'RoomType_List' })
   async listRoomTypes(
     @Args('listInput') listInput: ListInputRoomType,

@@ -2,36 +2,33 @@
 
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Button } from "@/components/ui/button";
-import ButtonDefault from "@/components/Button/Button";
-import MainTable from "@/components/Tables/MainTable";
-import {
-  HOSTEL_LIST_DASHBOARD,
-  PROPERTY_CATEGORY_LIST,
-} from "@/graphql/queries/main.quiries";
-import { useQuery } from "@apollo/client";
-import React, { useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery } from "@apollo/client";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "../../../components/Datatables/data-table";
 import { useRouter } from "next/navigation";
-import { hostelColumns } from "./column";
 import { useToast } from "@/hooks/use-toast";
+import { ColumnDef } from "@tanstack/react-table";
+import { HOSTEL_LIST_DASHBOARD } from "@/graphql/queries/main.quiries";
+import { AlertConfirm } from "@/components/Alerts/alert";
+import { Link } from "lucide-react";
+import { HOSTEL_DELETE_GQL } from "@/graphql/queries/main.mutations";
 
-interface hostelListInterface {
+interface HostelListInterface {
+  _id: string;
   name: string;
   propertyNo: string;
   sellingPrice: number;
   standardPrice: number;
   totalRooms: number;
 }
+
 const HostelList: React.FC = () => {
   const { toast } = useToast();
   const router = useRouter();
-  const [hostelListData, setHostelListData] = useState<
-    Array<hostelListInterface>
-  >([]);
-
-
-
-  const inputVaribales = {
+  const [hostelListData, setHostelListData] = useState<HostelListInterface[]>(
+    [],
+  );
+  const inputVariables = {
     listInputHostel: {
       statusArray: [1],
       limit: -1,
@@ -50,42 +47,120 @@ const HostelList: React.FC = () => {
     },
   };
 
-  const { loading, data, error } = useQuery(HOSTEL_LIST_DASHBOARD, {
-    variables: inputVaribales,
+  const { loading, data, error,refetch } = useQuery(HOSTEL_LIST_DASHBOARD, {
+    variables: inputVariables,
   });
 
+  
+  const hostelColumns: ColumnDef<HostelListInterface>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      accessorKey: "propertyNo",
+      header: "Property Number",
+    },
+    {
+      accessorKey: "sellingPrice",
+      header: "Selling Price",
+    },
+    {
+      accessorKey: "standardPrice",
+      header: "Standard Price",
+    },
+    {
+      accessorKey: "totalRooms",
+      header: "Total Rooms",
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created Date",
+      cell: ({ row }) =>
+        new Date(row.getValue("createdAt")).toLocaleDateString(),
+    },
+    {
+      id: "operations",
+      cell: ({ row }) => {
+        const { toast } = useToast();
+        const [deleteData, { loading, error }] =
+          useMutation(HOSTEL_DELETE_GQL);
+
+        const deleteHostel = async () => {
+          try {
+            console.log();
+            const { data, errors, } = await deleteData({
+              variables: {
+                statusChangeInput: {
+                  _status: 2,
+                  ids: [row.original._id],
+                },
+              },
+            });
+
+            if (data) {
+              toast({
+                variant: "default",
+                title: `Delete succesfull`,
+                description: `Delete succesfull`,
+              });
+              refetch(inputVariables);
+            }
+          } catch (error: any) {
+            toast({
+              variant: "destructive",
+              title: `Delete Failed`,
+              description: error.toString(),
+            });
+          }
+        };
+
+        return (
+          <>
+            <div className="flex gap-2">
+              <AlertConfirm
+                cancel="Cancel"
+                confirm="Delete"
+                description=""
+                title="Do you want to delete Hostel ?"
+                onContinue={deleteHostel}
+              >
+                <Button variant={"destructive"}>Delete</Button>
+              </AlertConfirm>
+              <Link href={`hostels/update/${row.original._id}`}>
+                <Button variant={"link"}>Edit</Button>
+              </Link>
+            </div>
+          </>
+        );
+      },
+    },
+  ];
+
+ 
+
   useEffect(() => {
-    console.log(data);
     if (data) {
       const hostelList = data.Hostel_List?.list || [];
-      console.log("inner", hostelList);
       setHostelListData(hostelList);
     }
     if (error) {
-   
       toast({
         variant: "destructive",
         title: "Uh oh! Response not found",
         description: error.message,
-        // action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
     }
-  }, [data]);
+  }, [data, error, toast]);
 
   return (
     <div>
       <Breadcrumb pageName="Hostel" />
-
-      {/* <p className="mt-[3px] text-body-sm font-medium">
-                    ${itemData.price}
-                  </p> */}
-
       <div className="flex flex-col gap-10">
         <div className="flex justify-end ">
           <Button onClick={() => router.push("hostels/create")}>Create</Button>
         </div>
-
-        <DataTable columns={hostelColumns} data={hostelListData || []} />
+        <DataTable columns={hostelColumns} data={hostelListData} />
       </div>
     </div>
   );
