@@ -61,6 +61,16 @@ export const HOSTEL_CREATE_GQL = gql`
   }
 `;
 
+export const HOSTEL_DELETE_GQL = gql`
+  mutation Hostel_StatusChange(
+    $statusChangeInput: statusChangeInput!
+  ) {
+    Hostel_StatusChange(statusChangeInput: $statusChangeInput) {
+      message
+    }
+  }
+`;
+
 export const GALLERY_CREATE_GQL = gql`
   mutation Gallery_Create($createGalleryInput: CreateGalleryInput!) {
     Gallery_Create(createGalleryInput: $createGalleryInput) {

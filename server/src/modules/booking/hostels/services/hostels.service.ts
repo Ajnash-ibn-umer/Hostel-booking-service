@@ -575,7 +575,16 @@ export class HostelsService {
       pipeline.push(...Paginate(dto.skip, dto.limit));
 
       projection && pipeline.push(responseFormat(projection['list']));
-
+      if (projection['list']['createdUser']) {
+        pipeline.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.USER,
+            params: { id: '$createdUserId' },
+            conditions: { $_id: '$$id' },
+            responseName: 'createdUser',
+          }),
+        );
+      }
       if (projection['list']['amenities']) {
         pipeline.push(
           ...Lookup({
@@ -630,7 +639,60 @@ export class HostelsService {
 
       if (projection['list']['rooms']) {
         const roomPipeLine = [];
-
+        if (projection['list']['rooms']['amenities']) {
+          roomPipeLine.push(
+            ...Lookup({
+              modelName: MODEL_NAMES.HOSTEL_X_AMENITIES,
+              params: { id: '$_id' },
+              conditions: { $roomId: '$$id' },
+              responseName: 'amenities',
+              isNeedUnwind: false,
+              innerPipeline: [
+                ...Lookup({
+                  modelName: MODEL_NAMES.AMENITIES,
+                  params: { id: '$amenityId' },
+                  project: responseFormat(
+                    projection['list']['rooms']['amenities'],
+                  ),
+                  conditions: { $_id: '$$id' },
+                  responseName: 'amenitiesData',
+                }),
+              ],
+            }),
+            {
+              $addFields: {
+                amenities: '$amenities.amenitiesData',
+              },
+            },
+          );
+        }
+        if (projection['list']['rooms']['galleries']) {
+          roomPipeLine.push(
+            ...Lookup({
+              modelName: MODEL_NAMES.GALLERY_ROOM_LINKS,
+              params: { id: '$_id' },
+              conditions: { $roomId: '$$id' },
+              responseName: 'galleries',
+              isNeedUnwind: false,
+              innerPipeline: [
+                ...Lookup({
+                  modelName: MODEL_NAMES.GALLERY,
+                  params: { id: '$galleryId' },
+                  project: responseFormat(
+                    projection['list']['rooms']['galleries'],
+                  ),
+                  conditions: { $_id: '$$id' },
+                  responseName: 'galleries',
+                }),
+              ],
+            }),
+            {
+              $addFields: {
+                galleries: '$galleries.galleries',
+              },
+            },
+          );
+        }
         if (projection['list']['rooms']['beds']) {
           roomPipeLine.push(
             ...Lookup({
@@ -656,6 +718,7 @@ export class HostelsService {
         );
       }
       if (projection['list']['category']) {
+        console.log('in category');
         pipeline.push(
           ...Lookup({
             modelName: MODEL_NAMES.CATEGORY,
