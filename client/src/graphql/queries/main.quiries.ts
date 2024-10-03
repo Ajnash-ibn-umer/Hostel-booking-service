@@ -247,6 +247,7 @@ export const ROOM_TYPE_LIST_GQL = gql`
         description
         name
         status
+        bedCount
         updatedAt
         updatedUserId
         createdUser{
@@ -272,3 +273,83 @@ export const ROOM_TYPE_LIST_MINIMAL_GQL = gql`
     }
   }
 `;
+
+
+export const BOOKING_LIST_GQL=gql`
+query Booking_List($dto: ListInputBooking!) {
+  Booking_List(dto: $dto) {
+    _id
+    address
+    arrivalTime
+    basePrice
+    bedId
+    bedName
+    bedPosition
+    bloodGroup
+    bookingNumber
+    bookingStatus
+    branch
+    canteenFacility
+    city
+    companyName
+    contractFrom
+    contractTo
+    createdAt
+    createdUserId
+    discountAmount
+    dob
+    email
+    emergencyMobile
+    emergencyName
+    emergenyRelation
+    fatherName
+    grossAmount
+    idCardNumber
+    invoiceId
+    jobTitle
+    motherName
+    name
+    netAmount
+    otherAmount
+    phone
+    propertyId
+    regNo
+    roomId
+    securityDeposit
+    selectedPaymentBase
+    status
+    taxAmount
+    taxId
+    taxPer
+    totalDays
+    updatedAt
+    updatedUserId
+    userRemark
+  }
+}`
+
+
+export const BOOKING_LIST_MINIMAL_GQL=gql`
+query Booking_List($dto: ListInputBooking!) {
+  Booking_List(dto: $dto) {
+    _id
+    arrivalTime
+    basePrice
+    bedId
+    bedName
+    bedPosition
+    bookingNumber
+    bookingStatus
+    canteenFacility
+    email
+    name
+    phone
+    propertyId
+    regNo
+    roomId
+    securityDeposit
+    selectedPaymentBase
+    status
+
+  }
+}`

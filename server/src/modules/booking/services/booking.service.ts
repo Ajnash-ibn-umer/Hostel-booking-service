@@ -266,6 +266,7 @@ export class BookingService {
           ),
         );
       }
+      console.log('in search -1');
 
       pipeline.push(
         ...MatchList([
@@ -341,7 +342,7 @@ export class BookingService {
       pipeline.push(...Paginate(dto.skip, dto.limit));
 
       projection && pipeline.push(responseFormat(projection['list']));
-
+      console.log('in lookup');
       if (projection['list']['bed']) {
         pipeline.push(
           ...Lookup({

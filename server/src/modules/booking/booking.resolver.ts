@@ -14,7 +14,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { UserTypes } from 'src/shared/decorators';
 import { USER_TYPES } from 'src/shared/variables/main.variable';
-import { Booking } from './enitities/booking.entity';
+import { Booking, BookingListResponse } from './enitities/booking.entity';
 import { ListInputBooking } from './dto/list-booking.input';
 import getProjection from 'src/shared/graphql/queryProjection';
 import { generalResponse } from 'src/shared/graphql/entities/main.entity';
@@ -46,7 +46,7 @@ export class BookingResolver {
   }
 
   @UserTypes([USER_TYPES.ADMIN])
-  @Query(() => [Booking], { name: 'Booking_List' })
+  @Query(() => BookingListResponse, { name: 'Booking_List' })
   async listBooking(
     @Args('dto') dto: ListInputBooking,
     @Context() context,
