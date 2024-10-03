@@ -9,8 +9,7 @@ import { LuUsers } from "react-icons/lu";
 import { IoMdSettings } from "react-icons/io";
 import { MdLocalLaundryService } from "react-icons/md";
 import { MdVerticalSplit } from "react-icons/md";
-import { RiSendPlaneLine } from "react-icons/ri";
-
+import { RiRegisteredFill, RiSendPlaneLine } from "react-icons/ri";
 
 import React from "react";
 import { usePathname } from "next/navigation";
@@ -31,57 +30,44 @@ const menuGroups = [
     name: "MAIN MENU",
     menuItems: [
       {
-        icon: (
-          <TbSmartHome/>
-        ),
+        icon: <TbSmartHome />,
         label: "Dashboard",
         route: "/dashboard",
-    
       },
       {
-        icon: (
-          <MdOutlineBedroomParent scale={"lg"} />
-        ),
+        icon: <MdOutlineBedroomParent scale={"lg"} />,
         label: "Hostels",
         route: "/dashboard/hostels",
       },
       {
-        icon: ( <TbCategory/>  ),
+        icon: <TbCategory />,
         label: "Categories",
         route: "/dashboard/categories",
       },
       {
-
-        icon: (
-          <GoLocation/>
-        ),
+        icon: <GoLocation />,
         label: "Locations",
         route: "/dashboard/locations",
-     
       },
       {
-        icon: (
-          <FiBox/>
-        ),
+        icon: <FiBox />,
         label: "Amenities",
         route: "/dashboard/amenities",
-     
       },
       {
-        icon: (
-          <Type/>
-        ),
+        icon: <Type />,
         label: "RoomType",
         route: "/dashboard/room-types",
-     
       },
       {
-        icon: (
-        <LuUsers/>
-        ),
+        icon: <RiRegisteredFill />,
+        label: "Booking",
+        route: "/dashboard/booking",
+      },
+      {
+        icon: <LuUsers />,
         label: "Users",
         route: "/dashboard/users",
-     
       },
 
       // {
@@ -91,35 +77,25 @@ const menuGroups = [
       //   label: "Settings",
       //   route: "/dashboard/settings",
       // },
-      
     ],
   },
   {
     name: "MANAGEMENT",
     menuItems: [
       {
-        icon: (
-          <MdLocalLaundryService/>
-        ),
+        icon: <MdLocalLaundryService />,
         label: "Laundry Booking",
         route: "/dashboard/laundry-booking",
-     
       },
       {
-        icon: (
-          <MdVerticalSplit/>
-        ),
+        icon: <MdVerticalSplit />,
         label: "Damage And Split",
         route: "/dashboard/damage-and-split",
-
       },
       {
-        icon: (
-          <RiSendPlaneLine/>
-        ),
+        icon: <RiSendPlaneLine />,
         label: "Complaints",
         route: "/dashboard/complaints",
-  
       },
     ],
   },
@@ -141,8 +117,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       >
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5 xl:py-10">
-          
-          
           <Link href="/">
             {/* <Image
               width={176}
@@ -162,8 +136,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               className="hidden dark:block"
               style={{ width: "auto", height: "auto" }}
             /> */}
-            <h3 style={{fontSize:"50px"}} role="heading" className={"x-el x-el-h3 c1-3a c1-3b c1-2f c1-2g c1-3c c1-26 c1-24 c1-23 c1-25 c1-33 c1-2r c1-3d c1-2m c1-3e c1-3f c1-3g c1-3h c1-3i c1-3j"}>OXTEL</h3>
-
+            <h3
+              style={{ fontSize: "50px" }}
+              role="heading"
+              className={
+                "x-el x-el-h3 c1-3a c1-3b c1-2f c1-2g c1-3c c1-26 c1-24 c1-23 c1-25 c1-33 c1-2r c1-3d c1-2m c1-3e c1-3f c1-3g c1-3h c1-3i c1-3j"
+              }
+            >
+              OXTEL
+            </h3>
           </Link>
 
           <button

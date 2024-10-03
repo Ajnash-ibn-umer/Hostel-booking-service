@@ -12,6 +12,7 @@ import { HOSTEL_LIST_DASHBOARD } from "@/graphql/queries/main.quiries";
 import { AlertConfirm } from "@/components/Alerts/alert";
 import { Link } from "lucide-react";
 import { HOSTEL_DELETE_GQL } from "@/graphql/queries/main.mutations";
+import Pageniation from "@/components/pagination/pagination";
 
 interface HostelListInterface {
   _id: string;
@@ -28,11 +29,11 @@ const HostelList: React.FC = () => {
   const [hostelListData, setHostelListData] = useState<HostelListInterface[]>(
     [],
   );
-  const inputVariables = {
+  const [inputVariables, setInputVariables] = useState({
     listInputHostel: {
       statusArray: [1],
-      limit: -1,
-      skip: -1,
+      limit: 10,
+      skip: 0,
       searchingText: null,
       sortOrder: null,
       sortType: null,
@@ -45,13 +46,12 @@ const HostelList: React.FC = () => {
       priceRangeFilter: null,
       propertyNumberFilter: null,
     },
-  };
+  });
 
-  const { loading, data, error,refetch } = useQuery(HOSTEL_LIST_DASHBOARD, {
+  const { loading, data, error, refetch } = useQuery(HOSTEL_LIST_DASHBOARD, {
     variables: inputVariables,
   });
 
-  
   const hostelColumns: ColumnDef<HostelListInterface>[] = [
     {
       accessorKey: "name",
@@ -83,13 +83,12 @@ const HostelList: React.FC = () => {
       id: "operations",
       cell: ({ row }) => {
         const { toast } = useToast();
-        const [deleteData, { loading, error }] =
-          useMutation(HOSTEL_DELETE_GQL);
+        const [deleteData, { loading, error }] = useMutation(HOSTEL_DELETE_GQL);
 
         const deleteHostel = async () => {
           try {
             console.log();
-            const { data, errors, } = await deleteData({
+            const { data, errors } = await deleteData({
               variables: {
                 statusChangeInput: {
                   _status: 2,
@@ -127,9 +126,12 @@ const HostelList: React.FC = () => {
               >
                 <Button variant={"destructive"}>Delete</Button>
               </AlertConfirm>
-              <Link href={`hostels/update/${row.original._id}`}>
+              <Link href={`locations/update/${row.original._id}`}>
                 <Button variant={"link"}>Edit</Button>
               </Link>
+              {/* <Link  href={`hostels/update/${row.original._id}`}>
+                <Button variant={"link"}>Edit</Button>
+              </Link> */}
             </div>
           </>
         );
@@ -137,7 +139,16 @@ const HostelList: React.FC = () => {
     },
   ];
 
- 
+  const changePage = (skip: number) => {
+    console.log({ skip });
+    setInputVariables({
+      listInputHostel: {
+        ...inputVariables.listInputHostel,
+        skip: skip || 0,
+      },
+    });
+    refetch(inputVariables);
+  };
 
   useEffect(() => {
     if (data) {
@@ -161,6 +172,12 @@ const HostelList: React.FC = () => {
           <Button onClick={() => router.push("hostels/create")}>Create</Button>
         </div>
         <DataTable columns={hostelColumns} data={hostelListData} />
+        <Pageniation
+          fetch={changePage}
+          skip={inputVariables?.listInputHostel.skip || 0}
+          totalCount={data?.Location_List?.totalCount || 0}
+          limit={inputVariables?.listInputHostel.limit || 10}
+        ></Pageniation>
       </div>
     </div>
   );

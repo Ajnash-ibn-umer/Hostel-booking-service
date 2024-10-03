@@ -639,6 +639,17 @@ export class HostelsService {
 
       if (projection['list']['rooms']) {
         const roomPipeLine = [];
+        if (projection['list']['rooms']['roomType']) {
+          roomPipeLine.push(
+            ...Lookup({
+              modelName: MODEL_NAMES.ROOM_TYPES,
+              params: { id: '$roomTypeId' },
+              project: responseFormat(projection['list']['rooms']['roomType']),
+              conditions: { $_id: '$$id' },
+              responseName: 'roomType',
+            }),
+          );
+        }
         if (projection['list']['rooms']['amenities']) {
           roomPipeLine.push(
             ...Lookup({
