@@ -45,7 +45,7 @@ export class BookingResolver {
     return this.bookingsService.admissionFormSubmission(dto);
   }
 
-  @UserTypes([USER_TYPES.ADMIN])
+  @UserTypes([USER_TYPES.ADMIN, USER_TYPES.PUBLIC])
   @Query(() => BookingListResponse, { name: 'Booking_List' })
   async listBooking(
     @Args('dto') dto: ListInputBooking,

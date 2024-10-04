@@ -10,10 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 import { ColumnDef } from "@tanstack/react-table";
 import { HOSTEL_LIST_DASHBOARD } from "@/graphql/queries/main.quiries";
 import { AlertConfirm } from "@/components/Alerts/alert";
-import { Link } from "lucide-react";
 import { HOSTEL_DELETE_GQL } from "@/graphql/queries/main.mutations";
 import Pageniation from "@/components/pagination/pagination";
-
+import Link from "next/link";
 interface HostelListInterface {
   _id: string;
   name: string;
@@ -126,12 +125,9 @@ const HostelList: React.FC = () => {
               >
                 <Button variant={"destructive"}>Delete</Button>
               </AlertConfirm>
-              <Link href={`locations/update/${row.original._id}`}>
+              <Link href={`hostels/update/${row.original._id}`}>
                 <Button variant={"link"}>Edit</Button>
               </Link>
-              {/* <Link  href={`hostels/update/${row.original._id}`}>
-                <Button variant={"link"}>Edit</Button>
-              </Link> */}
             </div>
           </>
         );

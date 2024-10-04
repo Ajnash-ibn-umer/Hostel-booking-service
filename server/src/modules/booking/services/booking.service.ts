@@ -160,14 +160,14 @@ export class BookingService {
       if (!bedAvailablity) {
         throw 'Bed not available OR already occupied';
       }
-
+      console.log({ dto });
       const rentData = (await this.calculateBedRent({
         bedPosition: dto.bedPosition,
         paymentBase: dto.selectedPaymentBase,
         roomId: dto.roomId,
       })) as RentCalculatorResponse;
-
-      if (rentData.rent !== dto.netAmount) {
+      console.log({ rentData });
+      if (rentData.rent !== dto.basePrice) {
         throw new Error('Rent amount mismatch, please try again');
       }
       if (rentData.securityDeposit !== dto.securityDeposit) {
@@ -185,6 +185,7 @@ export class BookingService {
       const newBooking = await this.bookingRepository.create(
         {
           ...dto,
+          dob: new Date(dto.dob),
           bookingNumber: `${bookingNumber.prefix}${bookingNumber.count}`,
           bookingStatus: BOOKING_STATUS.FORM_COMPLETED,
           createdAt: time,
@@ -213,8 +214,7 @@ export class BookingService {
     } catch (error) {
       await txnSession.abortTransaction();
 
-      console.error('Error submitting admission form:', error);
-      throw new GraphQLError('Failed to submit admission form', {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
