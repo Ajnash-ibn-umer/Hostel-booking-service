@@ -4,6 +4,9 @@ import { PRICE_BASE_MODE } from 'src/database/models/hostel.model';
 import { Base } from 'src/shared/graphql/entities/main.entity';
 import enumToString from 'src/shared/utils/enumTostring';
 import { BED_POSITION } from 'src/shared/variables/main.variable';
+import { Room } from '../hostels/entities/room.entity';
+import { Bed } from '../hostels/entities/bed.entity';
+import { Hostel } from '../hostels/entities/hostel.entity';
 
 @ObjectType()
 export class Booking extends PartialType(Base) {
@@ -135,6 +138,15 @@ export class Booking extends PartialType(Base) {
 
   @Field(() => Int, { nullable: true })
   otherAmount: number;
+
+  @Field(() => Room, { nullable: true })
+  room: Room;
+
+  @Field(() => Bed, { nullable: true })
+  bed: Bed;
+
+  @Field(() => Hostel, { nullable: true })
+  property: Hostel;
 }
 
 @ObjectType()

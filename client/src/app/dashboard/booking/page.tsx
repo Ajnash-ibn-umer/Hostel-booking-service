@@ -16,10 +16,28 @@ import { useToast } from "@/hooks/use-toast";
 
 export type Booking = {
   _id: string;
-  customerName: string;
-  property: string;
+  arrivalTime: Date;
+  basePrice: number;
+  bedId: string;
+  bedName: string;
+  bookingNumber: string;
+  bookingStatus: number;
+  canteenFacility: string;
+  email: string;
+  name: string;
+  phone: string;
+  propertyId: string;
+  regNo: string;
+  roomId: string;
+  securityDeposit: number;
+  selectedPaymentBase: string;
+  status: number;
   checkInDate: Date;
   checkOutDate: Date;
+  property: {
+    name: string;
+    _id: string;
+  };
 };
 
 function Booking() {
@@ -28,27 +46,54 @@ function Booking() {
 
   const columns: ColumnDef<Booking>[] = [
     {
-      accessorKey: "customerName",
+      accessorKey: "bookingNumber",
+      header: "BookingNo",
+    },
+    {
+      accessorKey: "name",
       header: "Customer Name",
     },
     {
       accessorKey: "property",
       header: "Property",
+      cell: ({ row }) => {
+        const name = row.original.property["name"];
+        return name;
+      },
     },
     {
-      accessorKey: "checkInDate",
+      accessorKey: "arrivalTime",
       header: "Check-In Date",
       cell: ({ row }) =>
-        new Date(row.getValue("checkInDate")).toLocaleDateString(),
+        new Date(row.getValue("arrivalTime")).toLocaleDateString(),
     },
     {
-      accessorKey: "checkOutDate",
-      header: "Check-Out Date",
-      cell: ({ row }) =>
-        new Date(row.getValue("checkOutDate")).toLocaleDateString(),
+      accessorKey: "bookingStatus",
+      header: "Booking Status",
+      cell: ({ row }) => {
+        const status = row.getValue("bookingStatus");
+        switch (status) {
+          case 1:
+            return "Init";
+          case 2:
+            return "Form Submitted";
+          case 3:
+            return "Payment Failed";
+          case 4:
+            return "Payment Sucess";
+          case 5:
+            return "Admin Approved";
+          case 6:
+            return "Chek in";
+          default:
+            return "Unknown";
+        }
+      },
     },
     {
       id: "operations",
+      header: "Operations",
+
       cell: ({ row }) => {
         // const [deleteData, { loading, error }] = useMutation(BOOKING_DELETE_GQL);
 

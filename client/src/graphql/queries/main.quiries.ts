@@ -278,7 +278,8 @@ export const ROOM_TYPE_LIST_MINIMAL_GQL = gql`
 export const BOOKING_LIST_GQL=gql`
 query Booking_List($dto: ListInputBooking!) {
   Booking_List(dto: $dto) {
-    _id
+    list{
+ _id
     address
     arrivalTime
     basePrice
@@ -325,14 +326,19 @@ query Booking_List($dto: ListInputBooking!) {
     updatedAt
     updatedUserId
     userRemark
+    }
+    totalCount
   }
+  
 }`
 
 
 export const BOOKING_LIST_MINIMAL_GQL=gql`
 query Booking_List($dto: ListInputBooking!) {
   Booking_List(dto: $dto) {
-    _id
+    
+    list{
+      _id
     arrivalTime
     basePrice
     bedId
@@ -350,6 +356,13 @@ query Booking_List($dto: ListInputBooking!) {
     securityDeposit
     selectedPaymentBase
     status
-
+    property{
+      _id
+      name
+      status
+    }
+    }
+    totalCount
+  
   }
 }`
