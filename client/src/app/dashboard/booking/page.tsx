@@ -6,13 +6,45 @@ import { useRouter } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
-import { BOOKING_LIST_MINIMAL_GQL } from "@/graphql/queries/main.quiries"; // Assuming a similar query exists for bookings
+import {
+  BOOKING_LIST_MINIMAL_GQL,
+  ROOM_BED_LIST_GQL,
+} from "@/graphql/queries/main.quiries"; // Assuming a similar query exists for bookings
 import Link from "next/link";
 import Pageniation from "../../../components/pagination/pagination";
 import { DataTable } from "../../../components/Datatables/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { AlertConfirm } from "@/components/Alerts/alert";
 import { useToast } from "@/hooks/use-toast";
+import { EyeIcon } from "lucide-react";
+import { BOOKING_STATUS_CHANGE } from "@/graphql/queries/main.mutations";
+import DialogComp from "@/components/dialog/Dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Form } from "react-hook-form";
+export enum BookingStatus {
+  INIT = 1,
+  FORM_COMPLETED = 2,
+  PAYMENT_FAILED = 3,
+  PAYMENT_SUCCESS = 4,
+  ADMIN_APPROVED = 5,
+  CHECK_IN = 6,
+}
+export enum BedAvailabilityStatus {
+  AVAILABLE = 0,
+  ENGAGED = 1,
+  OCCUPIED = 2,
+  NOT_AVAILABLE = 3,
+}
 
 export type Booking = {
   _id: string;
@@ -21,7 +53,7 @@ export type Booking = {
   bedId: string;
   bedName: string;
   bookingNumber: string;
-  bookingStatus: number;
+  bookingStatus: BookingStatus;
   canteenFacility: string;
   email: string;
   name: string;
@@ -30,6 +62,7 @@ export type Booking = {
   regNo: string;
   roomId: string;
   securityDeposit: number;
+  bedPosition: number;
   selectedPaymentBase: string;
   status: number;
   checkInDate: Date;
@@ -43,6 +76,7 @@ export type Booking = {
 function Booking() {
   const router = useRouter();
   const { toast } = useToast();
+  const [selectedBed, setSelectedBed] = React.useState<string | null>(null);
 
   const columns: ColumnDef<Booking>[] = [
     {
@@ -95,50 +129,125 @@ function Booking() {
       header: "Operations",
 
       cell: ({ row }) => {
-        // const [deleteData, { loading, error }] = useMutation(BOOKING_DELETE_GQL);
+        const [changeStatus, { loading, error }] = useMutation(
+          BOOKING_STATUS_CHANGE,
+        );
 
-        // const deleteBooking = async () => {
-        //   try {
-        //     const { data, errors } = await deleteData({
-        //       variables: {
-        //         statusChangeInput: {
-        //           _status: 2,
-        //           ids: [row.original._id],
-        //         },
-        //       },
-        //     });
+        setSelectedBed(row.original.bedId as string);
 
-        //     if (data) {
-        //       toast({
-        //         variant: "default",
-        //         title: `Delete successful`,
-        //         description: `Booking deleted successfully`,
-        //       });
-        //       refetch(inputVariables);
-        //     }
-        //   } catch (error: any) {
-        //     toast({
-        //       variant: "destructive",
-        //       title: `Delete Failed`,
-        //       description: error.toString(),
-        //     });
-        //   }
-        // };
+        const {
+          data,
+          error: errorOfBeds,
+          refetch,
+        } = useQuery(ROOM_BED_LIST_GQL, {
+          variables: {
+            listInputRoom: {
+              limit: -1,
+              roomIds: [row.original.roomId],
+
+              skip: -1,
+              statusArray: [1],
+            },
+          },
+        });
+        const approveStatus = async () => {
+          try {
+            console.log({ selectedBed });
+            if (!selectedBed) {
+              toast({
+                variant: "destructive",
+                title: `Bed is required`,
+                description: `Bed is required . must be select one bed`,
+              });
+            }
+            const { data, errors } = await changeStatus({
+              variables: {
+                dto: {
+                  bookingIds: row.original._id,
+                  date: null,
+                  remark: `Bed selected`,
+                  selectedBedId: selectedBed,
+                  status: BookingStatus.ADMIN_APPROVED,
+                },
+              },
+            });
+
+            if (data) {
+              toast({
+                variant: "default",
+                title: `Status changed successful`,
+                description: `Booking Status Changed successfully`,
+              });
+            }
+            refetch(inputVariables);
+          } catch (error: any) {
+            toast({
+              variant: "destructive",
+              title: `Status Change Failed`,
+              description: error.toString(),
+            });
+          }
+        };
 
         return (
           <div className="flex gap-2">
-            <AlertConfirm
-              cancel="Cancel"
-              confirm="Delete"
-              description=""
-              title="Do you want to delete this booking?"
-              onContinue={() => {}}
-            >
-              <Button variant={"secondary"}>Approve</Button>
-            </AlertConfirm>
-            <Link href={`bookings/update/${row.original._id}`}>
-              <Button variant={"link"}>Cancel</Button>
-            </Link>
+            {row.original.bookingStatus < BookingStatus.ADMIN_APPROVED && (
+              <DialogComp
+                buttonTitle="Approve"
+                dialogDescription={`Update booking status for ${row.original.bookingNumber}`}
+                dialogTitle="Change Booking Status"
+              >
+                <div className="flex gap-2 p-3">
+                  <Select
+                    value={selectedBed as string}
+                    onValueChange={(v) => {
+                      console.log({ v });
+                      setSelectedBed(v);
+                    }}
+                  >
+                    <SelectTrigger
+                      onChange={(e) => e.preventDefault()}
+                      className=""
+                    >
+                      <SelectValue placeholder="Select a Bed" />
+                    </SelectTrigger>
+                    <SelectContent
+                      onClick={(e) => {
+                        e.preventDefault();
+                      }}
+                      onChange={(e) => e.preventDefault()}
+                    >
+                      <SelectGroup>
+                        <SelectLabel>Select Bed</SelectLabel>
+                        {data &&
+                          data.Room_List?.list[0]?.beds &&
+                          data.Room_List?.list[0]?.beds.length > 0 &&
+                          data.Room_List?.list[0]?.beds.map((bed: any) => {
+                            if (
+                              bed.paymentBase ===
+                                row.original.selectedPaymentBase &&
+                              bed.bedPosition === row.original.bedPosition
+                            ) {
+                              return (
+                                <SelectItem value={bed._id}>
+                                  {`${bed.name}-${bed.bedPosition} (${BedAvailabilityStatus[bed.availabilityStatus].toLowerCase().replace("_", " ")})`}
+                                </SelectItem>
+                              );
+                            }
+                          })}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={approveStatus}>Approve</Button>
+                </div>
+              </DialogComp>
+            )}
+            {/* <Link href={`bookings/update/${row.original._id}`}>
+              <Button variant={"destructive"}>Cancel</Button>
+            </Link> */}
+            {/* <Button variant={"ghost"}>
+              <EyeIcon />
+            </Button> */}
           </div>
         );
       },
