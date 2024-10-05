@@ -443,8 +443,9 @@ export class BookingService {
           },
           txnSession,
         );
+        console.log({ bedUpdate });
 
-        if (bedUpdate) {
+        if (!bedUpdate) {
           throw 'Selected Bed not found Or This bed already Booked!';
         }
       }
@@ -471,6 +472,7 @@ export class BookingService {
         bookingStatusHistoryEntries,
         txnSession,
       );
+      await txnSession.commitTransaction();
       return {
         message: 'Booking status updated successfully',
       };

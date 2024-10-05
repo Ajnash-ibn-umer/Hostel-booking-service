@@ -62,9 +62,7 @@ export const HOSTEL_CREATE_GQL = gql`
 `;
 
 export const HOSTEL_DELETE_GQL = gql`
-  mutation Hostel_StatusChange(
-    $statusChangeInput: statusChangeInput!
-  ) {
+  mutation Hostel_StatusChange($statusChangeInput: statusChangeInput!) {
     Hostel_StatusChange(statusChangeInput: $statusChangeInput) {
       message
     }
@@ -206,3 +204,10 @@ export const ROOM_TYPE_DELETE_GQL = gql`
     }
   }
 `;
+
+export const BOOKING_STATUS_CHANGE = gql`
+mutation Booking_ApprovalStatusChange($dto: AdminBookingStatusChangeInput!) {
+  Booking_ApprovalStatusChange(dto: $dto) {
+    message
+  }
+}`;

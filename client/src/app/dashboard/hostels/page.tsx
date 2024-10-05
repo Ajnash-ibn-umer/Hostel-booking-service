@@ -125,9 +125,9 @@ const HostelList: React.FC = () => {
               >
                 <Button variant={"destructive"}>Delete</Button>
               </AlertConfirm>
-              <Link href={`hostels/update/${row.original._id}`}>
+              {/* <Link href={`hostels/update/${row.original._id}`}>
                 <Button variant={"link"}>Edit</Button>
-              </Link>
+              </Link> */}
             </div>
           </>
         );
