@@ -40,8 +40,13 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Form } from "react-hook-form";
-import { BedAvailabilityStatus, BookingStatus } from "./_lib/enums";
+import {
+  BED_POSITION,
+  BedAvailabilityStatus,
+  BookingStatus,
+} from "./_lib/enums";
 import { EyeOpenIcon } from "@radix-ui/react-icons";
+import BookingDetailsSheet from "./details";
 
 export type Booking = {
   _id: string;
@@ -167,7 +172,7 @@ function OperationsCell({
                 <SelectContent>
                   {data?.Room_List?.list[0]?.beds?.map((bed: any) => (
                     <SelectItem key={bed._id} value={bed._id}>
-                      {`${bed.name}-${bed.bedPosition} (${BedAvailabilityStatus[bed.availabilityStatus].toLowerCase().replace("_", " ")})`}
+                      {`${bed.name}-${BED_POSITION[bed.bedPosition].toLowerCase()} (${BedAvailabilityStatus[bed.availabilityStatus].toLowerCase().replace("_", " ")})`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -254,9 +259,7 @@ function Booking() {
           {row.original.bookingStatus < BookingStatus.ADMIN_APPROVED && (
             <OperationsCell booking={row.original} refetch={refetch} />
           )}
-          <Button>
-            <EyeOpenIcon />
-          </Button>
+          <BookingDetailsSheet booking={row.original}></BookingDetailsSheet>
         </div>
       ),
     },
