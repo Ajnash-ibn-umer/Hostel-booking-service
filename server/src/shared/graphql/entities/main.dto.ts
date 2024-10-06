@@ -70,3 +70,24 @@ export class GenericListInput {
   @Field({ nullable: true })
   searchingText: string;
 }
+
+@InputType()
+export class ContactUsInput {
+  @Field(() => String, { nullable: false, description: 'Name of the contact' })
+  name: string;
+
+  @Field(() => String, { nullable: true, description: 'Email of the contact' })
+  email: string;
+
+  @Field(() => String, {
+    nullable: true,
+    description: 'Message from the contact',
+  })
+  message: string;
+
+  @Field(() => String, {
+    nullable: true,
+    description: 'Phone number of the contact',
+  })
+  phone?: string;
+}

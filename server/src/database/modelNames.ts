@@ -20,4 +20,5 @@ export enum MODEL_NAMES {
   INVOICES = 'invoices',
   CONTRACTS = 'contracts',
   TRANSACTIONS = 'transactions',
+  CONTACT_US = 'contact_us',
 }

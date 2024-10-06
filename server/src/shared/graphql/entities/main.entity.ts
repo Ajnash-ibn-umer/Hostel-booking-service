@@ -41,3 +41,24 @@ export class Base {
   @Field(() => ID, { nullable: true })
   updatedUserId?: string;
 }
+
+@ObjectType()
+export class ContactUs {
+  @Field(() => String, { nullable: true })
+  name?: string;
+
+  @Field(() => String, { nullable: true })
+  email?: string;
+
+  @Field(() => String, { nullable: true })
+  phone?: string;
+
+  @Field(() => String, { nullable: true })
+  message?: string;
+
+  @Field(() => Date, { nullable: true })
+  createdAt?: Date;
+
+  @Field(() => Int, { nullable: true })
+  status?: STATUS_NAMES;
+}

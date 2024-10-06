@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './modules/main/app.controller';
 import { AppService } from './modules/main/app.service';
-import { ConfigModule ,ConfigService} from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { AppResolver } from './modules/main/app.resolver';
@@ -14,19 +14,25 @@ import { GalleryModule } from './modules/gallery/gallery.module';
 import { PaymentGatewayModule } from './modules/payment-gateway/service/payment-gateway.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import ENV from './shared/variables/env.variables';
+import { ModelDefinitions } from './database/modelDefinitions';
+import { ContactUsRepository } from './repositories/contact-us.repository';
 
-const configService = new ConfigService()
+const configService = new ConfigService();
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-      load:[ENV]
+      load: [ENV],
     }),
-    MongooseModule.forRoot(`${configService.get<string>("DB_URL")}/${configService.get<string>("DB_NAME")}`,{}),
+    MongooseModule.forRoot(
+      `${configService.get<string>('DB_URL')}/${configService.get<string>('DB_NAME')}`,
+      {},
+    ),
+    MongooseModule.forFeature([ModelDefinitions.contactUsModel]),
     JwtModule.register({
-      secret: String(configService.get("JWT_ACCESS_TOKEN_SECRET_KEY")),
-      signOptions: { expiresIn: configService.get("JWT_ACCESS_TOKEN_EXPIRY")},
+      secret: String(configService.get('JWT_ACCESS_TOKEN_SECRET_KEY')),
+      signOptions: { expiresIn: configService.get('JWT_ACCESS_TOKEN_EXPIRY') },
       global: true,
     }),
     GraphqlConfig(),
@@ -36,10 +42,9 @@ const configService = new ConfigService()
     LocationModule,
     GalleryModule,
     PaymentGatewayModule,
-    InvoiceModule
-    ,
+    InvoiceModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppResolver],
+  providers: [AppService, AppResolver, ContactUsRepository],
 })
 export class AppModule {}
