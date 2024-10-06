@@ -489,7 +489,7 @@ export class BookingService {
   }
 
   async verifyPayment(dto: VerifyPaymentInput) {
-    const startTime = Date.now().toLocaleString();
+    const startTime = new Date();
     const txnSession = await this.connection.startSession();
 
     await txnSession.startTransaction();
@@ -503,6 +503,8 @@ export class BookingService {
       const bookingData = await this.bookingRepository.findOne({
         _id: dto.bookingId,
       });
+      console.log('in booking');
+
       if (!bookingData) {
         throw 'Booking Not Found';
       }
@@ -522,12 +524,11 @@ export class BookingService {
           txnSession,
         );
       }
-
       if (paymentStatus === true) {
         const updatedBooking = await this.bookingApprovalStatusChange(
           {
             bookingIds: dto.bookingId,
-            date: startTime,
+            date: new Date().toISOString(),
             status: BOOKING_STATUS.PAYMENT_SUCCESS,
 
             remark: `payment successful`,
@@ -549,6 +550,7 @@ export class BookingService {
             phoneNumber: bookingData.phone,
             profileImgUrl: null,
             roleId: null,
+            bookingId: bookingData._id.toString(),
             userType: USER_TYPES.USER,
           },
           txnSession,
@@ -572,11 +574,12 @@ export class BookingService {
         );
         //  TODO: send notification
       }
-
+      await txnSession.commitTransaction();
       return {
         message: 'Booking status updated successfully',
       };
     } catch (error) {
+      await txnSession.abortTransaction();
       return new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,

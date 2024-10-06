@@ -71,6 +71,8 @@ export class UserService {
         userNo: userNo,
         name: dto.name,
         email: dto.email,
+        bookingId: dto.bookingId,
+
         phoneNumber: dto.phoneNumber,
         userType: dto.userType,
         roleId: dto.roleId,

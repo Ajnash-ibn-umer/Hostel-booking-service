@@ -84,6 +84,7 @@ export class BookingResolver {
     @Args('dto') dto: VerifyPaymentInput,
     @Context() context,
   ): Promise<generalResponse | GraphQLError> {
+    console.log('Verifying payment');
     return this.bookingsService.verifyPayment(dto);
   }
 }
