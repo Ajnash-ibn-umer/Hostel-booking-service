@@ -62,3 +62,12 @@ export class ContactUs {
   @Field(() => Int, { nullable: true })
   status?: STATUS_NAMES;
 }
+
+@ObjectType()
+export class ContactUsList {
+  @Field(() => [ContactUs], { nullable: true })
+  list?: ContactUs[];
+
+  @Field(() => Int, { nullable: false })
+  totalCount: number;
+}

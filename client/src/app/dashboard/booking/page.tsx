@@ -21,6 +21,15 @@ import { BOOKING_STATUS_CHANGE } from "@/graphql/queries/main.mutations";
 import DialogComp from "@/components/dialog/Dialog";
 import { Input } from "@/components/ui/input";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -32,7 +41,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Form } from "react-hook-form";
 import { BedAvailabilityStatus, BookingStatus } from "./_lib/enums";
-
+import { EyeOpenIcon } from "@radix-ui/react-icons";
 
 export type Booking = {
   _id: string;
@@ -61,11 +70,135 @@ export type Booking = {
   };
 };
 
+function OperationsCell({
+  booking,
+  refetch,
+}: {
+  booking: Booking;
+  refetch: any;
+}) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedBed, setSelectedBed] = useState<string>("");
+
+  const [changeStatus] = useMutation(BOOKING_STATUS_CHANGE);
+
+  const { data } = useQuery(ROOM_BED_LIST_GQL, {
+    variables: {
+      listInputRoom: {
+        limit: -1,
+        roomIds: [booking.roomId],
+        skip: -1,
+        statusArray: [1],
+        bedFilters: {
+          availabilityStatus: [
+            BedAvailabilityStatus.AVAILABLE,
+            BedAvailabilityStatus.ENGAGED,
+          ],
+          bedPositions: [booking.bedPosition],
+          priceBaseModes: [booking.selectedPaymentBase],
+        },
+      },
+    },
+  });
+
+  const approveStatus = async () => {
+    try {
+      if (!selectedBed) {
+        toast({
+          variant: "destructive",
+          title: "Bed is required",
+          description: "You must select a bed",
+        });
+        return;
+      }
+
+      const { data, errors } = await changeStatus({
+        variables: {
+          dto: {
+            bookingIds: booking._id,
+            date: null,
+            remark: "Bed selected",
+            selectedBedId: selectedBed,
+            status: BookingStatus.ADMIN_APPROVED,
+          },
+        },
+      });
+
+      if (data) {
+        toast({
+          variant: "default",
+          title: "Status changed successfully",
+          description: "Booking Status Changed successfully",
+        });
+        setIsDialogOpen(false);
+        refetch(); // Refetch the room bed list
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Status Change Failed",
+        description: error.toString(),
+      });
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      <Button onClick={() => setIsDialogOpen(true)} variant="secondary">
+        Approve
+      </Button>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Select Bed for Approval</DialogTitle>
+            <DialogDescription>
+              Choose a bed for the booking and click confirm to approve.
+            </DialogDescription>
+          </DialogHeader>
+          {data?.Room_List?.list[0]?.beds &&
+          data?.Room_List?.list[0]?.beds.length > 0 ? (
+            <div className="grid gap-4 py-4">
+              <Select onValueChange={setSelectedBed} value={selectedBed}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a bed" />
+                </SelectTrigger>
+                <SelectContent>
+                  {data?.Room_List?.list[0]?.beds?.map((bed: any) => (
+                    <SelectItem key={bed._id} value={bed._id}>
+                      {`${bed.name}-${bed.bedPosition} (${BedAvailabilityStatus[bed.availabilityStatus].toLowerCase().replace("_", " ")})`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <>
+              <span>
+                Bed Not available for this room with selected requirements
+              </span>
+            </>
+          )}
+          <DialogFooter>
+            <Button onClick={approveStatus} disabled={!selectedBed}>
+              Confirm Selection
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <div></div>
+    </div>
+  );
+}
+
 function Booking() {
   const router = useRouter();
   const { toast } = useToast();
   const [selectedBed, setSelectedBed] = React.useState<string | null>(null);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const handleOpenDialog = () => setIsDialogOpen(true);
+  const handleCloseDialog = () => setIsDialogOpen(false);
   const columns: ColumnDef<Booking>[] = [
     {
       accessorKey: "bookingNumber",
@@ -116,129 +249,16 @@ function Booking() {
       id: "operations",
       header: "Operations",
 
-      cell: ({ row }) => {
-        const [changeStatus, { loading, error }] = useMutation(
-          BOOKING_STATUS_CHANGE,
-        );
-
-        setSelectedBed(row.original.bedId as string);
-
-        const {
-          data,
-          error: errorOfBeds,
-          refetch,
-        } = useQuery(ROOM_BED_LIST_GQL, {
-          variables: {
-            listInputRoom: {
-              limit: -1,
-              roomIds: [row.original.roomId],
-
-              skip: -1,
-              statusArray: [1],
-            },
-          },
-        });
-        const approveStatus = async () => {
-          try {
-            console.log({ selectedBed });
-            if (!selectedBed) {
-              toast({
-                variant: "destructive",
-                title: `Bed is required`,
-                description: `Bed is required . must be select one bed`,
-              });
-            }
-            const { data, errors } = await changeStatus({
-              variables: {
-                dto: {
-                  bookingIds: row.original._id,
-                  date: null,
-                  remark: `Bed selected`,
-                  selectedBedId: selectedBed,
-                  status: BookingStatus.ADMIN_APPROVED,
-                },
-              },
-            });
-
-            if (data) {
-              toast({
-                variant: "default",
-                title: `Status changed successful`,
-                description: `Booking Status Changed successfully`,
-              });
-            }
-            refetch(inputVariables);
-          } catch (error: any) {
-            toast({
-              variant: "destructive",
-              title: `Status Change Failed`,
-              description: error.toString(),
-            });
-          }
-        };
-
-        return (
-          <div className="flex gap-2">
-            {row.original.bookingStatus < BookingStatus.ADMIN_APPROVED && (
-              <DialogComp
-                buttonTitle="Approve"
-                dialogDescription={`Update booking status for ${row.original.bookingNumber}`}
-                dialogTitle="Change Booking Status"
-              >
-                <div className="flex gap-2 p-3">
-                  <Select
-                    value={selectedBed as string}
-                    onValueChange={(v) => {
-                      console.log({ v });
-                      setSelectedBed(v);
-                    }}
-                  >
-                    <SelectTrigger
-                      onChange={(e) => e.preventDefault()}
-                      className=""
-                    >
-                      <SelectValue placeholder="Select a Bed" />
-                    </SelectTrigger>
-                    <SelectContent
-                      onClick={(e) => {
-                        e.preventDefault();
-                      }}
-                      onChange={(e) => e.preventDefault()}
-                    >
-                      <SelectGroup>
-                        <SelectLabel>Select Bed</SelectLabel>
-                        {data &&
-                          data.Room_List?.list[0]?.beds &&
-                          data.Room_List?.list[0]?.beds.length > 0 &&
-                          data.Room_List?.list[0]?.beds.map((bed: any) => {
-                            if (
-                              bed.paymentBase ===
-                                row.original.selectedPaymentBase &&
-                              bed.bedPosition === row.original.bedPosition
-                            ) {
-                              return (
-                                <SelectItem value={bed._id}>
-                                  {`${bed.name}-${bed.bedPosition} (${BedAvailabilityStatus[bed.availabilityStatus].toLowerCase().replace("_", " ")})`}
-                                </SelectItem>
-                              );
-                            }
-                          })}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <Button onClick={approveStatus}>Approve</Button>
-                </div>
-              </DialogComp>
-            )}
-            {/* <Link href={`bookings/update/${row.original._id}`}>
-              <Button variant={"destructive"}>Cancel</Button>
-            </Link> */}
-            {/* <Button variant={"ghost"}>
-              <EyeIcon />
-            </Button> */}
-          </div>
-        );
-      },
+      cell: ({ row }) => (
+        <div className="flex gap-1">
+          {row.original.bookingStatus < BookingStatus.ADMIN_APPROVED && (
+            <OperationsCell booking={row.original} refetch={refetch} />
+          )}
+          <Button>
+            <EyeOpenIcon />
+          </Button>
+        </div>
+      ),
     },
   ];
 
@@ -249,6 +269,7 @@ function Booking() {
       skip: number;
       searchingText: string | null;
       sortOrder: number;
+      sortType?: number;
     };
   }>({
     dto: {
@@ -256,7 +277,7 @@ function Booking() {
       limit: 10,
       skip: 0,
       searchingText: null,
-      sortOrder: 1,
+      sortOrder: -1,
     },
   });
 
@@ -285,11 +306,6 @@ function Booking() {
       <Breadcrumb pageName="Booking" />
 
       <div className="flex flex-col gap-10">
-        {/* <div className="flex justify-end ">
-          <Button asChild>
-            <Link href={"bookings/create"}>Approve</Link>
-          </Button>
-        </div> */}
         <DataTable columns={columns} data={data?.Booking_List?.list || []} />
         <Pageniation
           fetch={changePage}

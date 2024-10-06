@@ -21,6 +21,7 @@ import { generalResponse } from 'src/shared/graphql/entities/main.entity';
 import { AdminBookingStatusChangeInput } from './dto/booking-approval-status-update.input';
 import { BookingCreateInput } from './dto/create-booking.input';
 import { UpdateBookingInput } from './dto/update-booking.input';
+import { VerifyPaymentInput } from './dto/verify-booking.input';
 
 @UseGuards(AuthGuard)
 @Resolver()
@@ -75,5 +76,14 @@ export class BookingResolver {
   ) {
     const userId = context.req.user.userId;
     return this.bookingsService.updateAdmissionFormSubmission(dto, userId);
+  }
+
+  @UserTypes([USER_TYPES.PUBLIC])
+  @Mutation(() => generalResponse, { name: 'Booking_VerifyPayment' })
+  async verifyPayment(
+    @Args('dto') dto: VerifyPaymentInput,
+    @Context() context,
+  ): Promise<generalResponse | GraphQLError> {
+    return this.bookingsService.verifyPayment(dto);
   }
 }
