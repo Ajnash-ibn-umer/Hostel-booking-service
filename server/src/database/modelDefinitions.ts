@@ -4,6 +4,7 @@ import { BedSchema } from './models/bed.model';
 import { BookingStatusHistorySchema } from './models/booking-status.model';
 import { BookingSchema } from './models/booking.model';
 import { CategorySchema } from './models/category.model';
+import { ContactUsSchema } from './models/contact-us.model';
 import { ContractSchema } from './models/contract.model';
 import { CounterSchema } from './models/counter.model';
 import { GallerySchema } from './models/gallery.model';
@@ -101,5 +102,9 @@ export const ModelDefinitions = {
   transactionsModel: {
     name: MODEL_NAMES.TRANSACTIONS,
     schema: PaymentTransactionSchema,
+  },
+  contactUsModel: {
+    name: MODEL_NAMES.CONTACT_US,
+    schema: ContactUsSchema,
   },
 };
