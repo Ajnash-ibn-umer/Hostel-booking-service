@@ -1,4 +1,12 @@
-import React from "react";
+"use client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,19 +23,27 @@ const DialogComp: React.FC<{
   dialogDescription: string;
   children: any;
 }> = ({ buttonTitle, dialogTitle, children, dialogDescription }) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const handleOpenDialog = () => setIsDialogOpen(true);
+  const handleCloseDialog = () => setIsDialogOpen(false);
   return (
-    <Dialog modal={true}>
-      <Button variant={"secondary"}>
-        <DialogTrigger>{buttonTitle}</DialogTrigger>
+    <div>
+      <Button onClick={handleOpenDialog} variant={"secondary"}>
+        {buttonTitle}
       </Button>
-      <DialogContent onInteractOutside={(e) => e.preventDefault()}>
-        <DialogHeader>
-          <DialogTitle>{dialogTitle}</DialogTitle>
-          <DialogDescription>{dialogDescription}</DialogDescription>
-        </DialogHeader>
-        {children}
-      </DialogContent>
-    </Dialog>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DialogHeader>
+            <DialogTitle>{dialogTitle}</DialogTitle>
+            <DialogDescription>{dialogDescription}</DialogDescription>
+          </DialogHeader>
+
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

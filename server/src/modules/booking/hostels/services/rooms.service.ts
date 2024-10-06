@@ -169,12 +169,42 @@ export class RoomsService {
       }
 
       if (projection['list']['beds']) {
+        let bedPipeline = [];
+        if (dto.bedFilters) {
+          const bedFilter = dto.bedFilters;
+          if (
+            bedFilter.availabilityStatus &&
+            bedFilter.availabilityStatus.length > 0
+          ) {
+            bedPipeline.push({
+              $match: {
+                availabilityStatus: { $in: bedFilter.availabilityStatus },
+              },
+            });
+          }
+
+          if (bedFilter.bedPositions && bedFilter.bedPositions.length > 0) {
+            bedPipeline.push({
+              $match: {
+                bedPosition: { $in: bedFilter.bedPositions },
+              },
+            });
+          }
+          if (bedFilter.priceBaseModes && bedFilter.priceBaseModes.length > 0) {
+            bedPipeline.push({
+              $match: {
+                paymentBase: { $in: bedFilter.priceBaseModes },
+              },
+            });
+          }
+        }
         pipeline.push(
           ...Lookup({
             modelName: MODEL_NAMES.BED,
             params: { id: '$_id' },
             project: responseFormat(projection['list']['beds']),
             conditions: { $roomId: '$$id' },
+            innerPipeline: bedPipeline,
             isNeedUnwind: false,
             responseName: 'beds',
           }),

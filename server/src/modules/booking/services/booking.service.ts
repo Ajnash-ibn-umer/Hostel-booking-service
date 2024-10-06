@@ -495,6 +495,7 @@ export class BookingService {
     await txnSession.startTransaction();
     try {
       let paymentStatus: boolean;
+      paymentStatus = true;
       // TODO: Payment verfication
 
       // TODO: update admission book form status
@@ -505,12 +506,12 @@ export class BookingService {
       if (!bookingData) {
         throw 'Booking Not Found';
       }
-      if (paymentStatus === false) {
+      if (!paymentStatus) {
         const transaction = await this.transactionRepository.create(
           {
             amount: dto.amount,
             bookingId: dto.bookingId,
-            transactionId: dto.orderId,
+            transactionId: dto.orderId ?? '',
             remark: 'Payment failed',
             paymentType: 1,
             invoiceId: null,

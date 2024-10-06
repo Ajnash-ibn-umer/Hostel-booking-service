@@ -1,4 +1,4 @@
-import { Field, InputType, Int } from '@nestjs/graphql';
+import { Field, ID, InputType, Int, PartialType } from '@nestjs/graphql';
 import enumToString from 'src/shared/utils/enumTostring';
 import { STATUS_NAMES } from 'src/shared/variables/main.variable';
 
@@ -69,6 +69,14 @@ export class GenericListInput {
 
   @Field({ nullable: true })
   searchingText: string;
+}
+
+@InputType()
+export class ContactUsListInput extends PartialType(GenericListInput) {
+  @Field(() => [ID], {
+    nullable: true,
+  })
+  contactUsIds: string[];
 }
 
 @InputType()
