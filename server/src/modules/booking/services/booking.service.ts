@@ -354,7 +354,6 @@ export class BookingService {
           }),
         );
       }
-
       if (projection['list']['room']) {
         pipeline.push(
           ...Lookup({
