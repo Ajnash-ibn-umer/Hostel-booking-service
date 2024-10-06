@@ -10,10 +10,10 @@ export class Base {
   @Prop({ type: Number, enum: STATUS_NAMES })
   status?: STATUS_NAMES;
 
-  @Prop({ default: null })
+  @Prop({ type: Date, default: null })
   createdAt?: Date;
 
-  @Prop({ default: null })
+  @Prop({ type: Date, default: null })
   updatedAt?: Date;
 
   @Prop({ type: SchemaTypes.ObjectId, ref: MODEL_NAMES.USER, default: null })
