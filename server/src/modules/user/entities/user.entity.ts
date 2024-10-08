@@ -18,6 +18,9 @@ export class User extends PartialType(Base) {
   password: string;
 
   @Field({ nullable: true })
+  isActive: boolean;
+
+  @Field({ nullable: true })
   phoneNumber: string;
 
   @Field({ description: enumToString(USER_TYPES), nullable: true })
@@ -52,4 +55,28 @@ export class LoginResponse {
 
   @Field(() => User, { nullable: true })
   user: User;
+}
+
+@ObjectType()
+export class PhoneVerifyEntity {
+  @Field({ nullable: true })
+  message: string;
+
+  @Field()
+  exists: boolean;
+}
+
+@ObjectType()
+export class UserTokenResponse {
+  @Field({ nullable: true })
+  message: string;
+
+  @Field({ nullable: true })
+  accessToken: string;
+
+  @Field({ nullable: true })
+  refreshToken: string;
+
+  @Field()
+  loginStatus: boolean;
 }

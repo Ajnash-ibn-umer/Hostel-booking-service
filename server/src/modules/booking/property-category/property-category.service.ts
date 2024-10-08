@@ -181,8 +181,10 @@ export class PropertyCategoryService {
     const list = (await this.categoryRepository.aggregate(
       pipeline,
     )) as PropertyCategory[];
-
-    const totalCount = await this.categoryRepository.totalCount(pipeline);
+    let totalCount = 0;
+    if (projection['totalCount']) {
+      const totalCount = await this.categoryRepository.totalCount(pipeline);
+    }
     return {
       list,
       totalCount: totalCount,

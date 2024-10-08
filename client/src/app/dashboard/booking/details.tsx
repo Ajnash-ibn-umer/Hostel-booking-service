@@ -99,13 +99,13 @@ export default function BookingDetailsSheet({
             <div>
               <h4 className="text-sm font-medium">Base Price</h4>
               <p className="text-sm text-gray-500">
-                ${booking.basePrice.toFixed(2)}
+                RS{booking.basePrice.toFixed(2)}
               </p>
             </div>
             <div>
               <h4 className="text-sm font-medium">Security Deposit</h4>
               <p className="text-sm text-gray-500">
-                ${booking.securityDeposit.toFixed(2)}
+                RS{booking.securityDeposit.toFixed(2)}
               </p>
             </div>
             <div>

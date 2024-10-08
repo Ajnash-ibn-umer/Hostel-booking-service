@@ -300,7 +300,11 @@ function Booking() {
 
   useEffect(() => {
     if (error) {
-      alert(error.message);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Response not found",
+        description: error.message,
+      });
     }
   }, [error]);
 

@@ -756,7 +756,10 @@ export class HostelsService {
           pipeline as PipelineStage[],
         )) as any[]) || [];
 
-      const totalCount = await this.hostelRepository.totalCount(pipeline);
+      let totalCount = 0;
+      if (projection['totalCount']) {
+        totalCount = await this.hostelRepository.totalCount(pipeline);
+      }
 
       console.log(list);
       return {

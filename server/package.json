@@ -31,6 +31,8 @@
     "@nestjs/swagger": "^7.4.0",
     "bcrypt": "^5.1.1",
     "compression": "^1.7.4",
+    "firebase": "^10.14.0",
+    "firebase-admin": "^12.6.0",
     "graphql": "^16.9.0",
     "i": "^0.3.7",
     "next": "13.5.7",

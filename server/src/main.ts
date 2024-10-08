@@ -5,6 +5,8 @@ import * as compression from 'compression';
 import * as express from 'express';
 import { join } from 'path';
 
+export const serviceAccount = require('../oxtal-72f58-firebase-adminsdk-cpe2c-b867d006ed.json'); // Replace with your actual path
+
 import next from 'next';
 
 async function bootstrap() {

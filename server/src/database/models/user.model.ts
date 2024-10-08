@@ -16,6 +16,9 @@ export class User extends Base {
   @Prop({ default: '', required: false })
   email?: string;
 
+  @Prop({ default: false, required: true })
+  isActive?: boolean;
+
   @Prop({ default: '', required: false })
   password?: string;
 
