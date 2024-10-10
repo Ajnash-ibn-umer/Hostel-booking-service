@@ -32,7 +32,7 @@ const HostelList: React.FC = () => {
       limit: 10,
       skip: 0,
       searchingText: null,
-      sortOrder: null,
+      sortOrder: -1,
       sortType: null,
       categoryIds: null,
       hostelIds: null,
@@ -93,6 +93,7 @@ const HostelList: React.FC = () => {
                 },
               },
             });
+           await refetch();
 
             if (data) {
               toast({
@@ -100,7 +101,6 @@ const HostelList: React.FC = () => {
                 title: `Delete succesfull`,
                 description: `Delete succesfull`,
               });
-              refetch(inputVariables);
             }
           } catch (error: any) {
             toast({

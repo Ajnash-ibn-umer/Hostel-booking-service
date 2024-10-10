@@ -44,9 +44,11 @@ import {
   BED_POSITION,
   BedAvailabilityStatus,
   BookingStatus,
+  PRICE_BASE_MODE,
 } from "./_lib/enums";
 import { EyeOpenIcon } from "@radix-ui/react-icons";
 import BookingDetailsSheet from "./details";
+import { Badge } from "@/components/ui/badge";
 
 export type Booking = {
   _id: string;
@@ -90,6 +92,7 @@ function OperationsCell({
   const [changeStatus] = useMutation(BOOKING_STATUS_CHANGE);
 
   const { data } = useQuery(ROOM_BED_LIST_GQL, {
+    fetchPolicy: "no-cache",
     variables: {
       listInputRoom: {
         limit: -1,
@@ -102,7 +105,7 @@ function OperationsCell({
             BedAvailabilityStatus.ENGAGED,
           ],
           bedPositions: [booking.bedPosition],
-          priceBaseModes: [booking.selectedPaymentBase],
+          priceBaseModes: [booking.selectedPaymentBase, PRICE_BASE_MODE.BOTH],
         },
       },
     },
@@ -234,19 +237,28 @@ function Booking() {
         const status = row.getValue("bookingStatus");
         switch (status) {
           case 1:
-            return "Init";
+            <Badge variant={"secondary"}>Init</Badge>;
           case 2:
-            return "Form Submitted";
+            return <Badge variant={"secondary"}>Form Submitted</Badge>;
           case 3:
-            return "Payment Failed";
+            return <Badge variant={"secondary"}>Payment Failed</Badge>;
           case 4:
-            return "Payment Sucess";
+            return (
+              <Badge
+                style={{ background: "green", color: "white" }}
+              >
+                Payment Success
+              </Badge>
+            );
           case 5:
-            return "Admin Approved";
+            return <Badge
+            style={{ background: "#2cbf93", color: "white" }}
+            
+             variant={"secondary"}>Admin Approved</Badge>;
           case 6:
-            return "Chek in";
+            return <Badge variant={"secondary"}>Check in</Badge>;
           default:
-            return "Unknown";
+            return <Badge variant={"secondary"}>Unknown</Badge>;
         }
       },
     },
@@ -260,6 +272,9 @@ function Booking() {
             <OperationsCell booking={row.original} refetch={refetch} />
           )}
           <BookingDetailsSheet booking={row.original}></BookingDetailsSheet>
+          {row.original.bookingStatus === BookingStatus.ADMIN_APPROVED && (
+            <Button variant={"secondary"}>Check-In</Button>
+          )}
         </div>
       ),
     },

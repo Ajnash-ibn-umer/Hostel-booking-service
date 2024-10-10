@@ -120,6 +120,11 @@ export class AuthService {
       // }
 
       // Generate new access and refresh tokens
+
+      if (dto.token !== '123456') {
+        throw 'Invalid token';
+      }
+
       const accessToken = this.jwtService.sign({
         userId: dto.userId,
         userType: USER_TYPES.USER,

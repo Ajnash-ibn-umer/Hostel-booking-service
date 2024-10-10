@@ -80,27 +80,27 @@ const menuGroups = [
     ],
   }
 
-  // ,
-  // {
-  //   name: "MANAGEMENT",
-  //   menuItems: [
-  //     {
-  //       icon: <MdLocalLaundryService />,
-  //       label: "Laundry Booking",
-  //       route: "/dashboard/laundry-booking",
-  //     },
-  //     {
-  //       icon: <MdVerticalSplit />,
-  //       label: "Damage And Split",
-  //       route: "/dashboard/damage-and-split",
-  //     },
-  //     {
-  //       icon: <RiSendPlaneLine />,
-  //       label: "Complaints",
-  //       route: "/dashboard/complaints",
-  //     },
-  //   ],
-  // },
+  ,
+  {
+    name: "MANAGEMENT",
+    menuItems: [
+      {
+        icon: <MdLocalLaundryService />,
+        label: "Laundry Booking",
+        route: "/dashboard/laundry-booking",
+      },
+      {
+        icon: <MdVerticalSplit />,
+        label: "Damage And Split",
+        route: "/dashboard/damage-and-split",
+      },
+      {
+        icon: <RiSendPlaneLine />,
+        label: "Complaints",
+        route: "/dashboard/complaints",
+      },
+    ],
+  },
 ];
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
