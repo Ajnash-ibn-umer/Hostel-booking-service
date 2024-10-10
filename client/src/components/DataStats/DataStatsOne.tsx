@@ -24,8 +24,8 @@ const dataStatsList = [
       </svg>
     ),
     color: "#3FD97F",
-    title: "Total Views",
-    value: "3.456K",
+    title: "Total Rooms",
+    value: "300",
     growthRate: 0.43,
   },
   {
@@ -47,7 +47,7 @@ const dataStatsList = [
     ),
     color: "#FF9C55",
     title: "Total Profit",
-    value: "$42.2K",
+    value: "RS 42.2K",
     growthRate: 4.35,
   },
   {
@@ -74,8 +74,8 @@ const dataStatsList = [
       </svg>
     ),
     color: "#8155FF",
-    title: "Total Product",
-    value: "2.450",
+    title: "Total Complaints",
+    value: "211",
     growthRate: 2.59,
   },
   {
@@ -113,7 +113,7 @@ const dataStatsList = [
     ),
     color: "#18BFFF",
     title: "Total Users",
-    value: "3.465",
+    value: "3,465",
     growthRate: -0.95,
   },
 ];
