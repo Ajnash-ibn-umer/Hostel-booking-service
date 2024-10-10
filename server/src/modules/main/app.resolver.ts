@@ -6,6 +6,7 @@ import {
 import {
   ContactUs,
   ContactUsList,
+  generalResponse,
   infoResponse,
 } from 'src/shared/graphql/entities/main.entity';
 import { AppService } from './app.service';
@@ -16,15 +17,17 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { UserTypes } from 'src/shared/decorators';
 import { USER_TYPES } from 'src/shared/variables/main.variable';
-
+import admin from 'firebase-admin';
+import { serviceAccount } from 'src/main';
+import { getAuth, signInWithPhoneNumber } from 'firebase/auth';
 @UseGuards(AuthGuard)
 @Resolver()
 export class AppResolver {
   constructor(private readonly appService: AppService) {}
-  // @Mutation(()=>generalResponse)
-  // async init(){
-  //     return this.appService.projectInit()
-  // }
+  @Mutation(() => generalResponse)
+  async init() {
+    return { message: 'Hao' };
+  }
 
   @Query(() => infoResponse)
   async info(): Promise<infoResponse> {

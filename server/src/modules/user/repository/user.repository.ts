@@ -10,7 +10,6 @@ export class UserRepository extends EntityRepository<UserDocument> {
   constructor(
     @InjectModel(MODEL_NAMES.USER) protected userModel: Model<UserDocument>,
   ) {
-    
     super(userModel);
   }
 }

@@ -25,9 +25,7 @@ interface HostelListInterface {
 const HostelList: React.FC = () => {
   const { toast } = useToast();
   const router = useRouter();
-  const [hostelListData, setHostelListData] = useState<HostelListInterface[]>(
-    [],
-  );
+
   const [inputVariables, setInputVariables] = useState({
     listInputHostel: {
       statusArray: [1],
@@ -147,10 +145,7 @@ const HostelList: React.FC = () => {
   };
 
   useEffect(() => {
-    if (data) {
-      const hostelList = data.Hostel_List?.list || [];
-      setHostelListData(hostelList);
-    }
+  
     if (error) {
       toast({
         variant: "destructive",
@@ -167,13 +162,13 @@ const HostelList: React.FC = () => {
         <div className="flex justify-end ">
           <Button onClick={() => router.push("hostels/create")}>Create</Button>
         </div>
-        <DataTable columns={hostelColumns} data={hostelListData} />
+        <DataTable columns={hostelColumns} data={data?.Hostel_List?.list || []} />
         <Pageniation
           fetch={changePage}
           skip={inputVariables?.listInputHostel.skip || 0}
-          totalCount={data?.Location_List?.totalCount || 0}
+          totalCount={data?.Hostel_List?.totalCount || 0}
           limit={inputVariables?.listInputHostel.limit || 10}
-        ></Pageniation>
+        />
       </div>
     </div>
   );

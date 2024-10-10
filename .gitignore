@@ -23,6 +23,8 @@ client/*.pem
 client/npm-debug.log*
 client/yarn-debug.log*
 client/yarn-error.log*
+client/pnpm-error.log*
+
 
 # local env files
 client/.env*.local
@@ -45,3 +47,8 @@ server/build
 *.env/*
 server/.env
 
+server/pnpm-lock.yaml
+client/pnpm-lock.yaml
+
+client/package-lock.json
+client/yarn.lock

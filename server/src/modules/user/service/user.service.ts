@@ -72,7 +72,7 @@ export class UserService {
         name: dto.name,
         email: dto.email,
         bookingId: dto.bookingId,
-
+        isActive: true,
         phoneNumber: dto.phoneNumber,
         userType: dto.userType,
         roleId: dto.roleId,
@@ -196,6 +196,33 @@ export class UserService {
       };
     } catch (error) {
       return new GraphQLError(error.message ?? error, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    }
+  }
+
+  async activateUser(
+    userId: string,
+    session: mongoose.ClientSession,
+  ): Promise<User> {
+    try {
+      const user = await this.userRepo.findOne({ _id: userId }, session);
+      if (!user) {
+        throw new GraphQLError('User not found', {
+          extensions: {
+            code: HttpStatus.NOT_FOUND,
+          },
+        });
+      }
+
+      user.isActive = true;
+      await user.save({ session });
+
+      return user as any;
+    } catch (error) {
+      throw new GraphQLError(error.message ?? 'Error activating user', {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },

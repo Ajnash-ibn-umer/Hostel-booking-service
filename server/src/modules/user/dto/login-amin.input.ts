@@ -8,3 +8,12 @@ export class LoginAdminInput {
   @Field()
   password: string;
 }
+
+@InputType()
+export class OtpVerifyTokenInput {
+  @Field()
+  token: string;
+
+  @Field()
+  userId: string;
+}
