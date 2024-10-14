@@ -32,10 +32,10 @@ GallerySchema.index({ uid: 1, _id: 1 });
 GallerySchema.index({ name: 1 });
 GallerySchema.index({ docType: 1 });
 GallerySchema.index({ status: 1 });
-GallerySchema.index(
-  { uid: 1 },
-  { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
-);
+// GallerySchema.index(
+//   { uid: 1 },
+//   { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
+// );
 
 GallerySchema.post('save', async function (error, doc, next) {
   schemaPostFunctionForDuplicate(error, doc, next);

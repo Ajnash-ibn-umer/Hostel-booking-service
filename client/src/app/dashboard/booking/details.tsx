@@ -61,7 +61,9 @@ export default function BookingDetailsSheet({
           </div>
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Property Details</h4>
-            <p className="text-sm text-gray-500">{booking.property.name}</p>
+            <p className="text-sm text-gray-500">
+              {booking?.property?.name || ""}
+            </p>
             <p className="text-sm text-gray-500">
               Room: {booking.bedName} (Position:{" "}
               {BED_POSITION[booking.bedPosition].toLowerCase()})

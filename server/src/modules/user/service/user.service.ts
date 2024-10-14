@@ -20,6 +20,8 @@ import { ConfigService } from '@nestjs/config';
 import { LoginAdminInput } from '../dto/login-amin.input';
 import { JwtService } from '@nestjs/jwt';
 import { InjectConnection } from '@nestjs/mongoose';
+import { ContractRepository } from 'src/repositories/contract.repository';
+import { Lookup } from 'src/shared/utils/mongodb/lookupGenerator';
 
 @Injectable()
 export class UserService {
@@ -28,6 +30,8 @@ export class UserService {
     private readonly counterService: CounterService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    private readonly contractRepository: ContractRepository,
+
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
@@ -179,16 +183,13 @@ export class UserService {
         userAggregationArray.push(responseFormat(projection['list']));
       console.log(JSON.stringify(userAggregationArray));
 
-      const userData = await this.userRepo.aggregate([
-        {
-          $match: {
-            status: 1,
-          },
-        },
-      ]);
+      const userData = await this.userRepo.aggregate(userAggregationArray);
       console.log(userData);
 
       let totalCount = 0;
+      if (projection['totalCount']) {
+        totalCount = await this.userRepo.totalCount(userAggregationArray);
+      }
 
       return {
         list: userData,
@@ -223,6 +224,109 @@ export class UserService {
       return user as any;
     } catch (error) {
       throw new GraphQLError(error.message ?? 'Error activating user', {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    }
+  }
+
+  async me(userId: string = null, projection: Record<string, any>) {
+    try {
+      const uid = new mongoose.Types.ObjectId(userId);
+      console.log({ uid });
+
+      const user: any = await this.userRepo.aggregate([
+        {
+          $match: {
+            _id: uid,
+            status: STATUS_NAMES.ACTIVE,
+            userType: USER_TYPES.USER,
+            isActive: true,
+          },
+        },
+        {
+          $limit: 1,
+        },
+        responseFormat(projection['user']),
+      ]);
+
+      if (!user || user.length === 0) {
+        throw 'user not found';
+      }
+
+      const contractAggregationArray: any[] = [
+        {
+          $match: {
+            userId: uid,
+            status: STATUS_NAMES.ACTIVE,
+          },
+        },
+        {
+          $limit: 1,
+        },
+        responseFormat(projection['contract']),
+      ];
+      if (projection['contract']['property']) {
+        contractAggregationArray.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.HOSTEL,
+            params: { id: '$propertyId' },
+            project: responseFormat(projection['contract']['property']),
+            conditions: { $_id: '$$id' },
+            responseName: 'property',
+          }),
+        );
+      }
+
+      if (projection['contract']['bed']) {
+        contractAggregationArray.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.BED,
+            params: { id: '$bedId' },
+            project: responseFormat(projection['contract']['bed']),
+            conditions: { $_id: '$$id' },
+            responseName: 'bed',
+          }),
+        );
+      }
+      if (projection['contract']['room']) {
+        contractAggregationArray.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.ROOM,
+            params: { id: '$roomId' },
+            project: responseFormat(projection['contract']['room']),
+            conditions: { $_id: '$$id' },
+            responseName: 'room',
+          }),
+        );
+      }
+      if (projection['contract']['booking']) {
+        contractAggregationArray.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.BOOKING,
+            params: { id: '$bookingId' },
+            project: responseFormat(projection['contract']['booking']),
+            conditions: { $_id: '$$id' },
+            responseName: 'booking',
+          }),
+        );
+      }
+      const contract: any = await this.contractRepository.aggregate(
+        contractAggregationArray,
+      );
+
+      if (!contract || contract.length === 0) {
+        throw ` Contract not found`;
+      }
+
+      return {
+        message: 'Information fetched',
+        user: user[0] || null,
+        contract: contract[0] || null,
+      };
+    } catch (error) {
+      throw new GraphQLError(error.message ?? error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },

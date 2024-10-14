@@ -19,6 +19,7 @@ import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Type } from "lucide-react";
+import { ChatBubbleIcon } from "@radix-ui/react-icons";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -70,13 +71,13 @@ const menuGroups = [
       //   route: "/dashboard/users",
       // },
 
-      // {
-      //   icon: (
-      //    <IoMdSettings/>
-      //   ),
-      //   label: "Settings",
-      //   route: "/dashboard/settings",
-      // },
+      {
+        icon: (
+         <ChatBubbleIcon/>
+        ),
+        label: "Contact Us",
+        route: "/dashboard/contact-us",
+      },
     ],
   }
 
