@@ -2,6 +2,7 @@ import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { Base } from './base.model';
 import { MODEL_NAMES } from '../modelNames';
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 
 export type ContractDocument = HydratedDocument<Contract>;
 
@@ -10,31 +11,43 @@ export enum VACCATE_STATUS {
   VACCATE_PENDING = 2,
   VACCATED = 3,
 }
+
+@ObjectType()
 @Schema()
 export class Contract extends Base {
+  @Field(() => ID, { nullable: true })
   @Prop({ type: SchemaTypes.ObjectId, ref: MODEL_NAMES.USER })
   userId: string;
 
+  @Field(() => ID, { nullable: true })
   @Prop({ type: SchemaTypes.ObjectId, ref: MODEL_NAMES.BOOKING })
   bookingId: string;
 
+  @Field(() => ID, { nullable: true })
   @Prop({ type: SchemaTypes.ObjectId, ref: MODEL_NAMES.ROOM })
   roomId: string;
 
+  @Field(() => ID, { nullable: true })
   @Prop({ type: SchemaTypes.ObjectId, ref: MODEL_NAMES.BED })
   bedId: string;
 
+  @Field(() => ID, { nullable: true })
   @Prop({ type: SchemaTypes.ObjectId, ref: MODEL_NAMES.HOSTEL })
   propertyId: string;
 
+  @Field(() => Date, { nullable: true })
   @Prop({ required: true, type: Date })
   contractFrom: Date;
 
+  @Field(() => Date, { nullable: true })
   @Prop({ required: false, type: Date })
   contractTo: Date;
+
+  @Field(() => Int, { nullable: true })
   @Prop({ type: Number, required: false, default: 1, enum: VACCATE_STATUS })
   vaccatStatus: number;
 
+  @Field(() => Int, { nullable: true })
   @Prop({ default: 0 })
   laundryMonthlyCount: number;
 }

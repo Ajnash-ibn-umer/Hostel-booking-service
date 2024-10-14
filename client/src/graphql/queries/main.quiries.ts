@@ -384,3 +384,19 @@ export const ROOM_BED_LIST_GQL = gql`
     }
   }
 `;
+
+export const CONTACT_LIST_FOR_TABLE_GQL = gql`
+  query ContactUs_List($dto: ContactUsListInput!) {
+    ContactUs_List(dto: $dto) {
+      totalCount
+      list {
+        createdAt
+        email
+        message
+        name
+        phone
+        status
+      }
+    }
+  }
+`;

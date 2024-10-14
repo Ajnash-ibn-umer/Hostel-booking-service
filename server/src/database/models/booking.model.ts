@@ -34,6 +34,9 @@ export class Booking extends Base {
   @Prop({ default: '' })
   regNo: string;
 
+  @Prop({ type: Boolean, default: false })
+  laudryFacility: boolean;
+
   @Prop({ default: '' })
   idCardNumber: string;
 

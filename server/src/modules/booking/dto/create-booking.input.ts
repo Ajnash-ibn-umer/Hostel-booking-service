@@ -62,6 +62,9 @@ export class BookingCreateInput {
   @Field(() => Boolean, { description: 'Canteen Facility', nullable: true })
   canteenFacility?: boolean;
 
+  @Field(() => Boolean, { description: 'Laundry Facility', nullable: true })
+  laudryFacility?: boolean;
+
   @Field({ description: 'User Remark', nullable: true })
   userRemark?: string;
 

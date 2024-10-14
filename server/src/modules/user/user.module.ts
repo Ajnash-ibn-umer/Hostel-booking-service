@@ -9,13 +9,21 @@ import { ModelDefinitions } from 'src/database/modelDefinitions';
 import { CounterModule } from '../counter/counter.module';
 import { CounterService } from '../counter/counter.service';
 import { AuthService } from './service/auth.service';
+import { ContractRepository } from 'src/repositories/contract.repository';
 
 @Module({
-  providers: [UserResolver, UserService, UserRepository, AuthService],
+  providers: [
+    UserResolver,
+    UserService,
+    UserRepository,
+    ContractRepository,
+    AuthService,
+  ],
   imports: [
     MongooseModule.forFeature([
       ModelDefinitions.userModel,
       ModelDefinitions.counterModel,
+      ModelDefinitions.contractsModel,
     ]),
   ],
   exports: [UserService],

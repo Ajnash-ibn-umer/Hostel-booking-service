@@ -11,6 +11,7 @@ import { UserService } from '../service/user.service';
 import {
   ListUsersResponse,
   LoginResponse,
+  Me,
   PhoneVerifyEntity,
   User,
   UserTokenResponse,
@@ -79,5 +80,12 @@ export class UserResolver {
   @Mutation(() => UserTokenResponse, { name: 'User_Verify_Login' })
   verifyLogin(@Args('otpVerifyTokenInput') dto: OtpVerifyTokenInput) {
     return this.authService.verifyLogin(dto);
+  }
+
+  @UserTypes([USER_TYPES.USER])
+  @Query(() => Me, { name: 'User_Me' })
+  me(@Info() info: GraphQLResolveInfo, @Context() context) {
+    const projection = getProjection(info.fieldNodes[0]);
+    return this.userService.me(context.req.user.userId, projection);
   }
 }

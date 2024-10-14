@@ -120,7 +120,16 @@ export class AuthService {
       // }
 
       // Generate new access and refresh tokens
-
+      const userVerfication = await this.userRepo.findOne({
+        _id: dto.userId,
+        userType: USER_TYPES.USER,
+        isActive: true,
+        status: STATUS_NAMES.ACTIVE,
+      });
+      console.log({ userVerfication });
+      if (!userVerfication) {
+        throw `This user not found or not actvated in system. for more information please contact admin`;
+      }
       if (dto.token !== '123456') {
         throw 'Invalid token';
       }
@@ -141,7 +150,7 @@ export class AuthService {
         loginStatus: true,
       };
     } catch (error) {
-      throw new GraphQLError('Error verifying login', {
+      throw new GraphQLError('Error verifying login ' + error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
