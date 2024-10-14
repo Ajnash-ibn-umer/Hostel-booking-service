@@ -220,7 +220,7 @@ function Booking() {
       accessorKey: "property",
       header: "Property",
       cell: ({ row }) => {
-        const name = row.original.property["name"];
+        const name = row?.original?.property?.name|| "";
         return name;
       },
     },
@@ -244,17 +244,19 @@ function Booking() {
             return <Badge variant={"secondary"}>Payment Failed</Badge>;
           case 4:
             return (
-              <Badge
-                style={{ background: "green", color: "white" }}
-              >
+              <Badge style={{ background: "green", color: "white" }}>
                 Payment Success
               </Badge>
             );
           case 5:
-            return <Badge
-            style={{ background: "#2cbf93", color: "white" }}
-            
-             variant={"secondary"}>Admin Approved</Badge>;
+            return (
+              <Badge
+                style={{ background: "#2cbf93", color: "white" }}
+                variant={"secondary"}
+              >
+                Admin Approved
+              </Badge>
+            );
           case 6:
             return <Badge variant={"secondary"}>Check in</Badge>;
           default:
