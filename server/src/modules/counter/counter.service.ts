@@ -89,4 +89,30 @@ export class CounterService {
       });
     }
   }
+
+  async updateCount(
+    dto: GetCounterByEntityNameInput,
+    value: number = 1,
+    session: ClientSession = null,
+  ): Promise<Counter> {
+    try {
+      const counter = await this.counterRepository.findOneAndUpdate(
+        { entityName: dto.entityName },
+        { count: value },
+        session,
+      );
+      if (!counter) {
+        throw 'Failed to get or create counter';
+      }
+
+      return counter;
+    } catch (error) {
+      console.log({ error });
+      throw new GraphQLError(error, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    }
+  }
 }

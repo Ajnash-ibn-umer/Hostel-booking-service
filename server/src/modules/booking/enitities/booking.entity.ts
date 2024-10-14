@@ -71,6 +71,9 @@ export class Booking extends PartialType(Base) {
   canteenFacility: boolean;
 
   @Field({ nullable: true })
+  laudryFacility: boolean;
+
+  @Field({ nullable: true })
   userRemark: string;
 
   @Field(() => Int, {

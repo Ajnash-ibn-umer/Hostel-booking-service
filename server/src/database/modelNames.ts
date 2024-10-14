@@ -21,4 +21,7 @@ export enum MODEL_NAMES {
   CONTRACTS = 'contracts',
   TRANSACTIONS = 'transactions',
   CONTACT_US = 'contact_us',
+  COMPLAINTS = 'complaints',
+  COMPLAINTS_STATUS_HISTORY = 'complaints_status_histories',
+  COMPLAINTS_GALLERY_LINKS = 'complaints_gallery_links',
 }
