@@ -73,12 +73,14 @@ function UpdateRoomType({ params }: any) {
       variables: {
         listInput: {
           statusArray: [1],
+          roomTypeIds: [id],
           limit: 1,
           skip: 0,
           searchingText: null,
           sortOrder: 1,
         },
       },
+      fetchPolicy: "no-cache",
     },
   );
 
@@ -98,6 +100,7 @@ function UpdateRoomType({ params }: any) {
         rentMonthlyUpper,
         securityDeposit,
       } = roomTypeData.RoomType_List.list[0];
+      console.log({ name, description });
       form.reset({
         name,
         description,
@@ -109,7 +112,7 @@ function UpdateRoomType({ params }: any) {
         securityDeposit,
       });
     }
-  }, [roomTypeData, form]);
+  }, [roomTypeData, form, id]);
 
   const [updateRoomType, { loading }] = useMutation(ROOM_TYPE_UPDATE_GQL);
 
