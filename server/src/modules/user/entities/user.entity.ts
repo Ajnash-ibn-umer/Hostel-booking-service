@@ -65,6 +65,9 @@ export class PhoneVerifyEntity {
   @Field({ nullable: true })
   message: string;
 
+  @Field(() => ID, { nullable: true })
+  userId?: string;
+
   @Field()
   exists: boolean;
 }

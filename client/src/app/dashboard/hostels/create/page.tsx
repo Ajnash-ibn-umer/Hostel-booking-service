@@ -365,7 +365,7 @@ function CreateHostelForm() {
         }
         if (room.beds && room.beds.length > 0) {
           if (room.beds.length !== Number(room.totalBeds)) {
-            throw `Bed  Count doent match in room ${room.name}`;
+            throw `Bed  Count doesnt match in room ${room.name}`;
           }
 
           room.beds.map((bed) => {

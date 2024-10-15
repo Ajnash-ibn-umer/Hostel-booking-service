@@ -86,12 +86,14 @@ export class AuthService {
       }
       if (!user.isActive) {
         return {
+          userId: user._id,
           exists: false,
           message: 'User not activated with the provided phone number.',
         };
       }
 
       return {
+        userId: user._id,
         exists: true,
         message: 'User existed  with the provided phone number.',
       };
