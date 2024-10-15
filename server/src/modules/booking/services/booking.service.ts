@@ -167,12 +167,12 @@ export class BookingService {
         roomId: dto.roomId,
       })) as RentCalculatorResponse;
       console.log({ rentData });
-     // if (rentData.rent !== dto.basePrice) {
-       // throw new Error('Rent amount mismatch, please try again');
-     // }
-      //if (rentData.securityDeposit !== dto.securityDeposit) {
-       // throw new Error('Security Deposit amount mismatch, please try again');
-      //}
+      if (rentData.rent !== dto.basePrice) {
+        throw new Error('Rent amount mismatch, please try again');
+      }
+      if (rentData.securityDeposit !== dto.securityDeposit) {
+        throw new Error('Security Deposit amount mismatch, please try again');
+      }
 
       const bookingNumber = await this.counterService.getAndIncrementCounter(
         {
