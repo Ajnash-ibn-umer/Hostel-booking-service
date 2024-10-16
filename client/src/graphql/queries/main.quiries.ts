@@ -247,6 +247,11 @@ export const ROOM_TYPE_LIST_GQL = gql`
         description
         name
         status
+        rentDailyLower
+        rentDailyUpper
+        rentMonthlyUpper
+        rentMonthlyLower
+        securityDeposit
         bedCount
         updatedAt
         updatedUserId
