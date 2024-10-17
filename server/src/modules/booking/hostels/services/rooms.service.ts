@@ -12,10 +12,13 @@ import { Lookup } from 'src/shared/utils/mongodb/lookupGenerator';
 import { MODEL_NAMES } from 'src/database/modelNames';
 import { responseFormat } from 'src/shared/graphql/queryProjection';
 import { GraphQLError } from 'graphql';
+import { RoomGalleryLinksRepository } from '../repositories/room_gallery_link.repository';
+import { STATUS_NAMES } from 'src/shared/variables/main.variable';
 @Injectable()
 export class RoomsService {
   constructor(
     private readonly roomRepository: RoomRepository,
+    private readonly roomGalleryLinkRepo: RoomGalleryLinksRepository,
 
     @InjectConnection()
     private readonly connection: mongoose.Connection,
@@ -244,6 +247,41 @@ export class RoomsService {
         list,
         totalCount: totalCount,
       };
+    } catch (error) {
+      return new GraphQLError(error, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    }
+  }
+
+  async testRoom(): Promise<any | GraphQLError> {
+    try {
+      const rooms = await this.roomRepository.find({
+        propertyId: '670ea0ae0de00463055b9abc',
+      });
+      const galleries = [
+        '66e8751188348f580c27d2d3',
+        '66eaf05b68eabc029cd1c193',
+        '66eaf08068eabc029cd1c19f',
+        '66eaf0cd68eabc029cd1c1ab',
+        '66eaf13468eabc029cd1c1cf',
+        '66eaf18b68eabc029cd1c1dd',
+        '66e8751188348f580c27d2d3',
+        '66eaf05b68eabc029cd1c193',
+        '66eaf08068eabc029cd1c19f',
+        '66eaf0cd68eabc029cd1c1ab',
+      ];
+      const galleryLinks = rooms.map((room, idx) => ({
+        roomId: room._id.toString(),
+        galleryId: galleries[idx],
+        status: STATUS_NAMES.ACTIVE,
+        createdAt: Date.now(),
+        createdUserId: null,
+      }));
+      await this.roomGalleryLinkRepo.insertMany(galleryLinks as any);
+      return null;
     } catch (error) {
       return new GraphQLError(error, {
         extensions: {
