@@ -14,7 +14,7 @@ export class DamageAndSplitResolver {
   constructor(private readonly damageAndSplitService: DamageAndSplitService) {}
 
   @UserTypes([USER_TYPES.ADMIN])
-  @Mutation(() => DamageAndSplit)
+  @Mutation(() => DamageAndSplit, { name: 'DamageAndSplit_Create' })
   createDamageAndSplit(
     @Args('createDamageAndSplitInput')
     createDamageAndSplitInput: CreateDamageAndSplitInput,

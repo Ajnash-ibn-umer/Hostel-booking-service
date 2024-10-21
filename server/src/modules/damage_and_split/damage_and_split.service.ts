@@ -9,13 +9,16 @@ import { GraphQLError } from 'graphql';
 import { DamageAndSplit } from 'src/database/models/damage-and-split.model';
 import { STATUS_NAMES } from 'src/shared/variables/main.variable';
 import { DamageAndSplitDetails } from 'src/database/models/damage-and-split-details.model';
+import { PaymentsService } from '../payments/payments.service';
+import { CreatePaymentInput } from '../payments/dto/create-payment.input';
+import { VOUCHER_TYPE } from 'src/database/models/payments.model';
 
 @Injectable()
 export class DamageAndSplitService {
   constructor(
     private readonly damageAndSplitRepository: DamageAndSplitRepository,
     private readonly damageAndSplitDetailsRepository: DamageAndSplitDetailsRepository,
-
+    private readonly paymentsService: PaymentsService,
     @InjectConnection()
     private readonly connection: mongoose.Connection,
   ) {}
@@ -43,18 +46,32 @@ export class DamageAndSplitService {
 
       if (dto.splitDetails && dto.splitDetails.length > 0) {
         // TODO: create payment also
+        const details = [];
+        const paymentData: CreatePaymentInput[] = [];
 
-        const details = dto.splitDetails.map((detail) => ({
-          damageAndSplitId: newDamageAndSplit._id,
-          userId: detail.userId,
-          amount: detail.amount,
-          status: STATUS_NAMES.ACTIVE,
-          createdAt: new Date(),
-        }));
+        dto.splitDetails.forEach((detail) => {
+          details.push({
+            damageAndSplitId: newDamageAndSplit._id,
+            userId: detail.userId,
+            amount: detail.amount,
+            status: STATUS_NAMES.ACTIVE,
+            createdAt: new Date(),
+          });
+
+          paymentData.push({
+            voucherType: VOUCHER_TYPE.DAMAGE_AND_SPLIT,
+            dueDate: dto.dueDate,
+            voucherId: newDamageAndSplit._id,
+            userId: detail.userId,
+            payAmount: detail.amount,
+          });
+        });
+
         await this.damageAndSplitDetailsRepository.insertMany(
           details as any,
           txnSession,
         );
+        await this.paymentsService.create(paymentData, userId, txnSession);
       }
 
       await txnSession.commitTransaction();

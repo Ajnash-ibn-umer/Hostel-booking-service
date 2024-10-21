@@ -1,8 +1,9 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { Base } from './base.model';
 import { Field, ID, Int, ObjectType, PartialType } from '@nestjs/graphql';
 import enumToString from 'src/shared/utils/enumTostring';
+import { MODEL_NAMES } from '../modelNames';
 
 export enum PaymentStatus {
   PENDING = 0,
@@ -39,6 +40,16 @@ export class Payment extends Base {
   @Field({ nullable: true })
   @Prop({ required: true })
   payAmount: number;
+
+  @Field(() => ID, { nullable: true })
+  @Prop({
+    type: mongoose.SchemaTypes.ObjectId,
+    required: true,
+    default: null,
+    ref: MODEL_NAMES.USER,
+    index: true,
+  })
+  userId: string;
 
   @Field({ nullable: true })
   @Prop({ required: false, default: 0 })
