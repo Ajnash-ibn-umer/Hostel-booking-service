@@ -2,6 +2,7 @@
 import { MdOutlineBedroomParent } from "react-icons/md";
 import { TbCategory } from "react-icons/tb";
 import { TbSmartHome } from "react-icons/tb";
+import { PiUserCircleCheckThin } from "react-icons/pi";
 import { FiBox } from "react-icons/fi";
 import { GoLocation } from "react-icons/go";
 import { GrGallery } from "react-icons/gr";
@@ -77,6 +78,13 @@ const menuGroups = [
         ),
         label: "Contact Us",
         route: "/dashboard/contact-us",
+      },
+      {
+        icon: (
+         <PiUserCircleCheckThin />
+        ),
+        label: "Checked-In Guests",
+        route: "/dashboard/checked-in-guest",
       },
     ],
   }
