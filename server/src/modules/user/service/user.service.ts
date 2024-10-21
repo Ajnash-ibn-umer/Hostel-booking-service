@@ -35,7 +35,7 @@ export class UserService {
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
-  async create(dto: CreateUserInput): Promise<User> {
+  async create(dto: CreateUserInput): Promise<User | GraphQLError> {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
@@ -56,7 +56,7 @@ export class UserService {
   async createUser(
     dto: CreateUserInput,
     session: mongoose.ClientSession = null,
-  ): Promise<User> {
+  ): Promise<User | any> {
     try {
       //  Create counter
       const userNumberData = await this.counterService.getAndIncrementCounter(
@@ -196,7 +196,7 @@ export class UserService {
         totalCount: 0,
       };
     } catch (error) {
-      return new GraphQLError(error.message ?? error, {
+      throw new GraphQLError(error.message ?? error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
@@ -207,7 +207,7 @@ export class UserService {
   async activateUser(
     userId: string,
     session: mongoose.ClientSession,
-  ): Promise<User> {
+  ): Promise<User | GraphQLError> {
     try {
       const user = await this.userRepo.findOne({ _id: userId }, session);
       if (!user) {

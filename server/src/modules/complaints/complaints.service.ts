@@ -95,7 +95,7 @@ export class ComplaintsService {
       return newComplaint;
     } catch (error) {
       await session.abortTransaction();
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },

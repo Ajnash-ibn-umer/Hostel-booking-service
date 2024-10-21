@@ -462,7 +462,7 @@ export class HostelsService {
         message: 'Hostel status updated successfully',
       };
     } catch (error) {
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
@@ -769,7 +769,7 @@ export class HostelsService {
         totalCount: totalCount,
       };
     } catch (error) {
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },

@@ -34,7 +34,7 @@ async function bootstrap() {
       operationsSorter: 'alpha',
     },
   });
-  console.log({ __dirname });
+  // console.log({ __dirname });
 
   // const nextApp = next({ dev: true, conf: { distDir: '.next' } });
   // const handle = nextApp.getRequestHandler();

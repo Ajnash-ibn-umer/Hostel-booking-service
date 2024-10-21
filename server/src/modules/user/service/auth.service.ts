@@ -26,7 +26,9 @@ export class AuthService {
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
-  async loginAdmin(dto: LoginAdminInput): Promise<LoginResponse> {
+  async loginAdmin(
+    dto: LoginAdminInput,
+  ): Promise<LoginResponse | GraphQLError> {
     try {
       const user = (await this.userRepo.findOne({
         email: dto.email,
@@ -71,7 +73,9 @@ export class AuthService {
     }
   }
 
-  async checkUserExistence(phoneNumber: string): Promise<PhoneVerifyEntity> {
+  async checkUserExistence(
+    phoneNumber: string,
+  ): Promise<PhoneVerifyEntity | GraphQLError> {
     try {
       const user = await this.userRepo.findOne({
         phoneNumber,
@@ -106,7 +110,9 @@ export class AuthService {
     }
   }
 
-  async verifyLogin(dto: OtpVerifyTokenInput): Promise<UserTokenResponse> {
+  async verifyLogin(
+    dto: OtpVerifyTokenInput,
+  ): Promise<UserTokenResponse | any> {
     try {
       // TODO: verify login with firebase
       // Logic to verify the token and userId

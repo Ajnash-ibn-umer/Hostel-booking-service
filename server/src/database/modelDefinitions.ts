@@ -9,6 +9,8 @@ import { ComplaintSchema } from './models/complaints.model';
 import { ContactUsSchema } from './models/contact-us.model';
 import { ContractSchema } from './models/contract.model';
 import { CounterSchema } from './models/counter.model';
+import { DamageAndSplitDetailsSchema } from './models/damage-and-split-details.model';
+import { DamageAndSplitSchema } from './models/damage-and-split.model';
 import { GallerySchema } from './models/gallery.model';
 import { HostelSchema } from './models/hostel.model';
 import { InvoiceItemSchema } from './models/invoice-item.model';
@@ -19,6 +21,7 @@ import { HostelGalleryLinkSchema } from './models/join_tables/hostel_x_gallery.m
 import { RoomAmenitiesLinkSchema } from './models/join_tables/room_x_amenities.model';
 import { RoomGalleryLinkSchema } from './models/join_tables/room_x_gallery.model';
 import { LocationSchema } from './models/location.model';
+import { PaymentSchema } from './models/payments.model';
 import { RoomSchema } from './models/room.model';
 import { RoomTypeSchema } from './models/roomTytpe.model';
 import { PaymentTransactionSchema } from './models/transaction.model';
@@ -123,5 +126,18 @@ export const ModelDefinitions = {
   complaintsGalleryLinkModel: {
     name: MODEL_NAMES.COMPLAINTS_GALLERY_LINKS,
     schema: ComplaintGalleryLinkSchema,
+  },
+
+  paymentsModel: {
+    name: MODEL_NAMES.PAYMENTS,
+    schema: PaymentSchema,
+  },
+  damageAndSplitModel: {
+    name: MODEL_NAMES.DAMAGE_AND_SPLIT,
+    schema: DamageAndSplitSchema,
+  },
+  damageAndSplitDetailsModel: {
+    name: MODEL_NAMES.DAMAGE_AND_SPLIT_DETAILS,
+    schema: DamageAndSplitDetailsSchema,
   },
 };

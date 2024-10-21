@@ -24,4 +24,9 @@ export enum MODEL_NAMES {
   COMPLAINTS = 'complaints',
   COMPLAINTS_STATUS_HISTORY = 'complaints_status_histories',
   COMPLAINTS_GALLERY_LINKS = 'complaints_gallery_links',
+
+  DAMAGE_AND_SPLIT = 'damage_and_splits',
+  DAMAGE_AND_SPLIT_DETAILS = 'damage_and_split_details',
+  PAYMENTS = 'payments',
+  INVOICE = 'invoices',
 }

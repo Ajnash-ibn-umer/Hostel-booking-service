@@ -94,7 +94,7 @@ export class AmenitiesService {
         message: 'Amenity status updated successfully',
       };
     } catch (error) {
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },

@@ -248,7 +248,7 @@ export class RoomsService {
         totalCount: totalCount,
       };
     } catch (error) {
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
@@ -283,7 +283,7 @@ export class RoomsService {
       await this.roomGalleryLinkRepo.insertMany(galleryLinks as any);
       return null;
     } catch (error) {
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
