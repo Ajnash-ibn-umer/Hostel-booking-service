@@ -28,6 +28,7 @@ export class PaymentsService {
         dueDate: data.dueDate,
         voucherId: data.voucherId,
         payAmount: data.payAmount,
+        userId: data.userId,
         createdUserId: userId,
         createdAt: new Date(),
         paymentStatus: PaymentStatus.PENDING,

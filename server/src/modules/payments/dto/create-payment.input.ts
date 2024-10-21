@@ -1,4 +1,4 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { InputType, Int, Field, ID } from '@nestjs/graphql';
 import { VOUCHER_TYPE } from 'src/database/models/payments.model';
 import enumToString from 'src/shared/utils/enumTostring';
 
@@ -15,4 +15,7 @@ export class CreatePaymentInput {
 
   @Field({ nullable: true })
   payAmount: number;
+
+  @Field(() => ID)
+  userId: string;
 }

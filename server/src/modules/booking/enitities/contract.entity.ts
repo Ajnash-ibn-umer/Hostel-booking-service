@@ -16,6 +16,6 @@ export class ContractInfo extends PartialType(Contract) {
   @Field(() => Hostel, { nullable: true })
   property: Hostel;
 
-  @Field(() => Hostel, { nullable: true })
+  @Field(() => Booking, { nullable: true })
   booking: Booking;
 }

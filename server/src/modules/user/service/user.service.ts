@@ -136,7 +136,28 @@ export class UserService {
           },
         });
       }
-
+      if (dto?.bookingStatusFilter && dto?.bookingStatusFilter.length > 0) {
+        userAggregationArray.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.BOOKING,
+            params: { id: '$bookingId' },
+            conditions: { $_id: '$$id' },
+            innerPipeline: [
+              {
+                $match: {
+                  bookingStatus: dto.bookingStatusFilter,
+                },
+              },
+            ],
+            responseName: 'booking',
+          }),
+          {
+            $match: {
+              booking: { $ne: null },
+            },
+          },
+        );
+      }
       switch (dto.sortType) {
         case 0:
           userAggregationArray.push({
