@@ -93,7 +93,7 @@ export class UserService {
       }
 
       const newUser = await this.userRepo.create(userData, session);
-      return newUser as User;
+      return newUser;
     } catch (error) {
       throw new GraphQLError(error, {
         extensions: {
@@ -204,7 +204,17 @@ export class UserService {
       projection &&
         userAggregationArray.push(responseFormat(projection['list']));
       console.log(JSON.stringify(userAggregationArray));
-
+      if (projection['list']['booking']) {
+        userAggregationArray.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.BOOKING,
+            params: { id: '$bookingId' },
+            conditions: { $_id: '$$id' },
+            project: responseFormat(projection['list']['booking']),
+            responseName: 'booking',
+          }),
+        );
+      }
       const userData = await this.userRepo.aggregate(userAggregationArray);
       console.log(userData);
 
