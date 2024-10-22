@@ -121,6 +121,7 @@ export class UserService {
           },
         });
       }
+
       userAggregationArray.push({
         $match: {
           status: { $in: dto.statusFilter },
@@ -145,7 +146,7 @@ export class UserService {
             innerPipeline: [
               {
                 $match: {
-                  bookingStatus: dto.bookingStatusFilter,
+                  bookingStatus: { $in: dto.bookingStatusFilter },
                 },
               },
             ],

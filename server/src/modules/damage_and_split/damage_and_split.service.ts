@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateDamageAndSplitInput } from './dto/create-damage_and_split.input';
-import { UpdateDamageAndSplitInput } from './dto/update-damage_and_split.input';
+import { PayUpdateDamageAndSplitInput } from './dto/update-damage_and_split.input';
 import { DamageAndSplitRepository } from './repositories/damage-and-split.repository';
 import { DamageAndSplitDetailsRepository } from './repositories/damage-and-split-details.repository';
 import mongoose from 'mongoose';
@@ -12,6 +12,18 @@ import { DamageAndSplitDetails } from 'src/database/models/damage-and-split-deta
 import { PaymentsService } from '../payments/payments.service';
 import { CreatePaymentInput } from '../payments/dto/create-payment.input';
 import { VOUCHER_TYPE } from 'src/database/models/payments.model';
+import { ListInputDamageAndSpit } from './dto/list-damage_and_split.input';
+import { DamageAndSplitListResponse } from './entities/damage_and_split.entity';
+import {
+  MatchList,
+  Paginate,
+  Search,
+} from 'src/shared/utils/mongodb/filtration.util';
+import { responseFormat } from 'src/shared/graphql/queryProjection';
+import { Lookup } from 'src/shared/utils/mongodb/lookupGenerator';
+import { MODEL_NAMES } from 'src/database/modelNames';
+import { generalResponse } from 'src/shared/graphql/entities/main.entity';
+import { statusChangeInput } from 'src/shared/graphql/entities/main.dto';
 
 @Injectable()
 export class DamageAndSplitService {
@@ -87,4 +99,243 @@ export class DamageAndSplitService {
       await txnSession.endSession();
     }
   }
+
+  async listDamageAndSplit(
+    dto: ListInputDamageAndSpit,
+    projection: Record<string, any>,
+  ): Promise<DamageAndSplitListResponse> {
+    const pipeline: any[] = [];
+    if (dto.searchingText && dto.searchingText !== '') {
+      pipeline.push(Search(['description', 'title'], dto.searchingText));
+    }
+    pipeline.push(
+      ...MatchList([
+        {
+          match: { status: dto.statusArray },
+          _type_: 'number',
+          required: true,
+        },
+        {
+          match: { _id: dto.damageAndSplitIds },
+          _type_: 'objectId',
+          required: false,
+        },
+        {
+          match: { hostelId: dto.hostelIds },
+          _type_: 'objectId',
+          required: false,
+        },
+
+        {
+          match: { amountStatus: dto.amountStatusFilter },
+          _type_: 'number',
+          required: false,
+        },
+      ]),
+    );
+
+    if (dto.dueDateFilter) {
+      pipeline.push({
+        $match: {
+          dueDate: {
+            $gte: dto.dueDateFilter.from,
+            $lte: dto.dueDateFilter.to,
+          },
+        },
+      });
+    }
+
+    if (dto.dateFilter) {
+      pipeline.push({
+        $match: {
+          createdAt: {
+            $gte: dto.dateFilter.from,
+            $lte: dto.dateFilter.to,
+          },
+        },
+      });
+    }
+
+    if (dto?.userIds && dto?.userIds.length > 0) {
+      const uids = dto.userIds.map((id) => new mongoose.Types.ObjectId(id));
+      pipeline.push(
+        ...Lookup({
+          modelName: MODEL_NAMES.DAMAGE_AND_SPLIT_DETAILS,
+          params: { id: '$_id' },
+          conditions: { $damageAndSplitId: '$$id' },
+          isNeedUnwind: false,
+          innerPipeline: [
+            {
+              $match: {
+                userId: { $in: uids },
+              },
+            },
+          ],
+          responseName: 'splits',
+        }),
+        {
+          $match: {
+            splits: { $ne: [] },
+          },
+        },
+      );
+    }
+    switch (dto.sortType) {
+      case 0:
+        pipeline.push({
+          $sort: {
+            createdAt: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 1:
+        pipeline.push({
+          $sort: {
+            title: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 2:
+        pipeline.push({
+          $sort: {
+            status: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      default:
+        pipeline.push({
+          $sort: {
+            _id: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+    }
+
+    pipeline.push(...Paginate(dto.skip, dto.limit));
+
+    projection && pipeline.push(responseFormat(projection['list']));
+
+    if (projection['list']['splitDetails']) {
+      pipeline.push(
+        ...Lookup({
+          modelName: MODEL_NAMES.DAMAGE_AND_SPLIT_DETAILS,
+          params: { id: '$_id' },
+          project: responseFormat(projection['list']['splitDetails']),
+          conditions: { $damageAndSplitId: '$$id' },
+          isNeedUnwind: false,
+
+          responseName: 'splitDetails',
+        }),
+      );
+    }
+    if (projection['list']['hostel']) {
+      console.log('in hostl');
+      pipeline.push(
+        ...Lookup({
+          modelName: MODEL_NAMES.HOSTEL,
+          params: { id: '$hostelId' },
+          conditions: { $_id: '$$id' },
+          project: responseFormat(projection['list']['hostel']),
+
+          responseName: 'hostel',
+        }),
+      );
+    }
+    // Execute the aggregation pipeline
+    const list = await this.damageAndSplitRepository.aggregate(pipeline);
+    console.log(JSON.stringify(list));
+
+    let totalCount = 0;
+    if (projection && projection['totalCount']) {
+      totalCount = await this.damageAndSplitRepository.totalCount(pipeline);
+    }
+
+    return {
+      list: list as any[],
+      totalCount,
+    };
+  }
+
+  async statusChangeOfDamageAndSplit(
+    dto: statusChangeInput,
+    userId: string,
+  ): Promise<generalResponse> {
+    const startTime = new Date();
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const result = await this.damageAndSplitRepository.updateMany(
+        {
+          _id: { $in: dto.ids },
+        },
+        {
+          $set: {
+            updatedUserId: userId,
+            updatedAt: startTime,
+            status: dto._status,
+          },
+        },
+      );
+
+      const resultDetails =
+        await this.damageAndSplitDetailsRepository.updateMany(
+          {
+            damageAndSplitId: { $in: dto.ids },
+          },
+          {
+            $set: {
+              updatedUserId: userId,
+              updatedAt: startTime,
+              status: dto._status,
+            },
+          },
+        );
+      await session.commitTransaction();
+      return { message: 'Status updated successfully' };
+    } catch (error) {
+      await session.abortTransaction();
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    } finally {
+      session.endSession();
+    }
+  }
+
+  // async paymentUpdate(
+  //   dto: PayUpdateDamageAndSplitInput[],
+  //   userId: string,
+  //   session: mongoose.ClientSession = null,
+  // ): Promise<DamageAndSplit[]> {
+  //   const txnSession = session ?? (await this.connection.startSession());
+  //   !session && (await txnSession.startTransaction());
+  //   try {
+  //     const damageAndSplit = await this.damageAndSplit;
+  //     const updateData = dto.map((data) => {
+  //       return {
+  //         updateOne: {
+  //           filter: {},
+  //           update: {},
+  //         },
+  //       };
+  //     });
+
+  //     if (!response) {
+  //       throw 'Response not found in payment creation';
+  //     }
+  //     !session && (await txnSession.commitTransaction());
+  //     return response;
+  //   } catch (error) {
+  //     !session && (await txnSession.abortTransaction());
+  //     throw new GraphQLError(error, {
+  //       extensions: {
+  //         code: HttpStatus.INTERNAL_SERVER_ERROR,
+  //       },
+  //     });
+  //   } finally {
+  //     !session && (await txnSession.endSession());
+  //   }
+  // }
 }
