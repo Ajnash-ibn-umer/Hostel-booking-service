@@ -9,50 +9,55 @@ import { useMutation, useQuery } from "@apollo/client";
 import Link from "next/link";
 import Pageniation from "@/components/pagination/pagination";
 import { DataTable } from "@/components/Datatables/data-table";
-import { CONTACT_LIST_FOR_TABLE_GQL } from "@/graphql/queries/main.quiries";
+import { CONTACT_LIST_FOR_TABLE_GQL, CHECK_IN_GUEST } from "@/graphql/queries/main.quiries";
 import { useToast } from "@/hooks/use-toast";
 import { ColumnDef } from "@tanstack/react-table";
 import { AlertConfirm } from "@/components/Alerts/alert";
 
-export type Contact = {
+export type CheckInUser = {
     _id: string;
     name: string;
     email: string;
-    createdAt: string;
     status: number;
-    message: string;
-    phone: string;
+    phoneNumber: string;
+    userNo: string;
+    isActive: boolean;
 };
 
 function CheckedInGuest() {
     const router = useRouter();
     const { toast } = useToast();
     const [inputVariables, setInputVariables] = useState<{
-        dto: {
-            statusArray: number[];
+        listUserInput: {
+            statusFilter: number[];
+            bookingStatusFilter: number[];
             limit: number;
             skip: number;
-            searchingText: string | null;
             sortOrder: number;
         };
     }>({
-        dto: {
-            statusArray: [1],
+        listUserInput: {
+            statusFilter: [1],
             limit: 10,
             skip: 0,
-            searchingText: null,
             sortOrder: -1,
+            bookingStatusFilter: [6]
         },
     });
 
-    const { loading, data, error, refetch } = useQuery(
-        CONTACT_LIST_FOR_TABLE_GQL,
+    const { data, error, refetch } = useQuery(
+        CHECK_IN_GUEST,
         {
             variables: inputVariables,
         },
     );
 
-    const columns: ColumnDef<Contact>[] = [
+
+    const columns: ColumnDef<CheckInUser>[] = [
+        {
+            accessorKey: "userNo",
+            header: "User Number",
+        },
         {
             accessorKey: "name",
             header: "Name",
@@ -61,26 +66,29 @@ function CheckedInGuest() {
             accessorKey: "email",
             header: "Email",
         },
-        // {
-        //     accessorKey: "message",
-        //     header: "Message",
-        // },
         {
-            accessorKey: "phone",
+            accessorKey: "phoneNumber",
             header: "Phone",
         },
         {
-            accessorKey: "createdAt",
-            header: "Check in Date",
-            cell: ({ row }) =>
-                new Date(row.getValue("createdAt")).toLocaleDateString(),
+            accessorKey: "isActive",
+            header: "Status",
+            cell: ({ row }) => {
+                return row.getValue("isActive") ? "Active" : "Inactive";
+            },
         },
+        // {
+        //     accessorKey: "createdAt",
+        //     header: "Check in Date",
+        //     cell: ({ row }) =>
+        //         new Date(row.getValue("createdAt")).toLocaleDateString(),
+        // },
     ];
 
     const changePage = (skip: number) => {
         setInputVariables({
-            dto: {
-                ...inputVariables.dto,
+            listUserInput: {
+                ...inputVariables.listUserInput,
                 skip: skip || 0,
             },
         });
@@ -102,12 +110,12 @@ function CheckedInGuest() {
             <Breadcrumb pageName="Checked-In Guest" />
 
             <div className="flex flex-col gap-10">
-                <DataTable columns={columns} data={data?.ContactUs_List?.list || []} />
+                <DataTable columns={columns} data={data?.User_List?.list || []} />
                 <Pageniation
                     fetch={changePage}
-                    skip={inputVariables?.dto.skip || 0}
-                    totalCount={data?.ContactUs_List?.totalCount || 0}
-                    limit={inputVariables?.dto.limit || 10}
+                    skip={inputVariables?.listUserInput.skip || 0}
+                    totalCount={data?.User_List?.totalCount || 0}
+                    limit={inputVariables?.listUserInput.limit || 10}
                 />
             </div>
         </div>

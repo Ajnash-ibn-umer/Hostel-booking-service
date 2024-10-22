@@ -405,3 +405,19 @@ export const CONTACT_LIST_FOR_TABLE_GQL = gql`
     }
   }
 `;
+
+export const CHECK_IN_GUEST = gql`
+  query User_List($listUserInput: ListUserInput!) {
+    User_List(listUserInput: $listUserInput) {
+      list {
+        phoneNumber
+        email
+        name
+        isActive
+        userNo
+        _id
+      }
+      totalCount
+    }
+  }
+`;
