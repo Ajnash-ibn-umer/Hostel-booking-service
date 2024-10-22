@@ -6,7 +6,10 @@ import { DamageAndSplitDetailsRepository } from './repositories/damage-and-split
 import mongoose from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
 import { GraphQLError } from 'graphql';
-import { DamageAndSplit } from 'src/database/models/damage-and-split.model';
+import {
+  AmountStatus,
+  DamageAndSplit,
+} from 'src/database/models/damage-and-split.model';
 import { STATUS_NAMES } from 'src/shared/variables/main.variable';
 import { DamageAndSplitDetails } from 'src/database/models/damage-and-split-details.model';
 import { PaymentsService } from '../payments/payments.service';
@@ -304,38 +307,63 @@ export class DamageAndSplitService {
     }
   }
 
-  // async paymentUpdate(
-  //   dto: PayUpdateDamageAndSplitInput[],
-  //   userId: string,
-  //   session: mongoose.ClientSession = null,
-  // ): Promise<DamageAndSplit[]> {
-  //   const txnSession = session ?? (await this.connection.startSession());
-  //   !session && (await txnSession.startTransaction());
-  //   try {
-  //     const damageAndSplit = await this.damageAndSplit;
-  //     const updateData = dto.map((data) => {
-  //       return {
-  //         updateOne: {
-  //           filter: {},
-  //           update: {},
-  //         },
-  //       };
-  //     });
+  async paymentUpdate(
+    dto: PayUpdateDamageAndSplitInput[],
+    userId: string,
+    session: mongoose.ClientSession = null,
+  ): Promise<generalResponse> {
+    const txnSession = session ?? (await this.connection.startSession());
+    !session && (await txnSession.startTransaction());
+    try {
+      for (let pay of dto) {
+        const damageAndSplitData = await this.damageAndSplitRepository.findOne({
+          _id: pay._id,
+        });
 
-  //     if (!response) {
-  //       throw 'Response not found in payment creation';
-  //     }
-  //     !session && (await txnSession.commitTransaction());
-  //     return response;
-  //   } catch (error) {
-  //     !session && (await txnSession.abortTransaction());
-  //     throw new GraphQLError(error, {
-  //       extensions: {
-  //         code: HttpStatus.INTERNAL_SERVER_ERROR,
-  //       },
-  //     });
-  //   } finally {
-  //     !session && (await txnSession.endSession());
-  //   }
-  // }
+        if (!damageAndSplitData) {
+          throw 'Damage and Split not found';
+        }
+
+        const damageAndSplitDetails =
+          await this.damageAndSplitDetailsRepository.findOneAndUpdate(
+            {
+              damageAndSplitId: pay._id,
+              userId: pay.userId,
+            },
+            {
+              paymentId: pay.paymentId,
+              received: pay.payedAmount,
+              payed: true,
+              updatedAt: new Date(),
+              updatedUserId: userId,
+            },
+            txnSession,
+          );
+        if (!damageAndSplitDetails) {
+          throw 'Damage and split not found';
+        }
+        damageAndSplitData.amountStatus =
+          damageAndSplitData.receivedAmount + pay.payedAmount >=
+          damageAndSplitData.totalAmount
+            ? AmountStatus.FULLY_PAID
+            : AmountStatus.PARTIALY_PAID;
+
+        damageAndSplitData.receivedAmount += pay.payedAmount;
+
+        await damageAndSplitData.save({ session: txnSession });
+      }
+
+      !session && (await txnSession.commitTransaction());
+      return { message: 'Damgae split amount data updated' };
+    } catch (error) {
+      !session && (await txnSession.abortTransaction());
+      throw new GraphQLError(error, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    } finally {
+      !session && (await txnSession.endSession());
+    }
+  }
 }
