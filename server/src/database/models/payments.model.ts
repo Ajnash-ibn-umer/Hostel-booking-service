@@ -1,5 +1,5 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, SchemaTypes } from 'mongoose';
 import { Base } from './base.model';
 import { Field, ID, Int, ObjectType, PartialType } from '@nestjs/graphql';
 import enumToString from 'src/shared/utils/enumTostring';
@@ -34,7 +34,7 @@ export class Payment extends Base {
   payedDate: Date;
 
   @Field(() => ID)
-  @Prop({ required: false, default: null })
+  @Prop({ type: SchemaTypes.ObjectId, required: false, default: null })
   voucherId: string;
 
   @Field({ nullable: true })
@@ -63,7 +63,7 @@ export class Payment extends Base {
   paymentStatus: PaymentStatus;
 
   @Field(() => ID, { nullable: true })
-  @Prop({ required: false, ref: 'Invoice' })
+  @Prop({ type: SchemaTypes.ObjectId, required: false, ref: 'Invoice' })
   invoiceId: string;
 }
 

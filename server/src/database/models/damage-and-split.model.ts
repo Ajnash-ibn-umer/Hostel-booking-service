@@ -1,9 +1,10 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { Base } from './base.model';
 import { Field, ID, Int, ObjectType, PartialType } from '@nestjs/graphql';
 import enumToString from 'src/shared/utils/enumTostring';
 import { Hostel } from 'src/modules/booking/hostels/entities/hostel.entity';
+import { DamageAndSplitDetails } from './damage-and-split-details.model';
 
 export enum AmountStatus {
   PAYMENT_PENDING = 0,
@@ -17,7 +18,7 @@ export type DamageAndSplitDocument = HydratedDocument<DamageAndSplit>;
 @Schema()
 export class DamageAndSplit extends Base {
   @Field(() => ID, { nullable: true })
-  @Prop({ required: true })
+  @Prop({ type: SchemaTypes.ObjectId, required: true })
   hostelId: string;
 
   @Field({ nullable: true })
@@ -50,6 +51,9 @@ export class DamageAndSplit extends Base {
 
   @Field(() => Hostel, { nullable: true })
   hostel: Hostel;
+
+  @Field(() => [DamageAndSplitDetails], { nullable: true })
+  splitDetails: DamageAndSplitDetails[];
 }
 
 export const DamageAndSplitSchema =

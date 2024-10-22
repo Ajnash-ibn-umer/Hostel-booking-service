@@ -7,9 +7,9 @@ import {
 import enumToString from 'src/shared/utils/enumTostring';
 
 @InputType()
-export class ListInputBooking extends PartialType(GenericListInput) {
+export class ListInputDamageAndSpit extends PartialType(GenericListInput) {
   @Field(() => [ID], { nullable: true })
-  roomIds: string[];
+  damageAndSplitIds: string[];
 
   @Field(() => [ID], { nullable: true })
   hostelIds: string[];

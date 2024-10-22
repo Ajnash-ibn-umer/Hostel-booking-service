@@ -1,20 +1,25 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { Base } from './base.model';
 import { Field, ID, Int, ObjectType, PartialType } from '@nestjs/graphql';
 import { DamageAndSplit } from './damage-and-split.model';
-import { User } from './user.model';
+import { User } from 'src/modules/user/entities/user.entity';
+import { Payment } from './payments.model';
 
 @ObjectType()
 @Schema()
 export class DamageAndSplitDetails extends Base {
   @Field(() => ID, { nullable: true })
-  @Prop({ required: true })
+  @Prop({ type: SchemaTypes.ObjectId, required: true })
   damageAndSplitId: string;
 
   @Field(() => ID, { nullable: true })
-  @Prop({ required: true })
+  @Prop({ type: SchemaTypes.ObjectId, required: true })
   userId: string;
+
+  @Field(() => ID, { nullable: true })
+  @Prop({ type: SchemaTypes.ObjectId, required: false, default: null })
+  paymentId: string;
 
   @Field({ nullable: true, defaultValue: 0 })
   @Prop({ required: true })
@@ -33,11 +38,16 @@ export class DamageAndSplitDetails extends Base {
 
   @Field(() => User, { nullable: true })
   user: User;
+
+  @Field(() => Payment, { nullable: true })
+  payment: Payment;
 }
 
 export const DamageAndSplitDetailsSchema = SchemaFactory.createForClass(
   DamageAndSplitDetails,
 );
+export type DamageAndSplitDetailsDocument =
+  HydratedDocument<DamageAndSplitDetails>;
 
 DamageAndSplitDetailsSchema.index(
   { damageAndSplitId: 1, userId: 1 },
