@@ -37,6 +37,9 @@ export class User extends PartialType(Base) {
 
   @Field(() => ID, { nullable: true })
   bookingId: string;
+
+  @Field(() => Booking, { nullable: true })
+  booking: Booking;
 }
 
 @ObjectType()
