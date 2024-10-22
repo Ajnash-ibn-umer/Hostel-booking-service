@@ -52,10 +52,6 @@ UserSchema.index(
   { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
 );
 UserSchema.index(
-  { name: 1 },
-  { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
-);
-UserSchema.index(
   { phoneNumber: 1 },
   { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
 );
@@ -76,7 +72,7 @@ UserSchema.post('updateMany', async function (error, doc, next) {
 });
 function schemaPostFunctionForDuplicate(error, doc, next) {
   if (error.code == 11000) {
-    next(new Error('User already existing'));
+    next(new Error('User already existing with same email or password'));
   } else {
     next();
   }

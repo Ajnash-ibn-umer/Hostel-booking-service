@@ -29,10 +29,6 @@ export const RoomSchema = SchemaFactory.createForClass(Room);
 
 RoomSchema.index({ name: 1 });
 RoomSchema.index({ slug: 1, _id: 1 });
-RoomSchema.index(
-  { slug: 1 },
-  { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
-);
 
 RoomSchema.index({ property_id: 1 });
 RoomSchema.index(

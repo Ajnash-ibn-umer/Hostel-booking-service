@@ -93,7 +93,7 @@ export class LocationService {
         message: 'Location status updated successfully',
       };
     } catch (error) {
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },

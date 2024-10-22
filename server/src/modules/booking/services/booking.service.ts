@@ -112,11 +112,12 @@ export class BookingService {
       let rent = 0;
       let securityDeposit = 0;
       if (dto.paymentBase === PRICE_BASE_MODE.MONTHLY) {
-        securityDeposit = selectedBed.roomType.securityDeposit || 0;
         if (dto.bedPosition === BED_POSITION.LOWER) {
           rent = selectedBed.roomType.rentMonthlyLower;
+          securityDeposit = selectedBed.roomType.rentMonthlyLower || 0;
         } else if (dto.bedPosition === BED_POSITION.UPPER) {
           rent = selectedBed.roomType.rentMonthlyUpper;
+          securityDeposit = selectedBed.roomType.rentMonthlyUpper || 0;
         }
       } else if (dto.paymentBase === PRICE_BASE_MODE.DAILY) {
         if (dto.bedPosition === BED_POSITION.UPPER) {
@@ -135,7 +136,7 @@ export class BookingService {
         tempSelectedBedId: selectedBed._id.toString(),
       };
     } catch (error) {
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
@@ -388,7 +389,7 @@ export class BookingService {
         totalCount: totalCount,
       };
     } catch (error) {
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
@@ -477,7 +478,7 @@ export class BookingService {
       };
     } catch (error) {
       await txnSession.abortTransaction();
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
@@ -579,7 +580,7 @@ export class BookingService {
       };
     } catch (error) {
       await txnSession.abortTransaction();
-      return new GraphQLError(error, {
+      throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },

@@ -16,6 +16,9 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
 import ENV from './shared/variables/env.variables';
 import { ModelDefinitions } from './database/modelDefinitions';
 import { ContactUsRepository } from './repositories/contact-us.repository';
+import { ComplaintsModule } from './modules/complaints/complaints.module';
+import { DamageAndSplitModule } from './modules/damage_and_split/damage_and_split.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 const configService = new ConfigService();
 @Module({
@@ -43,6 +46,9 @@ const configService = new ConfigService();
     GalleryModule,
     PaymentGatewayModule,
     InvoiceModule,
+    ComplaintsModule,
+    DamageAndSplitModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver, ContactUsRepository],

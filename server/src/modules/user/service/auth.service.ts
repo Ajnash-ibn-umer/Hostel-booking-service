@@ -26,7 +26,9 @@ export class AuthService {
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
-  async loginAdmin(dto: LoginAdminInput): Promise<LoginResponse> {
+  async loginAdmin(
+    dto: LoginAdminInput,
+  ): Promise<LoginResponse | GraphQLError> {
     try {
       const user = (await this.userRepo.findOne({
         email: dto.email,
@@ -71,7 +73,9 @@ export class AuthService {
     }
   }
 
-  async checkUserExistence(phoneNumber: string): Promise<PhoneVerifyEntity> {
+  async checkUserExistence(
+    phoneNumber: string,
+  ): Promise<PhoneVerifyEntity | GraphQLError> {
     try {
       const user = await this.userRepo.findOne({
         phoneNumber,
@@ -86,12 +90,14 @@ export class AuthService {
       }
       if (!user.isActive) {
         return {
+          userId: user._id,
           exists: false,
           message: 'User not activated with the provided phone number.',
         };
       }
 
       return {
+        userId: user._id,
         exists: true,
         message: 'User existed  with the provided phone number.',
       };
@@ -104,7 +110,9 @@ export class AuthService {
     }
   }
 
-  async verifyLogin(dto: OtpVerifyTokenInput): Promise<UserTokenResponse> {
+  async verifyLogin(
+    dto: OtpVerifyTokenInput,
+  ): Promise<UserTokenResponse | any> {
     try {
       // TODO: verify login with firebase
       // Logic to verify the token and userId
@@ -120,7 +128,16 @@ export class AuthService {
       // }
 
       // Generate new access and refresh tokens
-
+      const userVerfication = await this.userRepo.findOne({
+        _id: dto.userId,
+        userType: USER_TYPES.USER,
+        isActive: true,
+        status: STATUS_NAMES.ACTIVE,
+      });
+      console.log({ userVerfication });
+      if (!userVerfication) {
+        throw `This user not found or not actvated in system. for more information please contact admin`;
+      }
       if (dto.token !== '123456') {
         throw 'Invalid token';
       }
@@ -141,7 +158,7 @@ export class AuthService {
         loginStatus: true,
       };
     } catch (error) {
-      throw new GraphQLError('Error verifying login', {
+      throw new GraphQLError('Error verifying login ' + error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },

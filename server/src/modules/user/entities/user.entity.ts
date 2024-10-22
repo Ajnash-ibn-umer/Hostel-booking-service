@@ -2,6 +2,9 @@ import enumToString from 'src/shared/utils/enumTostring';
 import { ObjectType, Field, Int, PartialType, ID } from '@nestjs/graphql';
 import { Base } from 'src/shared/graphql/entities/main.entity';
 import { USER_TYPES } from 'src/shared/variables/main.variable';
+import { Booking } from 'src/modules/booking/enitities/booking.entity';
+import { Contract } from 'src/database/models/contract.model';
+import { ContractInfo } from 'src/modules/booking/enitities/contract.entity';
 
 @ObjectType()
 export class User extends PartialType(Base) {
@@ -62,6 +65,9 @@ export class PhoneVerifyEntity {
   @Field({ nullable: true })
   message: string;
 
+  @Field(() => ID, { nullable: true })
+  userId?: string;
+
   @Field()
   exists: boolean;
 }
@@ -79,4 +85,16 @@ export class UserTokenResponse {
 
   @Field()
   loginStatus: boolean;
+}
+
+@ObjectType()
+export class Me {
+  @Field({ nullable: true })
+  message: string;
+
+  @Field(() => User, { nullable: true })
+  user: User;
+
+  @Field(() => ContractInfo, { nullable: true })
+  contract: ContractInfo;
 }

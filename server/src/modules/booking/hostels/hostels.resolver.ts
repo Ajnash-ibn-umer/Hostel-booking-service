@@ -92,4 +92,10 @@ export class HostelsResolver {
 
     return this.roomService.listRoom(listInputRoom, projection);
   }
+
+  @Query(() => RoomListResponse, { name: 'Room_Test' })
+  @UserTypes([USER_TYPES.ADMIN, USER_TYPES.USER, USER_TYPES.PUBLIC])
+  testRoom(@Context() context) {
+    return this.roomService.testRoom();
+  }
 }

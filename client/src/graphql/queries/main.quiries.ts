@@ -247,6 +247,11 @@ export const ROOM_TYPE_LIST_GQL = gql`
         description
         name
         status
+        rentDailyLower
+        rentDailyUpper
+        rentMonthlyUpper
+        rentMonthlyLower
+        securityDeposit
         bedCount
         updatedAt
         updatedUserId
@@ -428,5 +433,35 @@ query Hostel_List($listInputHostel: ListInputHostel!) {
       createdAt
     }
   }
-}
+}`;
+
+export const CONTACT_LIST_FOR_TABLE_GQL = gql`
+  query ContactUs_List($dto: ContactUsListInput!) {
+    ContactUs_List(dto: $dto) {
+      totalCount
+      list {
+        createdAt
+        email
+        message
+        name
+        phone
+        status
+      }
+    }
+}`;
+
+export const CHECK_IN_GUEST = gql`
+  query User_List($listUserInput: ListUserInput!) {
+    User_List(listUserInput: $listUserInput) {
+      list {
+        phoneNumber
+        email
+        name
+        isActive
+        userNo
+        _id
+      }
+      totalCount
+    }
+  }
 `;
