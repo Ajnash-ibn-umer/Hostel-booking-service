@@ -6,6 +6,14 @@ import mongoose from 'mongoose';
 import { PaymentsRepository } from './repositories/payments.repository';
 import { Payment, PaymentStatus } from 'src/database/models/payments.model';
 import { GraphQLError } from 'graphql';
+import {
+  MatchList,
+  Paginate,
+  Search,
+} from 'src/shared/utils/mongodb/filtration.util';
+import { responseFormat } from 'src/shared/graphql/queryProjection';
+import { PaymentsListResponse } from './entities/payment.entity';
+import { ListInputPayments } from './dto/list-payment.input';
 
 @Injectable()
 export class PaymentsService {
@@ -53,5 +61,115 @@ export class PaymentsService {
     } finally {
       !session && (await txnSession.endSession());
     }
+  }
+
+  async listPayments(
+    dto: ListInputPayments,
+    projection: Record<string, any>,
+  ): Promise<PaymentsListResponse> {
+    const pipeline: any[] = [];
+    if (dto.searchingText && dto.searchingText !== '') {
+      pipeline.push(Search(['dueDate', 'payAmount'], dto.searchingText));
+    }
+    pipeline.push(
+      ...MatchList([
+        {
+          match: { status: dto.statusArray },
+          _type_: 'number',
+          required: true,
+        },
+        {
+          match: { paymentStatus: dto.paymentStatusFilter },
+          _type_: 'number',
+          required: false,
+        },
+        {
+          match: { _id: dto.paymentIds },
+          _type_: 'objectId',
+          required: false,
+        },
+        {
+          match: { userId: dto.userIds },
+          _type_: 'objectId',
+          required: false,
+        },
+        {
+          match: { voucherType: dto.voucherTypeFilter },
+          _type_: 'number',
+          required: false,
+        },
+      ]),
+    );
+
+    if (dto.dueDateFilter) {
+      pipeline.push({
+        $match: {
+          dueDate: {
+            $gte: dto.dueDateFilter.from,
+            $lte: dto.dueDateFilter.to,
+          },
+        },
+      });
+    }
+
+    if (dto.payedDateFilter) {
+      pipeline.push({
+        $match: {
+          payedDate: {
+            $gte: dto.payedDateFilter.from,
+            $lte: dto.payedDateFilter.to,
+          },
+        },
+      });
+    }
+
+    switch (dto.sortType) {
+      case 0:
+        pipeline.push({
+          $sort: {
+            createdAt: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 1:
+        pipeline.push({
+          $sort: {
+            dueDate: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 2:
+        pipeline.push({
+          $sort: {
+            paymentStatus: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      default:
+        pipeline.push({
+          $sort: {
+            _id: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+    }
+
+    pipeline.push(...Paginate(dto.skip, dto.limit));
+
+    projection && pipeline.push(responseFormat(projection['list']));
+
+    // Execute the aggregation pipeline
+    const list = await this.paymentRepo.aggregate(pipeline);
+    console.log(JSON.stringify(list));
+
+    let totalCount = 0;
+    if (projection && projection['totalCount']) {
+      totalCount = await this.paymentRepo.totalCount(pipeline);
+    }
+
+    return {
+      list: list as any[],
+      totalCount,
+    };
   }
 }

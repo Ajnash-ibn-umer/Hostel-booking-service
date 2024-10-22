@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import { STATUS_NAMES, USER_TYPES } from 'src/shared/variables/main.variable';
 import { GraphQLError } from 'graphql';
 import { LoginAdminInput, OtpVerifyTokenInput } from '../dto/login-amin.input';
+
 import {
   LoginResponse,
   PhoneVerifyEntity,
@@ -15,6 +16,7 @@ import {
   UserTokenResponse,
 } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { app } from 'src/shared/config/firebase.config';
 
 @Injectable()
 export class AuthService {
@@ -116,16 +118,18 @@ export class AuthService {
     try {
       // TODO: verify login with firebase
       // Logic to verify the token and userId
-      // const isValidToken = this.validateToken(token, userId); // Assuming validateToken is a method that checks the token validity
-
-      // if (!isValidToken) {
-      //   return {
-      //     message: 'Invalid token or user ID.',
-      //     accessToken: '',
-      //     refreshToken: '',
-      //     loginStatus: false,
-      //   };
-      // }
+      let data;
+      try {
+        const isValidToken = await app.auth().verifyIdToken(dto.token);
+        data = isValidToken;
+      } catch (error) {
+        return {
+          message: 'Invalid token or user ID.',
+          accessToken: '',
+          refreshToken: '',
+          loginStatus: false,
+        };
+      }
 
       // Generate new access and refresh tokens
       const userVerfication = await this.userRepo.findOne({
@@ -137,9 +141,6 @@ export class AuthService {
       console.log({ userVerfication });
       if (!userVerfication) {
         throw `This user not found or not actvated in system. for more information please contact admin`;
-      }
-      if (dto.token !== '123456') {
-        throw 'Invalid token';
       }
 
       const accessToken = this.jwtService.sign({
