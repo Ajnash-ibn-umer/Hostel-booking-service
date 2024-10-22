@@ -17,6 +17,7 @@ import {
   //   @ts-ignore
 } from "@/components/ui/table";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -27,15 +28,20 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  
+  const route = useRouter();
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
+  const handleNavigateToDetails = (id: string) => {
+    route.push(`/dashboard/hostels/details/${id}`);
+  };
+
   return (
-    <div className="rounded-md  relative border">
+    <div className="relative  rounded-md border">
       <Table className="relative">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -57,12 +63,14 @@ export function DataTable<TData, TValue>({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows && table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
+            table.getRowModel().rows.map((row: any) => (
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className="cursor-pointer"
+                onClick={() => handleNavigateToDetails(row?.original?._id)}
               >
-                {row.getVisibleCells().map((cell) => (
+                {row.getVisibleCells().map((cell: any) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>

@@ -384,3 +384,49 @@ export const ROOM_BED_LIST_GQL = gql`
     }
   }
 `;
+
+export const HOSTEL_DETAILS = gql`
+query Hostel_List($listInputHostel: ListInputHostel!) {
+  Hostel_List(listInputHostel: $listInputHostel) {
+    list {
+      galleries {
+        url
+      }
+      amenities {
+        icon
+        name
+      }
+      name
+      description
+      rooms {
+        _id
+        galleries {
+          url
+        }
+        name
+        roomType {
+          name
+          description
+          rentDailyLower
+          rentDailyUpper
+          rentMonthlyLower
+          rentMonthlyUpper
+          securityDeposit
+        }
+        amenities {
+          name
+          icon
+        }
+        beds {
+          _id
+        }
+      }
+      propertyNo
+      sellingPrice
+      standardPrice
+      totalRooms
+      createdAt
+    }
+  }
+}
+`;
