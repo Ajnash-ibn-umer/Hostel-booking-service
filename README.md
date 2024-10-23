@@ -1,2 +1,0 @@
-# Oxtal-hostel-booking
-# Oxtel-
