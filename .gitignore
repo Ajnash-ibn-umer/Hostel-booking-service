@@ -1,0 +1,62 @@
+
+# dependencies
+client/node_modules
+client/.pnp
+.pnp.js
+.yarn/install-state.gz
+client/yarn.lock
+server/yarn.lock
+# testing
+client/coverage
+
+
+
+
+
+# next.js
+client/.next/
+client/out/
+
+# production
+client/build
+
+# misc
+client/.DS_Store
+client/*.pem
+
+# debug
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/pnpm-error.log*
+
+
+# local env files
+client/.env*.local
+
+# vercel
+client/.vercel
+
+# typescript
+client/*.tsbuildinfo
+client/next-env.d.ts
+
+
+.vscode
+
+
+server/dist
+server/node_modules
+server/build
+
+*.env/*
+server/.env
+
+server/pnpm-lock.yaml
+client/pnpm-lock.yaml
+
+client/package-lock.json
+server/package-lock.json
+
+
+
