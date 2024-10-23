@@ -32,6 +32,9 @@ export class Booking extends PartialType(Base) {
   regNo: string;
 
   @Field({ nullable: true })
+  checkInDate: Date;
+
+  @Field({ nullable: true })
   idCardNumber: string;
 
   @Field({ nullable: true })
