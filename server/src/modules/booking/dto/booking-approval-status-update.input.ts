@@ -7,7 +7,7 @@ export class AdminBookingStatusChangeInput {
   @Field(() => ID)
   bookingIds: string;
 
-  @Field(() => ID)
+  @Field(() => ID, { nullable: true })
   selectedBedId?: string;
 
   @Field({ description: enumToString(BOOKING_STATUS), nullable: false })
@@ -17,5 +17,5 @@ export class AdminBookingStatusChangeInput {
   remark?: string;
 
   @Field({ nullable: true })
-  date: string;
+  date: Date;
 }

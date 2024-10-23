@@ -123,6 +123,9 @@ export class Booking extends Base {
   @Prop({ default: new Date() })
   contractTo: Date;
 
+  @Prop({ default: new Date() })
+  checkInDate: Date;
+
   @Prop({ required: true, default: -1, enum: BED_POSITION })
   bedPosition: number;
 

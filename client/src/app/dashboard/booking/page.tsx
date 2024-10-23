@@ -77,7 +77,7 @@ export type Booking = {
   };
 };
 
-function OperationsCell({
+function ApprovalOperationsCell({
   booking,
   refetch,
 }: {
@@ -199,7 +199,80 @@ function OperationsCell({
     </div>
   );
 }
+function CheckInOperationsCell({
+  booking,
+  refetch,
+}: {
+  booking: Booking;
+  refetch: any;
+}) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [date, setDate] = useState<string | null>(null);
 
+  const [changeStatus] = useMutation(BOOKING_STATUS_CHANGE);
+
+  const approveStatus = async () => {
+    try {
+      const { data, errors } = await changeStatus({
+        variables: {
+          dto: {
+            bookingIds: booking._id,
+            date: date,
+            remark: "Bed selected",
+            status: BookingStatus.CHECK_IN,
+          },
+        },
+      });
+
+      if (data) {
+        toast({
+          variant: "default",
+          title: "Status changed successfully",
+          description: "Booking Status Changed successfully",
+        });
+        setIsDialogOpen(false);
+        refetch(); // Refetch the room bed list
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Status Change Failed",
+        description: error.toString(),
+      });
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      <Button onClick={() => setIsDialogOpen(true)} variant="secondary">
+        Check In
+      </Button>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Select Check In Date</DialogTitle>
+            <DialogDescription>
+              Submit guest Check In date for Approval
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            onChange={(e) => setDate(e.target.value)}
+            className="p-5"
+            type="datetime-local"
+          ></Input>
+          <DialogFooter>
+            <Button disabled={!date} onClick={approveStatus}>
+              Confirm Check In
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <div></div>
+    </div>
+  );
+}
 function Booking() {
   const router = useRouter();
   const { toast } = useToast();
@@ -220,7 +293,7 @@ function Booking() {
       accessorKey: "property",
       header: "Property",
       cell: ({ row }) => {
-        const name = row?.original?.property?.name|| "";
+        const name = row?.original?.property?.name || "";
         return name;
       },
     },
@@ -271,11 +344,11 @@ function Booking() {
       cell: ({ row }) => (
         <div className="flex gap-1">
           {row.original.bookingStatus < BookingStatus.ADMIN_APPROVED && (
-            <OperationsCell booking={row.original} refetch={refetch} />
+            <ApprovalOperationsCell booking={row.original} refetch={refetch} />
           )}
           <BookingDetailsSheet booking={row.original}></BookingDetailsSheet>
           {row.original.bookingStatus === BookingStatus.ADMIN_APPROVED && (
-            <Button variant={"secondary"}>Check-In</Button>
+            <CheckInOperationsCell booking={row.original} refetch={refetch} />
           )}
         </div>
       ),

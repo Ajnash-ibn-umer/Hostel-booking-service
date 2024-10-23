@@ -51,4 +51,8 @@ server/pnpm-lock.yaml
 client/pnpm-lock.yaml
 
 client/package-lock.json
+server/package-lock.json
+
 client/yarn.lock
+server/yarn.lock
+

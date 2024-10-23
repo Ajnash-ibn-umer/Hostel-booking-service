@@ -423,12 +423,12 @@ export class BookingService {
       const updateData = {
         bookingStatus: dto.status,
         updatedAt: startTime,
-        updatedBy: userId,
+        updatedUserId: userId,
       };
-      if (
-        (dto.selectedBedId && dto.status === BOOKING_STATUS.ADMIN_APPROVED) ||
-        dto.status === BOOKING_STATUS.CHECK_IN
-      ) {
+      if (dto.status === BOOKING_STATUS.ADMIN_APPROVED) {
+        if (!dto.selectedBedId) {
+          throw 'Bed not selected';
+        }
         updateData['bedId'] = dto.selectedBedId;
         const bedUpdate = await this.bedRepository.findOneAndUpdate(
           {
@@ -443,11 +443,16 @@ export class BookingService {
           },
           txnSession,
         );
+
         console.log({ bedUpdate });
 
         if (!bedUpdate) {
           throw 'Selected Bed not found Or This bed already Booked!';
         }
+      }
+
+      if (dto.status === BOOKING_STATUS.CHECK_IN) {
+        updateData['checkInDate'] = dto.date;
       }
       const updatedBooking = await this.bookingRepository.findOneAndUpdate(
         {
@@ -528,7 +533,7 @@ export class BookingService {
         const updatedBooking = await this.bookingApprovalStatusChange(
           {
             bookingIds: dto.bookingId,
-            date: new Date().toISOString(),
+            date: new Date(),
             status: BOOKING_STATUS.PAYMENT_SUCCESS,
 
             remark: `payment successful`,
