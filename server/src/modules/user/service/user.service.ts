@@ -323,10 +323,39 @@ export class UserService {
         );
       }
       if (projection['contract']['room']) {
+        let roomPipe = [];
+        if (projection['contract']['room']['galleries']) {
+          roomPipe.push(
+            ...Lookup({
+              modelName: MODEL_NAMES.GALLERY_ROOM_LINKS,
+              params: { id: '$_id' },
+              conditions: { $roomId: '$$id' },
+              responseName: 'galleries',
+              isNeedUnwind: false,
+              innerPipeline: [
+                ...Lookup({
+                  modelName: MODEL_NAMES.GALLERY,
+                  params: { id: '$galleryId' },
+                  project: responseFormat(
+                    projection['contract']['room']['galleries'],
+                  ),
+                  conditions: { $_id: '$$id' },
+                  responseName: 'galleries',
+                }),
+              ],
+            }),
+            {
+              $addFields: {
+                galleries: '$galleries.galleries',
+              },
+            },
+          );
+        }
         contractAggregationArray.push(
           ...Lookup({
             modelName: MODEL_NAMES.ROOM,
             params: { id: '$roomId' },
+            innerPipeline: roomPipe,
             project: responseFormat(projection['contract']['room']),
             conditions: { $_id: '$$id' },
             responseName: 'room',

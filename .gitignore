@@ -9,6 +9,8 @@ server/yarn.lock
 # testing
 client/coverage
 
+*.env
+**/*.env
 
 
 
