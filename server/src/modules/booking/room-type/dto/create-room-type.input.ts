@@ -11,8 +11,11 @@ export class CreateRoomTypeInput {
   @Field({ description: 'Number of beds in the room' })
   bedCount: number;
 
-  @Field({ description: 'Security deposit amount' })
-  securityDeposit: number;
+  @Field({ description: 'Security deposit amount', nullable: true })
+  securityDepositForLower: number;
+
+  @Field({ description: 'Security deposit amount', nullable: true })
+  securityDepositForUpper: number;
 
   @Field({ description: 'Upper limit of monthly rent' })
   rentMonthlyUpper: number;

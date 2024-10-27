@@ -3,7 +3,7 @@ import { CreateUserInput } from '../dto/create-user.input';
 import { UpdateUserInput } from '../dto/update-user.input';
 import { UserRepository } from '../repository/user.repository';
 import { STATUS_NAMES, USER_TYPES } from 'src/shared/variables/main.variable';
-import mongoose from 'mongoose';
+import mongoose, { ClientSession } from 'mongoose';
 import { GraphQLError } from 'graphql';
 import { ListUserInput } from '../dto/list-user.input';
 import { responseFormat } from 'src/shared/graphql/queryProjection';
@@ -76,7 +76,6 @@ export class UserService {
         name: dto.name,
         email: dto.email,
         bookingId: dto.bookingId,
-        isActive: true,
         phoneNumber: dto.phoneNumber,
         userType: dto.userType,
         roleId: dto.roleId,
@@ -386,6 +385,27 @@ export class UserService {
         user: user[0] || null,
         contract: contract[0] || null,
       };
+    } catch (error) {
+      throw new GraphQLError(error.message ?? error, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    }
+  }
+
+  async findOneUserByBookingId(
+    bookingId: string,
+    session: ClientSession = null,
+  ) {
+    try {
+      const user = await this.userRepo.findOne({ bookingId: bookingId });
+
+      if (!user) {
+        throw `User not found for bookingId: ${bookingId}`;
+      }
+
+      return user;
     } catch (error) {
       throw new GraphQLError(error.message ?? error, {
         extensions: {

@@ -96,7 +96,8 @@ function ApprovalOperationsCell({
     variables: {
       listInputRoom: {
         limit: -1,
-        roomIds: [booking.roomId],
+        // roomIds: [booking.roomId],
+        hostelIds:[booking.propertyId],
         skip: -1,
         statusArray: [1],
         bedFilters: {

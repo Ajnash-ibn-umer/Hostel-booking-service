@@ -251,7 +251,8 @@ export const ROOM_TYPE_LIST_GQL = gql`
         rentDailyUpper
         rentMonthlyUpper
         rentMonthlyLower
-        securityDeposit
+        securityDepositForLower
+        securityDepositForUpper
         bedCount
         updatedAt
         updatedUserId

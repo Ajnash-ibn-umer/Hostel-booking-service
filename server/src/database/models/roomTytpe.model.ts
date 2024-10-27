@@ -15,8 +15,11 @@ export class RoomType extends Base {
   @Prop({ required: true, default: 0 })
   bedCount: number;
 
-  @Prop({ required: true, default: 0 })
-  securityDeposit: number;
+  @Prop({ required: false, default: 0 })
+  securityDepositForLower: number;
+
+  @Prop({ required: false, default: 0 })
+  securityDepositForUpper: number;
 
   @Prop({ required: true, default: 0 })
   rentMonthlyUpper: number;

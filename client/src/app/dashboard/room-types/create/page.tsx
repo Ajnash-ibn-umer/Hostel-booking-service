@@ -45,7 +45,10 @@ const formSchema = z.object({
   rentMonthlyUpper: z.string().min(0, {
     message: "Rent monthly upper must be at least 0.",
   }),
-  securityDeposit: z.string().min(0, {
+  securityDepositForLower: z.string().min(0, {
+    message: "Security deposit must be at least 0.",
+  }),
+  securityDepositForUpper: z.string().min(0, {
     message: "Security deposit must be at least 0.",
   }),
 });
@@ -63,7 +66,8 @@ function CreateRoomType() {
       rentDailyUpper: "0",
       rentMonthlyLower: "0",
       rentMonthlyUpper: "0",
-      securityDeposit: "0",
+      securityDepositForLower: "0",
+      securityDepositForUpper: "0",
     },
   });
   const [createRoomType, { loading, error }] =
@@ -83,7 +87,8 @@ function CreateRoomType() {
             rentDailyUpper: parseFloat(values.rentDailyUpper),
             rentMonthlyLower: parseFloat(values.rentMonthlyLower),
             rentMonthlyUpper: parseFloat(values.rentMonthlyUpper),
-            securityDeposit: parseFloat(values.securityDeposit),
+            securityDepositForLower: parseFloat(values.securityDepositForLower),
+            securityDepositForUpper: parseFloat(values.securityDepositForUpper),
           },
         },
       });
@@ -133,24 +138,6 @@ function CreateRoomType() {
                   />
                   <FormField
                     control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Room Type Description"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="flex w-full flex-wrap justify-between gap-5">
-                  <FormField
-                    control={form.control}
                     name="bedCount"
                     render={({ field }) => (
                       <FormItem className="flex-1">
@@ -166,6 +153,8 @@ function CreateRoomType() {
                       </FormItem>
                     )}
                   />
+                </div>
+                <div className="flex w-full flex-wrap justify-between gap-5">
                   <FormField
                     control={form.control}
                     name="rentDailyLower"
@@ -176,25 +165,6 @@ function CreateRoomType() {
                           <Input
                             type="number"
                             placeholder="Daily Rent Lower"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="flex w-full flex-wrap justify-between gap-5">
-                  <FormField
-                    control={form.control}
-                    name="rentDailyUpper"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel> Daily Rent For Upper Bed</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Daily Rent Upper"
                             {...field}
                           />
                         </FormControl>
@@ -223,6 +193,23 @@ function CreateRoomType() {
                 <div className="flex w-full flex-wrap justify-between gap-5">
                   <FormField
                     control={form.control}
+                    name="rentDailyUpper"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel> Daily Rent For Upper Bed</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Daily Rent Upper"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="rentMonthlyUpper"
                     render={({ field }) => (
                       <FormItem className="flex-1">
@@ -238,16 +225,36 @@ function CreateRoomType() {
                       </FormItem>
                     )}
                   />
+                </div>
+                <div className="flex w-full flex-wrap justify-between gap-5">
                   <FormField
                     control={form.control}
-                    name="securityDeposit"
+                    name="securityDepositForLower"
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>Security Deposit</FormLabel>
+                        <FormLabel>Security Deposit For Lower Bed</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
-                            placeholder="Security Deposit"
+                            placeholder="Security Deposit For Lower Bed"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="securityDepositForUpper"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Security Deposit For Uppder Bed</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Security Deposit For Upper Bed"
                             {...field}
                           />
                         </FormControl>
@@ -256,6 +263,22 @@ function CreateRoomType() {
                     )}
                   />
                 </div>
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Room Type Description"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               <Button type="submit">Submit</Button>
             </form>

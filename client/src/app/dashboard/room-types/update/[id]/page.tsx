@@ -43,7 +43,10 @@ const formSchema = z.object({
   rentMonthlyUpper: z.string().min(0, {
     message: "Rent monthly upper must be at least 0.",
   }),
-  securityDeposit: z.string().min(0, {
+  securityDepositForLower: z.string().min(0, {
+    message: "Security deposit must be at least 0.",
+  }),
+  securityDepositForUpper: z.string().min(0, {
     message: "Security deposit must be at least 0.",
   }),
 });
@@ -63,7 +66,8 @@ function UpdateRoomType({ params }: any) {
       rentDailyUpper: "0",
       rentMonthlyLower: "0",
       rentMonthlyUpper: "0",
-      securityDeposit: "0",
+      securityDepositForLower: "0",
+      securityDepositForUpper: "0",
     },
   });
 
@@ -98,7 +102,8 @@ function UpdateRoomType({ params }: any) {
         rentDailyUpper,
         rentMonthlyLower,
         rentMonthlyUpper,
-        securityDeposit,
+        securityDepositForLower,
+        securityDepositForUpper
       } = roomTypeData.RoomType_List.list[0];
       console.log({ name, description });
       form.reset({
@@ -109,7 +114,8 @@ function UpdateRoomType({ params }: any) {
         rentDailyUpper,
         rentMonthlyLower,
         rentMonthlyUpper,
-        securityDeposit,
+        securityDepositForLower,
+        securityDepositForUpper
       });
     }
   }, [roomTypeData, form, id]);
@@ -129,7 +135,8 @@ function UpdateRoomType({ params }: any) {
             rentDailyUpper: parseFloat(values.rentDailyUpper),
             rentMonthlyLower: parseFloat(values.rentMonthlyLower),
             rentMonthlyUpper: parseFloat(values.rentMonthlyUpper),
-            securityDeposit: parseFloat(values.securityDeposit),
+            securityDepositForLower: parseFloat(values.securityDepositForLower),
+            securityDepositForUpper: parseFloat(values.securityDepositForUpper),
           },
         },
       });
@@ -286,14 +293,31 @@ function UpdateRoomType({ params }: any) {
                   />
                   <FormField
                     control={form.control}
-                    name="securityDeposit"
+                    name="securityDepositForLower"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Security Deposit</FormLabel>
+                        <FormLabel>Security Deposit For Lower Bed</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
-                            placeholder="Security Deposit"
+                            placeholder="Security Deposit For Lower Bed"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                    <FormField
+                    control={form.control}
+                    name="securityDepositForUpper"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Security Deposit For Upper Bed</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Security Deposit For Upper Bed"
                             {...field}
                           />
                         </FormControl>

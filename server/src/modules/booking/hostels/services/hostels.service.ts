@@ -204,12 +204,14 @@ export class HostelsService {
       const instertingRooms: any[] = [];
       const insertingBeds: any[] = [];
 
-      const hostelSlug = generateSlug(dto.name);
 
-      const newhostel = await this.hostelRepository.create(
+      const newhostel = await this.hostelRepository.findOneAndUpdate(
+        {
+          _id: dto._id,
+          status: 1,
+        },
         {
           ...dto,
-          slug: hostelSlug,
           updatedAt: time,
           updatedUserId: userId,
         },

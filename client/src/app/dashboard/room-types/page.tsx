@@ -23,7 +23,9 @@ export type RoomType = {
   rentDailyUpper: number;
   rentMonthlyLower: number;
   rentMonthlyUpper: number;
-  securityDeposit: number;
+  securityDepositForLower: number;
+  securityDepositForUpper: number;
+
   createdAt: Date;
   createdUser: any;
 };

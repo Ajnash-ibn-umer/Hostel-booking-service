@@ -184,7 +184,8 @@ export const ROOM_TYPE_CREATE_GQL = gql`
       rentDailyUpper
       rentMonthlyLower
       rentMonthlyUpper
-      securityDeposit
+      securityDepositForLower
+      securityDepositForUpper
     }
   }
 `;

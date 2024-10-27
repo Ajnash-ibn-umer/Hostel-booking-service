@@ -14,7 +14,10 @@ export class RoomType extends PartialType(Base) {
   bedCount?: number;
 
   @Field({ description: 'Security deposit amount', nullable: true })
-  securityDeposit?: number;
+  securityDepositForLower: number;
+
+  @Field({ description: 'Security deposit amount', nullable: true })
+  securityDepositForUpper: number;
 
   @Field({ description: 'Upper limit of monthly rent', nullable: true })
   rentMonthlyUpper?: number;

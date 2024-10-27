@@ -42,11 +42,14 @@ import { TranasactionRepository } from 'src/repositories/transaction.repository'
 import { PAYMENT_STATUS } from 'src/database/models/transaction.model';
 import { UserService } from 'src/modules/user/service/user.service';
 import { VACCATE_STATUS } from 'src/database/models/contract.model';
+import { MailerService } from 'src/modules/mailer/mailer.service';
+import { EMAIL_TEMPLATES } from 'src/modules/mailer/dto/create-mailer.input';
 @Injectable()
 export class BookingService {
   constructor(
     private readonly hostelRepository: HostelRepository,
     private readonly userService: UserService,
+    private readonly mailService: MailerService,
 
     private readonly roomRepository: RoomRepository,
     private readonly bedRepository: BedRepository,
@@ -56,7 +59,6 @@ export class BookingService {
     private readonly invoiceRepository: InvoiceRepository,
     private readonly invoiceItemRepository: InvoiceItemRepository,
     private readonly transactionRepository: TranasactionRepository,
-
     private readonly counterService: CounterService,
     @InjectConnection()
     private readonly connection: mongoose.Connection,
@@ -114,10 +116,10 @@ export class BookingService {
       if (dto.paymentBase === PRICE_BASE_MODE.MONTHLY) {
         if (dto.bedPosition === BED_POSITION.LOWER) {
           rent = selectedBed.roomType.rentMonthlyLower;
-          securityDeposit = selectedBed.roomType.rentMonthlyLower || 0;
+          securityDeposit = selectedBed.roomType.securityDepositForLower || 0;
         } else if (dto.bedPosition === BED_POSITION.UPPER) {
           rent = selectedBed.roomType.rentMonthlyUpper;
-          securityDeposit = selectedBed.roomType.rentMonthlyUpper || 0;
+          securityDeposit = selectedBed.roomType.securityDepositForUpper || 0;
         }
       } else if (dto.paymentBase === PRICE_BASE_MODE.DAILY) {
         if (dto.bedPosition === BED_POSITION.UPPER) {
@@ -430,7 +432,7 @@ export class BookingService {
           throw 'Bed not selected';
         }
         updateData['bedId'] = dto.selectedBedId;
-        const bedUpdate = await this.bedRepository.findOneAndUpdate(
+        const bedUpdate: any = await this.bedRepository.findOneAndUpdate(
           {
             _id: dto.selectedBedId,
             status: STATUS_NAMES.ACTIVE,
@@ -443,16 +445,41 @@ export class BookingService {
           },
           txnSession,
         );
-
         console.log({ bedUpdate });
 
         if (!bedUpdate) {
           throw 'Selected Bed not found Or This bed already Booked!';
         }
+
+        this.mailService.send({
+          subject: `Booking Approved`,
+          to: bedUpdate.email,
+          template: EMAIL_TEMPLATES.BOOKING_APPROVAL,
+          context: {
+            guestName: bedUpdate.name,
+            bookingNumber: bedUpdate.bookingNumber,
+            approvalDate: new Date().toLocaleDateString(),
+          },
+        });
       }
 
       if (dto.status === BOOKING_STATUS.CHECK_IN) {
         updateData['checkInDate'] = dto.date;
+        const user = await this.userService.findOneUserByBookingId(
+          dto.bookingIds,
+        );
+
+        await this.userService.activateUser(user._id, txnSession);
+        this.mailService.send({
+          subject: `Check In Confirmed`,
+          to: user.email,
+          template: EMAIL_TEMPLATES.BOOKING_APPROVAL,
+          context: {
+            name: user.name,
+            userNumber: user.userNo,
+            checkInDate: dto.date.toLocaleDateString(),
+          },
+        });
       }
       const updatedBooking = await this.bookingRepository.findOneAndUpdate(
         {
@@ -505,9 +532,13 @@ export class BookingService {
 
       // TODO: update admission book form status
 
-      const bookingData = await this.bookingRepository.findOne({
-        _id: dto.bookingId,
-      });
+      const bookingData = await this.bookingRepository.findOne(
+        {
+          _id: dto.bookingId,
+        },
+        null,
+        txnSession,
+      );
       console.log('in booking');
 
       if (!bookingData) {
@@ -578,8 +609,22 @@ export class BookingService {
           txnSession,
         );
         //  TODO: send notification
+
+        this.mailService.send({
+          subject: `Booking Successful`,
+          to: bookingData.email,
+          template: EMAIL_TEMPLATES.BOOKING_SUCCESSFULL,
+          context: {
+            customerName: bookingData.name,
+            bookingNumber: bookingData.bookingNumber,
+            bookingDate: bookingData.createdAt.toLocaleDateString(),
+            securityDeposit: bookingData.securityDeposit.toString(),
+            rent: bookingData.basePrice.toString(),
+          },
+        });
       }
       await txnSession.commitTransaction();
+
       return {
         message: 'Booking status updated successfully',
       };

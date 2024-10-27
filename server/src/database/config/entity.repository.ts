@@ -17,9 +17,11 @@ export class EntityRepository<T extends Document> {
     filterQuery: FilterQuery<T>,
     projection: Record<string, any> = { __v: 0 },
     transaction: ClientSession = null,
+    populates: string[] = [],
   ): Promise<T> {
     return this.entityModel
       .findOne(filterQuery, { __v: 0, ...projection })
+      .populate(populates)
       .session(transaction)
       .exec();
   }

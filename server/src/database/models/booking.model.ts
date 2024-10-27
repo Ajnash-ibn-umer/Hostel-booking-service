@@ -2,6 +2,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, SchemaTypes, HydratedDocument } from 'mongoose';
 import { Base } from './base.model';
 import { BED_POSITION } from 'src/shared/variables/main.variable';
+import { MODEL_NAMES } from '../modelNames';
 
 export enum BOOKING_STATUS {
   INIT = 1,
@@ -95,12 +96,18 @@ export class Booking extends Base {
   @Prop({
     type: SchemaTypes.ObjectId,
     default: null,
+    ref: MODEL_NAMES.ROOM,
     required: true,
     index: true,
   })
   roomId: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, default: null, index: true })
+  @Prop({
+    type: SchemaTypes.ObjectId,
+    default: null,
+    index: true,
+    ref: MODEL_NAMES.BED,
+  })
   bedId: string;
 
   @Prop({
@@ -108,10 +115,11 @@ export class Booking extends Base {
     default: null,
     required: true,
     index: true,
+    ref: MODEL_NAMES.HOSTEL,
   })
   propertyId: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, default: null })
+  @Prop({ type: SchemaTypes.ObjectId, default: null, ref: MODEL_NAMES.INVOICE })
   invoiceId: string;
 
   @Prop({ default: '' })

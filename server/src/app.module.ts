@@ -19,6 +19,9 @@ import { ContactUsRepository } from './repositories/contact-us.repository';
 import { ComplaintsModule } from './modules/complaints/complaints.module';
 import { DamageAndSplitModule } from './modules/damage_and_split/damage_and_split.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { MailerModule as NodeMailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { MailerModule } from './modules/mailer/mailer.module';
 
 const configService = new ConfigService();
 @Module({
@@ -39,6 +42,30 @@ const configService = new ConfigService();
       global: true,
     }),
     GraphqlConfig(),
+    NodeMailerModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get('MAIL_HOST'),
+          secure: true,
+          port: 465,
+          auth: {
+            user: configService.get('MAIL_USER'),
+            pass: configService.get('MAIL_PASS'),
+          },
+        },
+        defaults: {
+          from: '"Oxtel" <oxtel@gmail.com>',
+        },
+        template: {
+          dir: __dirname + '/../templates',
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+      inject: [ConfigService],
+    }),
     UserModule,
     CounterModule,
     BookingModule,
@@ -49,6 +76,7 @@ const configService = new ConfigService();
     ComplaintsModule,
     DamageAndSplitModule,
     PaymentsModule,
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver, ContactUsRepository],
