@@ -358,7 +358,7 @@ export class HostelsService {
 
       if (dto.aminityIds && dto.aminityIds.length > 0) {
         await this.hostelAmenityLinkRepo.deleteMany({
-          roomId: dto._id.toString(),
+          hostelId: dto._id.toString(),
           status: STATUS_NAMES.ACTIVE,
         });
         const amenitiesLinks: any = dto.aminityIds.map((id) => ({
@@ -372,7 +372,7 @@ export class HostelsService {
       }
       if (dto.galleryIds && dto.galleryIds.length > 0) {
         await this.hostelGalleryLinkRepo.deleteMany({
-          roomId: dto._id.toString(),
+          hostelId: dto._id.toString(),
           status: STATUS_NAMES.ACTIVE,
         });
         const galleriesLinks: any = dto.galleryIds.map((id) => ({
