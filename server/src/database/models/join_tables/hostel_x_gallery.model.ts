@@ -22,7 +22,10 @@ export class HostelGalleryLink extends Base {
 export const HostelGalleryLinkSchema =
   SchemaFactory.createForClass(HostelGalleryLink);
 
-HostelGalleryLinkSchema.index({ hostelId: 1, galleryId: 1 }, { unique: true });
+HostelGalleryLinkSchema.index(
+  { hostelId: 1, galleryId: 1 },
+  { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
+);
 HostelGalleryLinkSchema.index({ status: 1 });
 
 HostelGalleryLinkSchema.post('save', async function (error, doc, next) {

@@ -28,7 +28,7 @@ export const ComplaintGalleryLinkSchema =
 
 ComplaintGalleryLinkSchema.index(
   { complaintId: 1, galleryId: 1 },
-  { unique: true },
+  { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
 );
 ComplaintGalleryLinkSchema.index({ status: 1 });
 

@@ -204,7 +204,6 @@ export class HostelsService {
       const instertingRooms: any[] = [];
       const insertingBeds: any[] = [];
 
-
       const newhostel = await this.hostelRepository.findOneAndUpdate(
         {
           _id: dto._id,

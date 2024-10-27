@@ -24,7 +24,7 @@ export const HostelAmenitiesLinkSchema =
 
 HostelAmenitiesLinkSchema.index(
   { hostelId: 1, amenityId: 1 },
-  { unique: true },
+  { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
 );
 HostelAmenitiesLinkSchema.index({ status: 1 });
 

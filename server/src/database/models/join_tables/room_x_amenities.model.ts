@@ -22,7 +22,10 @@ export class RoomAmenitiesLink extends Base {
 export const RoomAmenitiesLinkSchema =
   SchemaFactory.createForClass(RoomAmenitiesLink);
 
-RoomAmenitiesLinkSchema.index({ roomId: 1, amenityId: 1 }, { unique: true });
+RoomAmenitiesLinkSchema.index(
+  { roomId: 1, amenityId: 1 },
+  { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
+);
 RoomAmenitiesLinkSchema.index({ status: 1 });
 
 RoomAmenitiesLinkSchema.post('save', async function (error, doc, next) {

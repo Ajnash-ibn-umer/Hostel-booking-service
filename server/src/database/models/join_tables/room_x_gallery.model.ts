@@ -22,7 +22,10 @@ export class RoomGalleryLink extends Base {
 export const RoomGalleryLinkSchema =
   SchemaFactory.createForClass(RoomGalleryLink);
 
-RoomGalleryLinkSchema.index({ roomId: 1, galleryId: 1 }, { unique: true });
+RoomGalleryLinkSchema.index(
+  { roomId: 1, galleryId: 1 },
+  { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
+);
 RoomGalleryLinkSchema.index({ status: 1 });
 
 RoomGalleryLinkSchema.post('save', async function (error, doc, next) {
