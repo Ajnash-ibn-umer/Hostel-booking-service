@@ -36,9 +36,9 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const handleNavigateToDetails = (id: string) => {
-    route.push(`/dashboard/hostels/details/${id}`);
-  };
+  // const handleNavigateToDetails = (id: string) => {
+  //   route.push(`/dashboard/hostels/details/${id}`);
+  // };
 
   return (
     <div className="relative  rounded-md border">
@@ -68,7 +68,6 @@ export function DataTable<TData, TValue>({
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
                 className="cursor-pointer"
-                onClick={() => handleNavigateToDetails(row?.original?._id)}
               >
                 {row.getVisibleCells().map((cell: any) => (
                   <TableCell key={cell.id}>
