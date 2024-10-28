@@ -5,7 +5,6 @@ import * as compression from 'compression';
 import * as express from 'express';
 import { join } from 'path';
 
-
 import next from 'next';
 
 async function bootstrap() {
