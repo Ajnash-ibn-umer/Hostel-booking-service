@@ -296,7 +296,7 @@ function CreateHostelForm() {
     variables: roomTypeinputVariables,
   });
 
-  console.log({ locationData });
+  // console.log({ locationData });
 
   const {
     register,
@@ -467,7 +467,7 @@ function CreateHostelForm() {
                   <Card className="mb-10 flex w-full flex-col p-5">
                     <MultiFileUploader
                       onChange={(files: File[]) => {
-                        console.log({ files });
+                        // console.log({ files });
                         setImages(files);
                       }}
                     ></MultiFileUploader>
