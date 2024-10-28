@@ -8,11 +8,15 @@ import { DataTable } from "../../../components/Datatables/data-table";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { ColumnDef } from "@tanstack/react-table";
-import { HOSTEL_LIST_DASHBOARD } from "@/graphql/queries/main.quiries";
+import {
+  HOSTEL_DETAILS,
+  HOSTEL_LIST_DASHBOARD,
+} from "@/graphql/queries/main.quiries";
 import { AlertConfirm } from "@/components/Alerts/alert";
 import { HOSTEL_DELETE_GQL } from "@/graphql/queries/main.mutations";
 import Pageniation from "@/components/pagination/pagination";
 import Link from "next/link";
+import HostelDetailsSheet from "./details/page";
 interface HostelListInterface {
   _id: string;
   name: string;
@@ -81,10 +85,18 @@ const HostelList: React.FC = () => {
       cell: ({ row }) => {
         const { toast } = useToast();
         const [deleteData, { loading, error }] = useMutation(HOSTEL_DELETE_GQL);
-
+        const { data } = useQuery(HOSTEL_DETAILS, {
+          variables: {
+            listInputHostel: {
+              hostelIds: row.original._id,
+              statusArray: 1,
+              limit: 1,
+            },
+          },
+        });
+        const hostelData = data?.Hostel_List?.list[0];
         const deleteHostel = async () => {
           try {
-            console.log();
             const { data, errors } = await deleteData({
               variables: {
                 statusChangeInput: {
@@ -93,7 +105,7 @@ const HostelList: React.FC = () => {
                 },
               },
             });
-           await refetch();
+            await refetch();
 
             if (data) {
               toast({
@@ -114,6 +126,13 @@ const HostelList: React.FC = () => {
         return (
           <>
             <div className="flex gap-2">
+              <HostelDetailsSheet hostelData={hostelData} />
+              <Button
+                variant={"default"}
+                onClick={() => router.push(`hostels/update/${row.original._id}`)}
+              >
+                Edit
+              </Button>
               <AlertConfirm
                 cancel="Cancel"
                 confirm="Delete"
@@ -145,7 +164,6 @@ const HostelList: React.FC = () => {
   };
 
   useEffect(() => {
-  
     if (error) {
       toast({
         variant: "destructive",
@@ -162,7 +180,10 @@ const HostelList: React.FC = () => {
         <div className="flex justify-end ">
           <Button onClick={() => router.push("hostels/create")}>Create</Button>
         </div>
-        <DataTable columns={hostelColumns} data={data?.Hostel_List?.list || []} />
+        <DataTable
+          columns={hostelColumns}
+          data={data?.Hostel_List?.list || []}
+        />
         <Pageniation
           fetch={changePage}
           skip={inputVariables?.listInputHostel.skip || 0}

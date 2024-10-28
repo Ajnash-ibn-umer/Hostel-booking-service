@@ -39,7 +39,14 @@ export default function MultiSelect({
 }) {
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<typeof values>([]);
-  console.log({ values });
+
+  React.useEffect(() => {
+    const initialSelected = values.filter((option) =>
+      selectedValues.includes(option.value),
+    );
+    setSelected(initialSelected);
+  }, [values, selectedValues]);
+  
   const handleSelect = (val: (typeof values)[number]) => {
     setSelected((prev) => {
       if (prev.some((item) => item && item.value === val.value)) {
@@ -81,7 +88,7 @@ export default function MultiSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-full h-fit justify-between"
         >
           {selected && selected.length > 0 ? (
             <div className="flex flex-wrap gap-1">

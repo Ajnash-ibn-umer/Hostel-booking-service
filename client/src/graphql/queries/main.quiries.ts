@@ -396,11 +396,13 @@ query Hostel_List($listInputHostel: ListInputHostel!) {
   Hostel_List(listInputHostel: $listInputHostel) {
     list {
       galleries {
+        _id
         url
       }
       amenities {
-        icon
+        _id
         name
+        icon
       }
       name
       description
@@ -417,7 +419,6 @@ query Hostel_List($listInputHostel: ListInputHostel!) {
           rentDailyUpper
           rentMonthlyLower
           rentMonthlyUpper
-          securityDeposit
         }
         amenities {
           name
@@ -427,11 +428,14 @@ query Hostel_List($listInputHostel: ListInputHostel!) {
           _id
         }
       }
-      propertyNo
       sellingPrice
       standardPrice
       totalRooms
       createdAt
+      availabilityStatus
+      locationId
+      priceBaseMode
+      propertyNo
     }
   }
 }`;
@@ -464,5 +468,4 @@ export const CHECK_IN_GUEST = gql`
       }
       totalCount
     }
-  }
-`;
+}`;

@@ -10,12 +10,22 @@ interface FileWithPreview extends File {
 }
 interface MultiFileUplaoderProps {
   onChange: Function;
+  initialFiles?: FileWithPreview[];
 }
 export default function MultiFileUploader({
   onChange,
+  initialFiles = [],
 }: MultiFileUplaoderProps) {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // useEffect(() => {
+  //   setFiles(initialFiles);
+  // }, [initialFiles]);
+
+  useEffect(() => {
+    onChange(files);
+  }, [files]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -29,10 +39,6 @@ export default function MultiFileUploader({
       setFiles((prevFiles: any) => [...prevFiles, ...newFiles]);
     }
   };
-
-  useEffect(() => {
-    onChange(files);
-  }, [files]);
 
   const removeFile = (fileToRemove: FileWithPreview) => {
     setFiles(files.filter((file) => file !== fileToRemove));
@@ -72,7 +78,6 @@ export default function MultiFileUploader({
           ref={fileInputRef}
           onChange={handleFileChange}
           multiple
-        
           className="hidden"
           accept="image/*,.pdf,.doc,.docx,.txt"
         />
