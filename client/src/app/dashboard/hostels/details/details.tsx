@@ -1,10 +1,6 @@
 "use client";
-
-import { HOSTEL_DETAILS } from "@/graphql/queries/main.quiries";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@apollo/client";
-import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Carousel,
@@ -26,48 +22,29 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HOSTEL_DETAILS } from "@/graphql/queries/main.quiries";
+import { useQuery } from "@apollo/client";
 
-export type Hostel = {
-  galleries: {
-    url: string;
-  }[];
-  amenities: {
-    icon: string;
-    name: string;
-  }[];
-  name: string;
-  description: string;
-  rooms: {
-    _id: string;
-    galleries: {
-      url: string;
-    }[];
-    name: string;
-    roomType: string | null;
-    amenities: {
-      icon: string;
-      name: string;
-    }[];
-    beds: {
-      _id: string;
-    }[];
-  }[];
-  propertyNo: string;
-  sellingPrice: number;
-  standardPrice: number;
-  totalRooms: number;
-  createdAt: string;
-};
 
-interface HostelDetailsSheetProps {
-  hostelData?: Hostel;
+
+interface HostelDetailsProps {
+  hostelId: string;
 }
 
-const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
-  hostelData,
-}) => {
+function HostelDetailsSheet({ hostelId }: HostelDetailsProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+
+  const { data } = useQuery(HOSTEL_DETAILS, {
+    variables: {
+      listInputHostel: {
+        hostelIds: hostelId,
+        statusArray: 1,
+        limit: 1,
+      },
+    },
+  });
+  const hostelDetails = data?.Hostel_List?.list[0];
 
   // useEffect(() => {
   //   if (error) {
@@ -83,7 +60,7 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
   //   return <p>Loading...</p>;
   // }
 
-  if (!hostelData) {
+  if (!hostelDetails) {
     return <p>Hostel not found</p>;
   }
 
@@ -96,8 +73,8 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
       <SheetContent className="flex flex-col sm:max-w-[540px]">
         <div className="scrollable-sheet px-4">
           <SheetHeader>
-            <SheetTitle>{hostelData?.name}</SheetTitle>
-            <SheetDescription>{hostelData.description}</SheetDescription>
+            <SheetTitle>{hostelDetails?.name}</SheetTitle>
+            <SheetDescription>{hostelDetails.description}</SheetDescription>
           </SheetHeader>
 
           <div className="space-y-4 py-4">
@@ -110,7 +87,7 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
                   <div className="flex flex-row items-center justify-start gap-6">
                     <span className="text-sm text-gray-500">Property No:</span>
                     <span className="text-sm font-semibold">
-                      {hostelData.propertyNo}
+                      {hostelDetails.propertyNo}
                     </span>
                   </div>
                   <div className="flex flex-row items-center justify-start gap-6">
@@ -118,7 +95,7 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
                       Selling Price:
                     </span>
                     <span className="text-lg font-semibold">
-                      {hostelData.sellingPrice}
+                      {hostelDetails.sellingPrice}
                     </span>
                   </div>
                   <div className="flex flex-row items-center justify-start gap-6">
@@ -126,13 +103,13 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
                       Standard Price:
                     </span>
                     <span className="text-lg font-semibold">
-                      {hostelData.standardPrice}
+                      {hostelDetails.standardPrice}
                     </span>
                   </div>
                   <div className="flex flex-row items-center justify-start gap-6">
                     <span className="text-sm text-gray-500">Total Rooms:</span>
                     <span className="text-lg font-semibold">
-                      {hostelData.totalRooms}
+                      {hostelDetails.totalRooms}
                     </span>
                   </div>
                 </div>
@@ -145,7 +122,7 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
               </CardHeader>
               <Carousel className="hover" opts={{ loop: true }}>
                 <CarouselContent>
-                  {hostelData?.galleries?.map((gallery: any, index: number) => (
+                  {hostelDetails?.galleries?.map((gallery: any, index: number) => (
                     <CarouselItem key={index} className="h-84 w-64">
                       <CardContent className="relative flex aspect-square items-center justify-center p-6">
                         {" "}
@@ -161,7 +138,7 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
                   ))}
                 </CarouselContent>
 
-                {hostelData?.galleries?.length > 0 && (
+                {hostelDetails?.galleries?.length > 0 && (
                   <>
                     <CarouselPrevious className="ml-6 h-12 w-12 rounded-full bg-gray-200 p-2 text-sm" />
                     <CarouselNext className="mr-7 h-12 w-12 rounded-full bg-gray-200 p-2 text-sm" />
@@ -175,7 +152,7 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
                 <CardTitle>Amenities</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-start justify-start gap-4">
-                {hostelData?.amenities?.map((amenity: any, index: number) => (
+                {hostelDetails?.amenities?.map((amenity: any, index: number) => (
                   <div
                     key={index}
                     className="flex flex-row items-center space-x-4"
@@ -195,7 +172,7 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
                 <CardTitle className="text-xl font-bold">Rooms</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {hostelData?.rooms?.map((room: any) => (
+                {hostelDetails?.rooms?.map((room: any) => (
                   <Card key={room._id} className="p-2">
                     <CardHeader>
                       <CardTitle className="text-lg">{room.name}</CardTitle>
@@ -239,6 +216,6 @@ const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
       </SheetContent>
     </Sheet>
   );
-};
+}
 
 export default HostelDetailsSheet;
