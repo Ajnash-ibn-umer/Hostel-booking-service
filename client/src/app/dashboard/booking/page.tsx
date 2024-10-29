@@ -90,14 +90,14 @@ function ApprovalOperationsCell({
   const [selectedBed, setSelectedBed] = useState<string>("");
 
   const [changeStatus] = useMutation(BOOKING_STATUS_CHANGE);
-
+  console.log("booking", booking.bookingNumber, booking.propertyId);
   const { data } = useQuery(ROOM_BED_LIST_GQL, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     variables: {
       listInputRoom: {
         limit: -1,
         // roomIds: [booking.roomId],
-        hostelIds:[booking.propertyId],
+        hostelIds: [booking.propertyId],
         skip: -1,
         statusArray: [1],
         bedFilters: {
@@ -174,11 +174,13 @@ function ApprovalOperationsCell({
                   <SelectValue placeholder="Select a bed" />
                 </SelectTrigger>
                 <SelectContent>
-                  {data?.Room_List?.list[0]?.beds?.map((bed: any) => (
-                    <SelectItem key={bed._id} value={bed._id}>
-                      {`${bed.name}-${BED_POSITION[bed.bedPosition].toLowerCase()} (${BedAvailabilityStatus[bed.availabilityStatus].toLowerCase().replace("_", " ")})`}
-                    </SelectItem>
-                  ))}
+                  {data?.Room_List?.list?.map((room: any) =>
+                    room.beds?.map((bed: any) => (
+                      <SelectItem key={bed._id} value={bed._id}>
+                        {`${bed.name}-${BED_POSITION[bed.bedPosition].toLowerCase()} (${BedAvailabilityStatus[bed.availabilityStatus].toLowerCase().replace("_", " ")})`}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -319,7 +321,7 @@ function Booking() {
           case 4:
             return (
               <Badge style={{ background: "green", color: "white" }}>
-                Payment Success
+                Booking Completed
               </Badge>
             );
           case 5:

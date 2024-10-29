@@ -240,7 +240,8 @@ export class UserService {
     session: mongoose.ClientSession,
   ): Promise<User | GraphQLError> {
     try {
-      const user = await this.userRepo.findOne({ _id: userId }, session);
+      console.log('in CHeckin', userId);
+      const user = await this.userRepo.findOne({ _id: userId });
       if (!user) {
         throw new GraphQLError('User not found', {
           extensions: {

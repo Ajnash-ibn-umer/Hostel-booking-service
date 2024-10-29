@@ -129,7 +129,9 @@ const HostelList: React.FC = () => {
               <HostelDetailsSheet hostelData={hostelData} />
               <Button
                 variant={"default"}
-                onClick={() => router.push(`hostels/update/${row.original._id}`)}
+                onClick={() =>
+                  router.push(`hostels/update/${row.original._id}`)
+                }
               >
                 Edit
               </Button>

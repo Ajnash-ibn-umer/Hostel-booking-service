@@ -446,7 +446,7 @@ export class BookingService {
           txnSession,
         );
         console.log({ bedUpdate });
-
+        console.log({ email: bedUpdate.email });
         if (!bedUpdate) {
           throw 'Selected Bed not found Or This bed already Booked!';
         }
@@ -468,12 +468,13 @@ export class BookingService {
         const user = await this.userService.findOneUserByBookingId(
           dto.bookingIds,
         );
-
+        console.log({ email: user.email, e: user.name });
         await this.userService.activateUser(user._id, txnSession);
+        console.log('activated', user);
         this.mailService.send({
           subject: `Check In Confirmed`,
           to: user.email,
-          template: EMAIL_TEMPLATES.BOOKING_APPROVAL,
+          template: EMAIL_TEMPLATES.CHECKIN_CONFIRMED,
           context: {
             name: user.name,
             userNumber: user.userNo,

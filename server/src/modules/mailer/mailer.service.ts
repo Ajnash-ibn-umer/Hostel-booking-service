@@ -29,17 +29,17 @@ export class MailerService {
     }
   }
   send(dto: MailParams) {
-    try {
-      this.nodeMailerService.sendMail({
+    this.nodeMailerService
+      .sendMail({
         to: dto.to,
         from: process.env.MAIL_USER,
         subject: dto.subject,
         template: dto.template,
         context: dto.context,
+      })
+      .catch((e) => {
+        console.log(e);
       });
-      return { message: 'Email sent successfully' };
-    } catch (error) {
-      console.error(error);
-    }
+    return { message: 'Email sent successfully' };
   }
 }

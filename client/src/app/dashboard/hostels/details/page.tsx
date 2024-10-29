@@ -66,6 +66,7 @@ interface HostelDetailsSheetProps {
 const HostelDetailsSheet: React.FC<HostelDetailsSheetProps> = ({
   hostelData,
 }) => {
+  
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
