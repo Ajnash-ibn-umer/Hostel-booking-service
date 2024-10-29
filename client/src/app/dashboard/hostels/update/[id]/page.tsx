@@ -266,7 +266,7 @@ const baseListInput = {
   searchingText: null,
   sortOrder: 1,
 };
-function UpdateHostelForm({ params }: HostelDetailsProps) {
+function UpdateHostelForm({ params }: any) {
   const { toast } = useToast();
   const { id } = params;
   const router = useRouter();
