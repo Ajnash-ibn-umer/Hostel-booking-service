@@ -16,7 +16,38 @@ import { AlertConfirm } from "@/components/Alerts/alert";
 import { HOSTEL_DELETE_GQL } from "@/graphql/queries/main.mutations";
 import Pageniation from "@/components/pagination/pagination";
 import Link from "next/link";
-import HostelDetailsSheet from "./details/page";
+import HostelDetailsSheet from "./details/details";
+type Hostel = {
+  galleries: {
+    url: string;
+  }[];
+  amenities: {
+    icon: string;
+    name: string;
+  }[];
+  name: string;
+  description: string;
+  rooms: {
+    _id: string;
+    galleries: {
+      url: string;
+    }[];
+    name: string;
+    roomType: string | null;
+    amenities: {
+      icon: string;
+      name: string;
+    }[];
+    beds: {
+      _id: string;
+    }[];
+  }[];
+  propertyNo: string;
+  sellingPrice: number;
+  standardPrice: number;
+  totalRooms: number;
+  createdAt: string;
+};
 interface HostelListInterface {
   _id: string;
   name: string;
@@ -26,7 +57,7 @@ interface HostelListInterface {
   totalRooms: number;
 }
 
-const HostelList: React.FC = () => {
+function HostelList() {
   const { toast } = useToast();
   const router = useRouter();
 
@@ -85,16 +116,7 @@ const HostelList: React.FC = () => {
       cell: ({ row }) => {
         const { toast } = useToast();
         const [deleteData, { loading, error }] = useMutation(HOSTEL_DELETE_GQL);
-        const { data } = useQuery(HOSTEL_DETAILS, {
-          variables: {
-            listInputHostel: {
-              hostelIds: row.original._id,
-              statusArray: 1,
-              limit: 1,
-            },
-          },
-        });
-        const hostelData = data?.Hostel_List?.list[0];
+    
         const deleteHostel = async () => {
           try {
             const { data, errors } = await deleteData({
@@ -126,7 +148,7 @@ const HostelList: React.FC = () => {
         return (
           <>
             <div className="flex gap-2">
-              <HostelDetailsSheet hostelData={hostelData} />
+              <HostelDetailsSheet hostelId={row.original._id} />
               <Button
                 variant={"default"}
                 onClick={() =>
@@ -195,6 +217,6 @@ const HostelList: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default HostelList;
