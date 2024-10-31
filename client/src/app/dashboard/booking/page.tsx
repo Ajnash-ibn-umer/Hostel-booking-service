@@ -16,7 +16,7 @@ import { DataTable } from "../../../components/Datatables/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { AlertConfirm } from "@/components/Alerts/alert";
 import { useToast } from "@/hooks/use-toast";
-import { EyeIcon } from "lucide-react";
+import { Download, EyeIcon } from "lucide-react";
 import { BOOKING_STATUS_CHANGE } from "@/graphql/queries/main.mutations";
 import DialogComp from "@/components/dialog/Dialog";
 import { Input } from "@/components/ui/input";
@@ -49,7 +49,14 @@ import {
 import { EyeOpenIcon } from "@radix-ui/react-icons";
 import BookingDetailsSheet from "./details";
 import { Badge } from "@/components/ui/badge";
-
+import { Document, pdf, usePDF } from "@react-pdf/renderer";
+const PDFDownloadLink = dynamic(
+  () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  },
+);
 export type Booking = {
   _id: string;
   arrivalTime: Date;
@@ -76,6 +83,9 @@ export type Booking = {
     _id: string;
   };
 };
+import { Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import dynamic from "next/dynamic";
+import MembershipPDF from "./pdf-form";
 
 function ApprovalOperationsCell({
   booking,
@@ -179,7 +189,7 @@ function ApprovalOperationsCell({
                       <SelectItem key={bed._id} value={bed._id}>
                         {`${bed.name}-${BED_POSITION[bed.bedPosition].toLowerCase()} (${BedAvailabilityStatus[bed.availabilityStatus].toLowerCase().replace("_", " ")})`}
                       </SelectItem>
-                    ))
+                    )),
                   )}
                 </SelectContent>
               </Select>
@@ -353,6 +363,57 @@ function Booking() {
           {row.original.bookingStatus === BookingStatus.ADMIN_APPROVED && (
             <CheckInOperationsCell booking={row.original} refetch={refetch} />
           )}
+          <Button
+            onClick={async (e) => {
+              const data = row.original;
+              const blob = await pdf(
+                MembershipPDF({
+                  formData: {
+                    address: "",
+                    companyName: "",
+                    contactNumber: "",
+                    date:
+                      (data.checkInDate &&
+                        data?.checkInDate?.toLocaleDateString()) ??
+                      "",
+                    dob: "",
+                    email: data.email,
+                    emergencyContact: "",
+                    emergencyContactNumber: "",
+                    idCardNumber: data.bookingNumber,
+                    jobTitle: "",
+                    name: data.name,
+                    relation: "",
+                    roomPreference: data.bedName,
+                    stayDuration: "",
+                    bloodGroup: "",
+                    roomName: "",
+                    healthIssue: "",
+                  },
+                }),
+              ).toBlob();
+
+              console.log(blob);
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = `${row.original.bookingNumber}.pdf`;
+              document.body.appendChild(link);
+              link.click();
+
+              // Cleanup
+              link.remove();
+              window.URL.revokeObjectURL(url);
+            }}
+            style={{ background: "transparent" }}
+          >
+            <Download color="green" size={"15px"}></Download>
+          </Button>
+          {/* <PDFDownloadLink document={<MyDocument />} fileName="somename.pdf">
+            {({ blob, url, loading, error }) =>
+              loading ? "Loading document..." : "Download now!"
+            }
+          </PDFDownloadLink> */}
         </div>
       ),
     },

@@ -5,7 +5,7 @@ const nextConfig = {
   },
 
   images: {
-    domains: ["localhost","ajn-p1-2024.s3.amazonaws.com"],
+    // domains: ["localhost","ajn-p1-2024.s3.amazonaws.com"],
     remotePatterns: [
       {
         protocol: "https",
