@@ -263,11 +263,36 @@ export class UserService {
     }
   }
 
-  async me(userId: string = null, projection: Record<string, any>) {
+  async me(
+    userId: string = null,
+    userType: USER_TYPES,
+    projection: Record<string, any>,
+  ) {
     try {
       const uid = new mongoose.Types.ObjectId(userId);
-      console.log({ uid });
+      console.log({ userType });
+      if (userType === USER_TYPES.ADMIN) {
+        const user: any = await this.userRepo.aggregate([
+          {
+            $match: {
+              _id: uid,
+              status: STATUS_NAMES.ACTIVE,
+              userType: USER_TYPES.ADMIN,
+            },
+          },
+          {
+            $limit: 1,
+          },
+          responseFormat(projection['user']),
+        ]);
 
+        if (!user || user.length === 0) {
+          throw 'user not found';
+        }
+        return {
+          user: user[0],
+        };
+      }
       const user: any = await this.userRepo.aggregate([
         {
           $match: {
@@ -400,7 +425,10 @@ export class UserService {
     session: ClientSession = null,
   ) {
     try {
-      const user = await this.userRepo.findOne({ bookingId: bookingId });
+      const user = await this.userRepo.findOne({
+        bookingId: bookingId,
+        status: 1,
+      });
 
       if (!user) {
         throw `User not found for bookingId: ${bookingId}`;

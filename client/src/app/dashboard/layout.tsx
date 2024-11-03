@@ -1,7 +1,9 @@
 "use client";
-import React, { useState, ReactNode } from "react";
+import React, { useState, ReactNode, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
+import { useQuery } from "@apollo/client";
+import { ME_ADMIN } from "@/graphql/queries/main.quiries";
 
 export default function DashboardLayout({
   children,
@@ -9,6 +11,20 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { loading, data, error, refetch } = useQuery(ME_ADMIN, {
+    fetchPolicy: "no-cache",
+  });
+  // console.log("User_Me", data);
+
+  if (data && data !== undefined) {
+    typeof window !== "undefined"
+      ? window.localStorage.setItem("me", JSON.stringify(data.User_Me.user))
+      : "";
+  }
+  useEffect(() => {
+    refetch();
+  }, []);
+
   return (
     <>
       {/* <!-- ===== Page Wrapper Star ===== --> */}

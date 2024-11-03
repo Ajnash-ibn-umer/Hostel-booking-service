@@ -9,7 +9,7 @@ const DropdownUser = () => {
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <Link
-        // onClick={() => setDropdownOpen(!dropdownOpen)}
+        onClick={() => setDropdownOpen(!dropdownOpen)}
         className="flex items-center gap-4"
         href="#"
       >
@@ -49,7 +49,7 @@ const DropdownUser = () => {
       </Link>
 
       {/* <!-- Dropdown Star --> */}
-      {/* {dropdownOpen && (
+      {dropdownOpen && (
         <div
           className={`absolute right-0 mt-7.5 flex w-[280px] flex-col rounded-lg border-[0.5px] border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-gray-dark`}
         >
@@ -72,14 +72,14 @@ const DropdownUser = () => {
 
             <span className="block">
               <span className="block font-medium text-dark dark:text-white">
-                Jhon Smith
+                {JSON.parse(window.localStorage.getItem("me") as any).name || ""}
               </span>
               <span className="block font-medium text-dark-5 dark:text-dark-6">
-                jonson@nextadmin.com
+                {JSON.parse(window.localStorage.getItem("me") as any).email || ""}
               </span>
             </span>
           </div>
-          <ul className="flex flex-col gap-1 border-y-[0.5px] border-stroke p-2.5 dark:border-dark-3">
+          {/* <ul className="flex flex-col gap-1 border-y-[0.5px] border-stroke p-2.5 dark:border-dark-3">
             <li>
               <Link
                 href="/profile"
@@ -139,9 +139,15 @@ const DropdownUser = () => {
                 Account Settings
               </Link>
             </li>
-          </ul>
+          </ul> */}
           <div className="p-2.5">
-            <button className="flex w-full items-center gap-2.5 rounded-[7px] p-2.5 text-sm font-medium text-dark-4 duration-300 ease-in-out hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white lg:text-base">
+            <button
+              onClick={() => {
+                localStorage.removeItem("authToken");
+                window.location.href = "/auth/signin";
+              }}
+              className="flex w-full items-center gap-2.5 rounded-[7px] p-2.5 text-sm font-medium text-dark-4 duration-300 ease-in-out hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white lg:text-base"
+            >
               <svg
                 className="fill-current"
                 width="18"
@@ -170,7 +176,7 @@ const DropdownUser = () => {
             </button>
           </div>
         </div>
-      )} */}
+      )}
       {/* <!-- Dropdown End --> */}
     </ClickOutside>
   );

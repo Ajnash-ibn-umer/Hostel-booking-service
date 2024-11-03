@@ -27,6 +27,11 @@ const nextConfig = {
         hostname: "ajn-p1-2024.s3.ap-south-1.amazonaws.com",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "ajn-p1-2024.s3.amazonaws.com",
+        port: "",
+      },
     ],
   },
   env: {

@@ -35,6 +35,7 @@ const configService = new ConfigService();
       `${configService.get<string>('DB_URL')}/${configService.get<string>('DB_NAME')}`,
       {},
     ),
+
     MongooseModule.forFeature([ModelDefinitions.contactUsModel]),
     JwtModule.register({
       secret: String(configService.get('JWT_ACCESS_TOKEN_SECRET_KEY')),
@@ -54,7 +55,7 @@ const configService = new ConfigService();
           },
         },
         defaults: {
-          from: '"Oxtel" <oxtel@gmail.com>',
+          from: '"Oxtel"  <oxtel@gmail.com>',
         },
         template: {
           dir: __dirname + '/../templates',

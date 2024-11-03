@@ -203,6 +203,8 @@ export class HostelsService {
     try {
       const instertingRooms: any[] = [];
       const insertingBeds: any[] = [];
+      let galleryRoomLinks = [];
+      let amenityRoomLinks = [];
 
       const newhostel = await this.hostelRepository.findOneAndUpdate(
         {
@@ -314,53 +316,54 @@ export class HostelsService {
 
           // Create galleryRoom link
           if (room.galleryIds && room.galleryIds.length > 0) {
-            await this.roomGalleryLinkRepo.deleteMany({
-              roomId: roomId.toString(),
-              status: STATUS_NAMES.ACTIVE,
-            });
-            const galleryRoomLinks: any[] = room.galleryIds.map(
-              (galleryId) => ({
+            await this.roomGalleryLinkRepo.deleteMany(
+              {
+                roomId: roomId.toString(),
+                status: STATUS_NAMES.ACTIVE,
+              },
+              txnSession,
+            );
+            galleryRoomLinks.push(
+              ...room.galleryIds.map((galleryId) => ({
                 roomId: roomId.toString(),
                 galleryId: galleryId,
                 status: STATUS_NAMES.ACTIVE,
                 createdAt: time,
                 createdUserId: userId,
-              }),
-            );
-            await this.roomGalleryLinkRepo.insertMany(
-              galleryRoomLinks,
-              txnSession,
+              })),
             );
           }
 
           // Create amenityRoom link
           if (room.aminityIds && room.aminityIds.length > 0) {
-            await this.roomAmenityLinkRepo.deleteMany({
-              roomId: roomId.toString(),
-              status: STATUS_NAMES.ACTIVE,
-            });
-            const amenityRoomLinks: any[] = room.aminityIds.map(
-              (amenityId) => ({
+            await this.roomAmenityLinkRepo.deleteMany(
+              {
+                roomId: roomId.toString(),
+                status: STATUS_NAMES.ACTIVE,
+              },
+              txnSession,
+            );
+            amenityRoomLinks.push(
+              ...room.aminityIds.map((amenityId) => ({
                 roomId: roomId.toString(),
                 amenityId: amenityId,
                 status: STATUS_NAMES.ACTIVE,
                 createdAt: time,
                 createdUserId: userId,
-              }),
-            );
-            await this.roomAmenityLinkRepo.insertMany(
-              amenityRoomLinks,
-              txnSession,
+              })),
             );
           }
         }
       }
 
       if (dto.aminityIds && dto.aminityIds.length > 0) {
-        await this.hostelAmenityLinkRepo.deleteMany({
-          hostelId: dto._id.toString(),
-          status: STATUS_NAMES.ACTIVE,
-        });
+        await this.hostelAmenityLinkRepo.deleteMany(
+          {
+            hostelId: dto._id.toString(),
+            status: STATUS_NAMES.ACTIVE,
+          },
+          txnSession,
+        );
         const amenitiesLinks: any = dto.aminityIds.map((id) => ({
           hostelId: newhostel._id,
           amenityId: id,
@@ -370,26 +373,36 @@ export class HostelsService {
         }));
         await this.hostelAmenityLinkRepo.insertMany(amenitiesLinks, txnSession);
       }
+
+      let galleriesLinks = [];
       if (dto.galleryIds && dto.galleryIds.length > 0) {
-        await this.hostelGalleryLinkRepo.deleteMany({
-          hostelId: dto._id.toString(),
-          status: STATUS_NAMES.ACTIVE,
-        });
-        const galleriesLinks: any = dto.galleryIds.map((id) => ({
+        await this.hostelGalleryLinkRepo.deleteMany(
+          {
+            hostelId: dto._id.toString(),
+            status: STATUS_NAMES.ACTIVE,
+          },
+          txnSession,
+        );
+        galleriesLinks = dto.galleryIds.map((id) => ({
           hostelId: newhostel._id,
           galleryId: id,
           status: STATUS_NAMES.ACTIVE,
           createdAt: time,
           createdUserId: userId,
         }));
-        await this.hostelGalleryLinkRepo.insertMany(galleriesLinks, txnSession);
       }
+      await this.hostelGalleryLinkRepo.insertMany(galleriesLinks, txnSession);
 
+      await this.roomGalleryLinkRepo.insertMany(galleryRoomLinks, txnSession);
+      await this.roomAmenityLinkRepo.insertMany(amenityRoomLinks, txnSession);
       await this.roomRepository.deleteMany(
-        dto.deletedRoomIds || [],
+        { _id: { $in: dto.deletedRoomIds || [] } },
         txnSession,
       );
-      await this.bedRepository.deleteMany(dto.deletedRoomIds || [], txnSession);
+      await this.bedRepository.deleteMany(
+        { _id: { $in: dto.deletedRoomIds || [] } },
+        txnSession,
+      );
 
       const roomResp = await this.roomRepository.bulkWriteMany(
         instertingRooms,
@@ -405,7 +418,7 @@ export class HostelsService {
 
       await txnSession.commitTransaction();
 
-      return;
+      return newhostel;
     } catch (error) {
       await txnSession.abortTransaction();
       throw new GraphQLError(error, {

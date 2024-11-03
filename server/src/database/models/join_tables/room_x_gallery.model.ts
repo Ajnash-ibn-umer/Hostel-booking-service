@@ -51,9 +51,9 @@ RoomGalleryLinkSchema.post('updateMany', async function (error, doc, next) {
   schemaPostFunctionForDuplicate(error, doc, next);
 });
 
-function schemaPostFunctionForDuplicate(error, doc, next) {
+function schemaPostFunctionForDuplicate(error, doc: any, next) {
   if (error.code == 11000) {
-    next(new Error('RoomGalleryLink already existing'));
+    next(new Error(('RoomGalleryLink already existing ' + error) as any));
   } else {
     next();
   }

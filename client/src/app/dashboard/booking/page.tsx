@@ -219,6 +219,7 @@ function CheckInOperationsCell({
   booking: Booking;
   refetch: any;
 }) {
+  console.log("my bbok", booking);
   const router = useRouter();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
