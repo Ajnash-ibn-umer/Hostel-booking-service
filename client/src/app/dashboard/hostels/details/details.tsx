@@ -44,6 +44,7 @@ function HostelDetailsSheet({ hostelId }: HostelDetailsProps) {
       },
     },
   });
+  
   const hostelDetails = data?.Hostel_List?.list[0];
 
   // useEffect(() => {

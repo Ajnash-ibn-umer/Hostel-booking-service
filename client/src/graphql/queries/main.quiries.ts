@@ -392,53 +392,54 @@ export const ROOM_BED_LIST_GQL = gql`
 `;
 
 export const HOSTEL_DETAILS = gql`
-query Hostel_List($listInputHostel: ListInputHostel!) {
-  Hostel_List(listInputHostel: $listInputHostel) {
-    list {
-      galleries {
-        _id
-        url
-      }
-      amenities {
-        _id
-        name
-        icon
-      }
-      name
-      description
-      rooms {
-        _id
+  query Hostel_List($listInputHostel: ListInputHostel!) {
+    Hostel_List(listInputHostel: $listInputHostel) {
+      list {
         galleries {
+          _id
           url
         }
-        name
-        roomType {
-          name
-          description
-          rentDailyLower
-          rentDailyUpper
-          rentMonthlyLower
-          rentMonthlyUpper
-        }
         amenities {
+          _id
           name
           icon
         }
-        beds {
+        name
+        description
+        rooms {
           _id
+          galleries {
+            url
+          }
+          name
+          roomType {
+            name
+            description
+            rentDailyLower
+            rentDailyUpper
+            rentMonthlyLower
+            rentMonthlyUpper
+          }
+          amenities {
+            name
+            icon
+          }
+          beds {
+            _id
+          }
         }
+        sellingPrice
+        standardPrice
+        totalRooms
+        createdAt
+        availabilityStatus
+        locationId
+        priceBaseMode
+        propertyNo
       }
-      sellingPrice
-      standardPrice
-      totalRooms
-      createdAt
-      availabilityStatus
-      locationId
-      priceBaseMode
-      propertyNo
     }
   }
-}`;
+`;
 
 export const CONTACT_LIST_FOR_TABLE_GQL = gql`
   query ContactUs_List($dto: ContactUsListInput!) {
@@ -453,7 +454,8 @@ export const CONTACT_LIST_FOR_TABLE_GQL = gql`
         status
       }
     }
-}`;
+  }
+`;
 
 export const CHECK_IN_GUEST = gql`
   query User_List($listUserInput: ListUserInput!) {
@@ -468,4 +470,18 @@ export const CHECK_IN_GUEST = gql`
       }
       totalCount
     }
-}`;
+  }
+`;
+
+export const ME_ADMIN = gql`
+  query User {
+    User_Me {
+      user {
+        _id
+        name
+        email
+      }
+      message
+    }
+  }
+`;

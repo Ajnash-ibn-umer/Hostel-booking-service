@@ -1,12 +1,14 @@
 import {
   CanActivate,
   ExecutionContext,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
+import { GraphQLError } from 'graphql';
 import { Observable } from 'rxjs';
 import { UserTypes } from 'src/shared/decorators';
 import { USER_TYPES } from 'src/shared/variables/main.variable';
@@ -22,28 +24,45 @@ export class AuthGuard implements CanActivate {
     context: GqlExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const ctx = GqlExecutionContext.create(context);
+    try {
+      const userTypes = this.reflector.get(UserTypes, context.getHandler());
+      console.log({ userTypes });
+      const token = this.extractTokenFromHeader(ctx);
 
-    const userTypes = this.reflector.get(UserTypes, context.getHandler());
-    console.log({ userTypes });
-    if (userTypes && userTypes.includes(USER_TYPES.PUBLIC)) {
+      if (!token && userTypes && userTypes.includes(USER_TYPES.PUBLIC)) {
+        console.log('it is true');
+        return true;
+      }
+      console.log('this is not public');
+
+      console.log({ token });
+      if (!token) {
+        throw new UnauthorizedException();
+      }
+
+      const decoded = this.jwtService.verify(token);
+      console.log({ decoded });
+      if (!decoded) {
+        console.log('decode failed');
+        throw 'Token Verification Failed';
+      }
+
+      if (userTypes && !userTypes.includes(decoded.userType)) {
+        console.log('decode user types difffrent');
+
+        throw 'This User dosn`t have permission to access this request';
+      }
+      console.log({ decoded });
+      ctx.getContext().req['user'] = decoded;
       return true;
+    } catch (error) {
+      console.log({ error });
+      throw new GraphQLError(error + ' ', {
+        extensions: {
+          code: HttpStatus.UNAUTHORIZED,
+        },
+      });
     }
-    console.log('this is not public');
-    const token = this.extractTokenFromHeader(ctx);
-    if (!token) {
-      throw new UnauthorizedException();
-    }
-    const decoded = this.jwtService.verify(token);
-    if (!decoded) {
-      throw new UnauthorizedException();
-    }
-
-    if (userTypes && !userTypes.includes(decoded.userType)) {
-      throw new UnauthorizedException();
-    }
-    console.log({ decoded });
-    ctx.getContext().req['user'] = decoded;
-    return true;
   }
 
   private extractTokenFromHeader(ctx: GqlExecutionContext): string | undefined {

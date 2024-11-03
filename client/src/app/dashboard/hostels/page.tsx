@@ -48,6 +48,7 @@ type Hostel = {
   totalRooms: number;
   createdAt: string;
 };
+
 interface HostelListInterface {
   _id: string;
   name: string;

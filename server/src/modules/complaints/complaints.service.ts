@@ -65,6 +65,7 @@ export class ComplaintsService {
       const newComplaint = await this.complaintsRepository.create(
         {
           ...dto,
+          userId: userId,
           _id: complaintId,
           title: dto.title,
           description: dto.description,
@@ -312,6 +313,18 @@ export class ComplaintsService {
           project: responseFormat(projection['list']['room']),
           conditions: { $_id: '$$id' },
           responseName: 'room',
+        }),
+      );
+    }
+
+    if (projection['list']['user']) {
+      pipeline.push(
+        ...Lookup({
+          modelName: MODEL_NAMES.USER,
+          params: { id: '$userId' },
+          project: responseFormat(projection['list']['user']),
+          conditions: { $_id: '$$id' },
+          responseName: 'user',
         }),
       );
     }

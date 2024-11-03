@@ -82,10 +82,11 @@ export class UserResolver {
     return this.authService.verifyLogin(dto);
   }
 
-  @UserTypes([USER_TYPES.USER])
+  @UserTypes([USER_TYPES.USER, USER_TYPES.ADMIN])
   @Query(() => Me, { name: 'User_Me' })
   me(@Info() info: GraphQLResolveInfo, @Context() context) {
     const projection = getProjection(info.fieldNodes[0]);
-    return this.userService.me(context.req.user.userId, projection);
+    const userType = context.req.user.userType;
+    return this.userService.me(context.req.user.userId, userType, projection);
   }
 }

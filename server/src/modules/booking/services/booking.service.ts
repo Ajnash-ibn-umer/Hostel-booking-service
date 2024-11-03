@@ -184,7 +184,14 @@ export class BookingService {
         1,
         txnSession,
       );
-
+      const bookingExist = await this.bookingRepository.findOne({
+        phone: dto.phone,
+        status: 1,
+        bookingStatus: { $gte: BOOKING_STATUS.PAYMENT_SUCCESS },
+      });
+      if (bookingExist) {
+        throw 'User with this same phone number already exists. try another number';
+      }
       const newBooking = await this.bookingRepository.create(
         {
           ...dto,
@@ -587,7 +594,7 @@ export class BookingService {
             phoneNumber: bookingData.phone,
             profileImgUrl: null,
             roleId: null,
-            bookingId: bookingData._id.toString(),
+            bookingId: dto.bookingId.toString(),
             userType: USER_TYPES.USER,
           },
           txnSession,

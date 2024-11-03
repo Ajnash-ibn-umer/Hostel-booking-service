@@ -84,7 +84,7 @@ const Header = (props: {
             {/* <!-- Search Form --> */}
 
             {/* <!-- Dark Mode Toggle --> */}
-            <DarkModeSwitcher />
+            {/* <DarkModeSwitcher /> */}
             {/* <!-- Dark Mode Toggle --> */}
 
             {/* <!-- Notification Menu Area --> */}
