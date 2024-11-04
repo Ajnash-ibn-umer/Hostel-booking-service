@@ -549,29 +549,29 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
           rooms: rooms,
         },
       };
-      console.log(inputData);
-      // const { data: hostelData, errors } = await updateHostel({
-      //   variables: inputData,
-      // });
+      // console.log(inputData);
+      const { data: hostelData, errors } = await updateHostel({
+        variables: inputData,
+      });
 
-      // setIsLoading(false);
+      setIsLoading(false);
 
-      // if (hostelData?.Hostel_Update) {
-      //   toast({
-      //     variant: "default",
-      //     title: "Hostel Updated",
-      //     description: "Hostel Updated Successfully",
-      //     // action: <ToastAction altText="Try again">Try again</ToastAction>,
-      //   });
-      //   router.push("/dashboard/hostels");
-      // } else {
-      //   toast({
-      //     variant: "destructive",
-      //     title: "Uh oh! Response not found",
-      //     description: "Response not found from hostel updation",
-      //     // action: <ToastAction altText="Try again">Try again</ToastAction>,
-      //   });
-      // }
+      if (hostelData?.Hostel_Update) {
+        toast({
+          variant: "default",
+          title: "Hostel Updated",
+          description: "Hostel Updated Successfully",
+          // action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
+        router.push("/dashboard/hostels");
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Response not found",
+          description: "Response not found from hostel updation",
+          // action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
+      }
     } catch (err: any) {
       setIsLoading(false);
 
