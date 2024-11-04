@@ -138,11 +138,12 @@ type Inputs = {
   totalRooms: string;
   shortDescription: string;
   totalBeds: string;
-  category: string;
-  location: string;
+  categoryId: string;
+  locationId: string;
   availabilityStatus: string;
   purchaseBaseMode: string;
   amenities: string[];
+  galleryIds: string[];
   description: string;
 };
 
@@ -191,6 +192,7 @@ interface RoomTypeinputVariables {
     sortOrder: number;
   };
 }
+
 const formSchema = z.object({
   name: z.string().optional(),
   sellingPrice: z.string().optional(),
@@ -248,6 +250,7 @@ const formSchema = z.object({
 });
 
 type Room = {
+  _id: string;
   aminityIds: string[];
   beds: Bed[];
   floor: number;
@@ -256,6 +259,18 @@ type Room = {
   totalBeds: number;
   files: File[];
 };
+
+type RoomInputType = {
+  _id: string;
+  amenities: string[];
+  beds: Bed[];
+  floor: string;
+  name: string;
+  roomTypeId: string;
+  totalBeds: number;
+  galleries: { url: string }[];
+};
+
 type Hostel = {
   rooms: Room[];
 };
@@ -274,10 +289,9 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
     rooms: [],
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isDone, setIsDone] = useState(false);
   const [images, setImages] = useState<File[]>([]);
-  const [initialGalleryFiles, setInitialGalleryFiles] = useState<
-    FileWithPreview[]
-  >([]);
+  const [files, setFiles] = useState<FileWithPreview[]>([]);
   const [updateHostel, { loading, error }] = useMutation(HOSTEL_UPDATE_GQL, {
     refetchQueries: [
       {
@@ -352,12 +366,11 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
     },
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>();
-  const form = useForm<z.infer<typeof formSchema>>({
+  const { handleSubmit, formState } = useForm<Inputs>();
+
+  type FormSchema = z.infer<typeof formSchema>;
+
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -395,6 +408,7 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
       // ],
     },
   });
+
   const handleHostelData = (data: HostelProps): TransformedHostelData => {
     if (data?.galleries) {
       const galleryFiles = data?.galleries.map((gallery: any) => {
@@ -402,7 +416,8 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
         const file = new File([blob], gallery._id, { type: "image/jpeg" });
         return Object.assign(file, { preview: gallery.url });
       });
-      setInitialGalleryFiles(galleryFiles);
+      // setImages(galleryFiles);
+      setFiles(galleryFiles);
     }
     return {
       name: data?.name,
@@ -421,70 +436,94 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
     };
   };
 
+  const handleHostelRoom = (rooms: RoomInputType[]): Hostel => {
+    if (!rooms || rooms.length === 0) return { rooms: [] };
+
+    const data = rooms.map((room) => {
+      const roomFiles: File[] = room.galleries.map((gallery) => {
+        const blob = new Blob([], { type: "image/jpeg" });
+        const file = new File([blob], gallery.url.split("/").pop() || "", {
+          type: "image/jpeg",
+        });
+        return Object.assign(file, { preview: gallery.url });
+      });
+
+      return {
+        _id: room._id,
+        aminityIds: room.amenities,
+        beds: room.beds,
+        floor: Number(room.floor),
+        name: room.name,
+        roomTypeId: room.roomTypeId,
+        totalBeds: room.totalBeds,
+        files: roomFiles,
+      };
+    });
+
+    return { rooms: data };
+  };
+
+  const { reset } = form;
+
   useEffect(() => {
     if (data?.Hostel_List?.list?.[0]) {
-      const hostel: HostelProps = data?.Hostel_List.list[0];
+      const hostel = data.Hostel_List.list[0];
       const result = handleHostelData(hostel);
-      form.setValue("name", result.name);
-      form.setValue("sellingPrice", result.sellingPrice);
-      form.setValue("standardPrice", result.standardPrice);
-      form.setValue("totalRooms", result.totalRooms);
-      form.setValue("shortDescription", result.shortDescription);
-      form.setValue("totalBeds", result.totalBeds);
-      form.setValue("categoryId", result.categoryId);
-      form.setValue("locationId", result.locationId);
-      form.setValue("availabilityStatus", result.availabilityStatus);
-      form.setValue("purchaseBaseMode", result.purchaseBaseMode);
-      form.setValue("amenityIds", result.amenityIds);
-      form.setValue("description", result.description);
-      form.setValue("galleryIds", result.galleryIds);
+      const hostelRoom = handleHostelRoom(hostel.rooms);
+      setHostel(hostelRoom);
+      reset((v) => ({
+        ...v,
+        ...result,
+      }));
+      setIsDone(true);
     }
-  }, [data,form]);
+  }, [data, reset]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormSchema) {
     try {
       setIsLoading(true);
-      // console.log(values, "submit data");
       const rooms: any[] = [];
 
-      // for (const room of hostel.rooms) {
-      //   let beds: any[] = [];
-      //   if (hostel.rooms.length !== Number(values.totalRooms)) {
-      //     throw `Room Count doent match `;
-      //   }
-      //   let roomGalleries: string[] = [];
-      //   if (room.files && room.files.length > 0) {
-      //     roomGalleries = await galleryUpload({
-      //       images: room.files,
-      //       createGallery,
-      //     });
-      //   }
-      //   if (room.beds && room.beds.length > 0) {
-      //     if (room.beds.length !== Number(room.totalBeds)) {
-      //       throw `Bed  Count doesnt match in room ${room.name}`;
-      //     }
+      for (const room of hostel.rooms) {
+        let beds: any[] = [];
+        if (hostel.rooms.length !== Number(values.totalRooms)) {
+          throw `Room Count doent match `;
+        }
+        let roomGalleries: string[] = [];
+        if (room.files && room.files.length > 0) {
+          roomGalleries = await galleryUpload({
+            images: room.files,
+            createGallery,
+          });
+        }
+        if (room.beds && room.beds.length > 0) {
+          if (room.beds.length !== Number(room.totalBeds)) {
+            throw `Bed  Count doesnt match in room ${room.name}`;
+          }
 
-      //     room.beds.map((bed) => {
-      //       beds.push({
-      //         availabilityStatus: Number(bed.availabilityStatus),
-      //         bedPosition: Number(bed.bedPosition),
-      //         floor: room.floor,
-      //         paymentBase: Number(bed.paymentBase),
-      //         roomTypeId: room.roomTypeId,
-      //       });
-      //     });
-      //   }
+          room.beds.forEach((bed) => {
+            beds.push({
+              _id: bed._id,
+              availabilityStatus: Number(bed.availabilityStatus),
+              bedPosition: Number(bed.bedPosition),
+              floor: room.floor.toString(),
+              paymentBase: Number(bed.paymentBase),
+              roomTypeId: room.roomTypeId,
+            });
+          });
+        }
 
-      //   rooms.push({
-      //     name: room.name,
-      //     aminityIds: room.aminityIds,
-      //     floor: room.floor,
-      //     roomTypeId: room.roomTypeId,
-      //     totalBeds: Number(room.totalBeds),
-      //     galleryIds: roomGalleries,
-      //     beds: beds,
-      //   });
-      // }
+        rooms.push({
+          _id: room._id,
+          name: room.name,
+          aminityIds: room.aminityIds,
+          floor: room.floor.toString(),
+          roomTypeId: room.roomTypeId,
+          totalBeds: Number(room.totalBeds),
+          galleryIds: roomGalleries,
+          beds: beds,
+        });
+      }
 
       let galleryIds: string[] = [];
       if (images && images.length > 0) {
@@ -507,26 +546,32 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
           categoryId: values.categoryId,
           availabilityStatus: Number(values.availabilityStatus),
           aminityIds: values.amenityIds,
-          // rooms: rooms,
+          rooms: rooms,
         },
       };
-      const { data, errors } = await updateHostel({
-        variables: inputData,
-      });
+      console.log(inputData);
+      // const { data: hostelData, errors } = await updateHostel({
+      //   variables: inputData,
+      // });
 
-      setIsLoading(false);
+      // setIsLoading(false);
 
-      console.log({ data });
-      if (data && data.Hostel_Update) {
-        router.push("/dashboard/hostels");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Response not found",
-          description: "Response not found from hostel updation",
-          // action: <ToastAction altText="Try again">Try again</ToastAction>,
-        });
-      }
+      // if (hostelData?.Hostel_Update) {
+      //   toast({
+      //     variant: "default",
+      //     title: "Hostel Updated",
+      //     description: "Hostel Updated Successfully",
+      //     // action: <ToastAction altText="Try again">Try again</ToastAction>,
+      //   });
+      //   router.push("/dashboard/hostels");
+      // } else {
+      //   toast({
+      //     variant: "destructive",
+      //     title: "Uh oh! Response not found",
+      //     description: "Response not found from hostel updation",
+      //     // action: <ToastAction altText="Try again">Try again</ToastAction>,
+      //   });
+      // }
     } catch (err: any) {
       setIsLoading(false);
 
@@ -547,15 +592,16 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
       // Handle login error (e.g., show error message)
     }
   }
-  // console.log(hostelData);
+
   return (
     <div>
       <Breadcrumb pageName="EditHostel" />
 
       <div className="flex  gap-10">
-        <div className="flex w-full ">
+        <div className="flex w-full">
           <Form {...form}>
             <form
+              key={isDone ? 0 : 1}
               onSubmit={form.handleSubmit(onSubmit)}
               className="relative flex w-full flex-col space-y-8"
             >
@@ -568,7 +614,8 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
                       onChange={(files: File[]) => {
                         setImages(files);
                       }}
-                      initialFiles={initialGalleryFiles}
+                      setFiles={setFiles}
+                      files={files}
                     ></MultiFileUploader>
                   </Card>
 
@@ -722,7 +769,8 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
-                                value={field.value}
+                                // value={field.value}
+                                {...field}
                               >
                                 <FormControl>
                                   <SelectTrigger>
@@ -867,7 +915,7 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
                   </div>
                 </Card>
               </div>
-              {/* <div className="align-start flex w-full p-2">
+              <div className="align-start flex w-full p-2">
                 <RoomCreationForm
                   hostel={hostel}
                   setHostel={setHostel}
@@ -875,7 +923,7 @@ function UpdateHostelForm({ params }: HostelDetailsProps) {
                   amenityData={amenityData}
                   roomTypeData={roomTypeData}
                 ></RoomCreationForm>
-              </div> */}
+              </div>
 
               <Button className="h-10 w-30 self-end" type="submit">
                 Submit

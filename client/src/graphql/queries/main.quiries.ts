@@ -425,7 +425,16 @@ query Hostel_List($listInputHostel: ListInputHostel!) {
         }
         beds {
           _id
+          availabilityStatus
+          bedPosition
+          floor
+          name
+          paymentBase
+          roomTypeId
         }
+        floor
+        roomTypeId
+        totalBeds
       }
       sellingPrice
       standardPrice

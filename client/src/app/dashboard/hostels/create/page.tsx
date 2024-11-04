@@ -88,6 +88,10 @@ interface CreateHostelInput {
   }>;
 }
 
+interface FileWithPreview extends File {
+  preview: string;
+}
+
 type Inputs = {
   name: string;
   sellingPrice: string;
@@ -245,6 +249,7 @@ function CreateHostelForm() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
+  const [files, setFiles] = useState<FileWithPreview[]>([]);
   const [createHostel, { loading, error }] = useMutation(HOSTEL_CREATE_GQL);
   const [createGallery, { loading: galleryLoading, error: galleryError }] =
     useMutation(GALLERY_CREATE_MULTIPLE_GQL);
@@ -470,6 +475,8 @@ function CreateHostelForm() {
                         // console.log({ files });
                         setImages(files);
                       }}
+                      files={files}
+                      setFiles={setFiles}
                     ></MultiFileUploader>
                   </Card>
 
