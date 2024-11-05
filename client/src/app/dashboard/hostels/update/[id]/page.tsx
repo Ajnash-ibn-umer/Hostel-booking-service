@@ -84,7 +84,7 @@ interface CreateHostelInput {
     floor: number | null;
     name: string | null;
     roomTypeId: string | null;
-    totalBeds: number | null;
+    totalBeds: string | null;
     galleryIds: string[] | null;
   }>;
 }
@@ -97,8 +97,8 @@ interface TransformedHostelData {
   sellingPrice: string;
   standardPrice: string;
   totalRooms: string;
+  totalBeds: number;
   shortDescription: string;
-  totalBeds: string;
   categoryId: string;
   locationId: string;
   availabilityStatus: string;
@@ -126,6 +126,7 @@ export type HostelProps = {
   sellingPrice: number;
   standardPrice: number;
   totalRooms: number;
+  totalBeds: number;
   propertyNo: string;
   availabilityStatus: number;
   createdAt: string;
@@ -137,12 +138,13 @@ type Inputs = {
   standardPrice: string;
   totalRooms: string;
   shortDescription: string;
-  totalBeds: string;
-  category: string;
-  location: string;
+  totalBeds: number;
+  categoryId: string;
+  locationId: string;
   availabilityStatus: string;
   purchaseBaseMode: string;
   amenities: string[];
+  galleryIds: string[];
   description: string;
 };
 
@@ -191,13 +193,14 @@ interface RoomTypeinputVariables {
     sortOrder: number;
   };
 }
+
 const formSchema = z.object({
   name: z.string().optional(),
   sellingPrice: z.string().optional(),
   standardPrice: z.string().optional(),
   totalRooms: z.string().optional(),
   shortDescription: z.string().optional(),
-  totalBeds: z.string().optional(),
+  totalBeds: z.number().optional(),
   categoryId: z.string().optional(),
   locationId: z.string().optional(),
   availabilityStatus: z.string(),
@@ -248,14 +251,27 @@ const formSchema = z.object({
 });
 
 type Room = {
+  _id: string;
   aminityIds: string[];
   beds: Bed[];
-  floor: number;
+  floor: string;
   name: string;
   roomTypeId: string;
   totalBeds: number;
   files: File[];
 };
+
+type RoomInputType = {
+  _id: string;
+  amenities: string[];
+  beds: Bed[];
+  floor: string;
+  name: string;
+  roomTypeId: string;
+  totalBeds: number;
+  galleries: { url: string }[];
+};
+
 type Hostel = {
   rooms: Room[];
 };
@@ -274,10 +290,9 @@ function UpdateHostelForm({ params }: any) {
     rooms: [],
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isDone, setIsDone] = useState(false);
   const [images, setImages] = useState<File[]>([]);
-  const [initialGalleryFiles, setInitialGalleryFiles] = useState<
-    FileWithPreview[]
-  >([]);
+  const [files, setFiles] = useState<FileWithPreview[]>([]);
   const [updateHostel, { loading, error }] = useMutation(HOSTEL_UPDATE_GQL, {
     refetchQueries: [
       {
@@ -352,12 +367,11 @@ function UpdateHostelForm({ params }: any) {
     },
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>();
-  const form = useForm<z.infer<typeof formSchema>>({
+  const { handleSubmit, formState } = useForm<Inputs>();
+
+  type FormSchema = z.infer<typeof formSchema>;
+
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -365,7 +379,7 @@ function UpdateHostelForm({ params }: any) {
       standardPrice: "0",
       totalRooms: "0",
       shortDescription: "",
-      totalBeds: "0",
+      totalBeds: 0,
       categoryId: "",
       locationId: "",
       availabilityStatus: "0",
@@ -395,22 +409,25 @@ function UpdateHostelForm({ params }: any) {
       // ],
     },
   });
+
   const handleHostelData = (data: HostelProps): TransformedHostelData => {
     if (data?.galleries) {
       const galleryFiles = data?.galleries.map((gallery: any) => {
         const blob = new Blob([], { type: "image/jpeg" });
         const file = new File([blob], gallery._id, { type: "image/jpeg" });
+        console.log("preview url",gallery.url)
         return Object.assign(file, { preview: gallery.url });
       });
-      setInitialGalleryFiles(galleryFiles);
+      // setImages(galleryFiles);
+      setFiles(galleryFiles);
     }
     return {
       name: data?.name,
       sellingPrice: data?.sellingPrice?.toString(),
       standardPrice: data?.standardPrice?.toString(),
-      totalRooms: data?.totalRooms?.toString(),
+      totalRooms: data?.totalRooms?.toString() ?? "",
       shortDescription: "",
-      totalBeds: "",
+      totalBeds: data?.totalBeds,
       categoryId: "",
       locationId: data?.locationId,
       availabilityStatus: data?.availabilityStatus?.toString(),
@@ -421,76 +438,100 @@ function UpdateHostelForm({ params }: any) {
     };
   };
 
+  const handleHostelRoom = (rooms: RoomInputType[]): Hostel => {
+    if (!rooms || rooms.length === 0) return { rooms: [] };
+
+    const data = rooms.map((room) => {
+      const roomFiles: File[] = room.galleries.map((gallery) => {
+        const blob = new Blob([], { type: "image/jpeg" });
+        const file = new File([blob], gallery.url.split("/").pop() || "", {
+          type: "image/jpeg",
+        });
+        return Object.assign(file, { preview: gallery.url });
+      });
+
+      return {
+        _id: room._id,
+        aminityIds: room.amenities,
+        beds: room.beds,
+        floor: room.floor,
+        name: room.name,
+        roomTypeId: room.roomTypeId,
+        totalBeds: room.totalBeds,
+        files: roomFiles,
+      };
+    });
+
+    return { rooms: data };
+  };
+
+  const { reset } = form;
+
   useEffect(() => {
     if (data?.Hostel_List?.list?.[0]) {
-      const hostel: HostelProps = data?.Hostel_List.list[0];
+      const hostel = data.Hostel_List.list[0];
       const result = handleHostelData(hostel);
-      form.setValue("name", result.name);
-      form.setValue("sellingPrice", result.sellingPrice);
-      form.setValue("standardPrice", result.standardPrice);
-      form.setValue("totalRooms", result.totalRooms);
-      form.setValue("shortDescription", result.shortDescription);
-      form.setValue("totalBeds", result.totalBeds);
-      form.setValue("categoryId", result.categoryId);
-      form.setValue("locationId", result.locationId);
-      form.setValue("availabilityStatus", result.availabilityStatus);
-      form.setValue("purchaseBaseMode", result.purchaseBaseMode);
-      form.setValue("amenityIds", result.amenityIds);
-      form.setValue("description", result.description);
-      form.setValue("galleryIds", result.galleryIds);
+      const hostelRoom = handleHostelRoom(hostel.rooms);
+      setHostel(hostelRoom);
+      reset((v) => ({
+        ...v,
+        ...result,
+      }));
+      setIsDone(true);
     }
-  }, [data,form]);
+  }, [data, reset]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormSchema) {
     try {
       setIsLoading(true);
-      // console.log(values, "submit data");
       const rooms: any[] = [];
 
-      // for (const room of hostel.rooms) {
-      //   let beds: any[] = [];
-      //   if (hostel.rooms.length !== Number(values.totalRooms)) {
-      //     throw `Room Count doent match `;
-      //   }
-      //   let roomGalleries: string[] = [];
-      //   if (room.files && room.files.length > 0) {
-      //     roomGalleries = await galleryUpload({
-      //       images: room.files,
-      //       createGallery,
-      //     });
-      //   }
-      //   if (room.beds && room.beds.length > 0) {
-      //     if (room.beds.length !== Number(room.totalBeds)) {
-      //       throw `Bed  Count doesnt match in room ${room.name}`;
-      //     }
+      for (const room of hostel.rooms) {
+        let beds: any[] = [];
+        if (hostel.rooms.length !== Number(values.totalRooms)) {
+          throw `Room Count doent match `;
+        }
+        let roomGalleries: string[] = [];
+        if (room.files && room.files.length > 0) {
+          roomGalleries = await galleryUpload({
+            images: room.files,
+            createGallery,
+          });
+        }
+        if (room.beds && room.beds.length > 0) {
+          if (room.beds.length !== Number(room.totalBeds)) {
+            throw `Bed  Count doesnt match in room ${room.name}`;
+          }
 
-      //     room.beds.map((bed) => {
-      //       beds.push({
-      //         availabilityStatus: Number(bed.availabilityStatus),
-      //         bedPosition: Number(bed.bedPosition),
-      //         floor: room.floor,
-      //         paymentBase: Number(bed.paymentBase),
-      //         roomTypeId: room.roomTypeId,
-      //       });
-      //     });
-      //   }
+          room.beds.forEach((bed) => {
+            beds.push({
+              _id: bed._id,
+              availabilityStatus: Number(bed.availabilityStatus),
+              bedPosition: Number(bed.bedPosition),
+              floor: room.floor.toString(),
+              paymentBase: Number(bed.paymentBase),
+              roomTypeId: room.roomTypeId,
+            });
+          });
+        }
 
-      //   rooms.push({
-      //     name: room.name,
-      //     aminityIds: room.aminityIds,
-      //     floor: room.floor,
-      //     roomTypeId: room.roomTypeId,
-      //     totalBeds: Number(room.totalBeds),
-      //     galleryIds: roomGalleries,
-      //     beds: beds,
-      //   });
-      // }
+        rooms.push({
+          _id: room._id,
+          name: room.name,
+          aminityIds: room.aminityIds,
+          floor: room.floor.toString(),
+          roomTypeId: room.roomTypeId,
+          totalBeds: Number(room.totalBeds),
+          galleryIds: roomGalleries,
+          beds: beds,
+        });
+      }
 
       let galleryIds: string[] = [];
       if (images && images.length > 0) {
-        galleryIds = await galleryUpload({ images, createGallery });
+        galleryIds = await galleryUpload({ images: images, createGallery });
       }
-
+      console.log("total beds", values.totalBeds);
       const inputData = {
         updateHostelInput: {
           _id: id,
@@ -507,17 +548,23 @@ function UpdateHostelForm({ params }: any) {
           categoryId: values.categoryId,
           availabilityStatus: Number(values.availabilityStatus),
           aminityIds: values.amenityIds,
-          // rooms: rooms,
+          rooms: rooms,
         },
       };
-      const { data, errors } = await updateHostel({
+      // console.log(inputData);
+      const { data: hostelData, errors } = await updateHostel({
         variables: inputData,
       });
 
       setIsLoading(false);
 
-      console.log({ data });
-      if (data && data.Hostel_Update) {
+      if (hostelData?.Hostel_Update) {
+        toast({
+          variant: "default",
+          title: "Hostel Updated",
+          description: "Hostel Updated Successfully",
+          // action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
         router.push("/dashboard/hostels");
       } else {
         toast({
@@ -547,15 +594,16 @@ function UpdateHostelForm({ params }: any) {
       // Handle login error (e.g., show error message)
     }
   }
-  // console.log(hostelData);
+
   return (
     <div>
       <Breadcrumb pageName="EditHostel" />
 
       <div className="flex  gap-10">
-        <div className="flex w-full ">
+        <div className="flex w-full">
           <Form {...form}>
             <form
+              key={isDone ? 0 : 1}
               onSubmit={form.handleSubmit(onSubmit)}
               className="relative flex w-full flex-col space-y-8"
             >
@@ -568,7 +616,8 @@ function UpdateHostelForm({ params }: any) {
                       onChange={(files: File[]) => {
                         setImages(files);
                       }}
-                      initialFiles={initialGalleryFiles}
+                      setFiles={setFiles}
+                      files={files}
                     ></MultiFileUploader>
                   </Card>
 
@@ -722,7 +771,8 @@ function UpdateHostelForm({ params }: any) {
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
-                                value={field.value}
+                                // value={field.value}
+                                {...field}
                               >
                                 <FormControl>
                                   <SelectTrigger>
@@ -867,7 +917,7 @@ function UpdateHostelForm({ params }: any) {
                   </div>
                 </Card>
               </div>
-              {/* <div className="align-start flex w-full p-2">
+              <div className="align-start flex w-full p-2">
                 <RoomCreationForm
                   hostel={hostel}
                   setHostel={setHostel}
@@ -875,7 +925,7 @@ function UpdateHostelForm({ params }: any) {
                   amenityData={amenityData}
                   roomTypeData={roomTypeData}
                 ></RoomCreationForm>
-              </div> */}
+              </div>
 
               <Button className="h-10 w-30 self-end" type="submit">
                 Submit

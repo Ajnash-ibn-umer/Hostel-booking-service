@@ -56,7 +56,7 @@ export class Booking extends Base {
   @Prop({ default: '' })
   address: string;
 
-  @Prop({ default: new Date() })
+  @Prop({ default: null })
   arrivalTime: Date;
 
   @Prop({ default: '' })
@@ -68,7 +68,7 @@ export class Booking extends Base {
   @Prop({ default: '' })
   motherName: string;
 
-  @Prop({ type: Date, default: Date.now() })
+  @Prop({ type: Date, default: null })
   dob: Date;
 
   @Prop({ default: '' })
@@ -131,7 +131,7 @@ export class Booking extends Base {
   @Prop({ default: new Date() })
   contractTo: Date;
 
-  @Prop({ default: new Date() })
+  @Prop({ type: Date, default: null })
   checkInDate: Date;
 
   @Prop({ required: true, default: -1, enum: BED_POSITION })
