@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
       console.log({ userTypes });
       const token = this.extractTokenFromHeader(ctx);
 
-      if (!token && userTypes && userTypes.includes(USER_TYPES.PUBLIC)) {
+      if (userTypes && userTypes.includes(USER_TYPES.PUBLIC)) {
         console.log('it is true');
         return true;
       }
