@@ -412,6 +412,9 @@ export const HOSTEL_DETAILS = gql`
             url
           }
           name
+          floor
+          totalBeds
+          roomTypeId  
           roomType {
             name
             description
@@ -426,6 +429,12 @@ export const HOSTEL_DETAILS = gql`
           }
           beds {
             _id
+            availabilityStatus
+            bedPosition
+            floor
+            name
+            paymentBase
+            roomTypeId
           }
         }
         sellingPrice
@@ -434,8 +443,17 @@ export const HOSTEL_DETAILS = gql`
         createdAt
         availabilityStatus
         locationId
+        categoryId
+        category {
+          _id
+          name
+          slug
+          status
+        }
         priceBaseMode
         propertyNo
+
+        totalBeds
       }
     }
   }
@@ -463,7 +481,7 @@ export const CHECK_IN_GUEST = gql`
       list {
         phoneNumber
         email
-        name
+        namez
         isActive
         userNo
         _id

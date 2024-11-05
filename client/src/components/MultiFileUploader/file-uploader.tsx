@@ -10,18 +10,16 @@ interface FileWithPreview extends File {
 }
 interface MultiFileUplaoderProps {
   onChange: Function;
-  initialFiles?: FileWithPreview[];
+  setFiles: Function;
+  files: FileWithPreview[];
 }
 export default function MultiFileUploader({
   onChange,
-  initialFiles = [],
-}: MultiFileUplaoderProps) {
-  const [files, setFiles] = useState<FileWithPreview[]>([]);
+  setFiles,
+  files,
+}: Readonly<MultiFileUplaoderProps>) {
+  // const [files, setFiles] = useState<FileWithPreview[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // useEffect(() => {
-  //   setFiles(initialFiles);
-  // }, [initialFiles]);
 
   useEffect(() => {
     onChange(files);
@@ -83,7 +81,7 @@ export default function MultiFileUploader({
         />
         <p>Click to select files or drag and drop here</p>
       </div>
-      {files.length > 0 && (
+      {files?.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-lg font-semibold">Uploaded Files:</h2>
           <ul className="space-y-2">

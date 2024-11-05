@@ -47,6 +47,10 @@ interface RoomCreationProps {
   setHostel: React.Dispatch<React.SetStateAction<Hostel>>;
 }
 
+interface FileWithPreview extends File {
+  preview: string;
+}
+
 export default function RoomCreationForm({
   amenityData,
   roomTypeData,
@@ -54,6 +58,8 @@ export default function RoomCreationForm({
   hostel,
   setHostel,
 }: RoomCreationProps) {
+  const [files, setFiles] = useState<FileWithPreview[]>([]);
+
   const addRoom = () => {
     setHostel((prev: { rooms: any }) => ({
       ...prev,
@@ -279,6 +285,8 @@ export default function RoomCreationForm({
                           onChange={(files: File[]) => {
                             updateRoom(roomIndex, "files", files);
                           }}
+                          files={files}
+                          setFiles={setFiles}
                         ></MultiFileUploader>
                       </Card>
                       <div className="space-y-2">
@@ -290,7 +298,9 @@ export default function RoomCreationForm({
                             className="grid grid-cols-3 gap-2"
                           >
                             <div className="item-between flex flex-col gap-1">
-                              <Label htmlFor={`roomAvailablity-${roomIndex}-${bedIndex}`}>
+                              <Label
+                                htmlFor={`roomAvailablity-${roomIndex}-${bedIndex}`}
+                              >
                                 Availablity Status
                               </Label>
                               <Select
@@ -344,9 +354,7 @@ export default function RoomCreationForm({
                                   <SelectValue placeholder="Select a bedPosition" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem  value="1">
-                                    Upper
-                                  </SelectItem>
+                                  <SelectItem value="1">Upper</SelectItem>
                                   <SelectItem value="2">Lower</SelectItem>
                                 </SelectContent>
                               </Select>
@@ -372,8 +380,9 @@ export default function RoomCreationForm({
                               >
                                 <SelectTrigger>
                                   <SelectValue
-                                  // defaultValue={"1"}
-                                  placeholder="Select a Payment Base" />
+                                    // defaultValue={"1"}
+                                    placeholder="Select a Payment Base"
+                                  />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="1">Daily</SelectItem>

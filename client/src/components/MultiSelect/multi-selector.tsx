@@ -41,7 +41,7 @@ export default function MultiSelect({
   const [selected, setSelected] = React.useState<typeof values>([]);
 
   React.useEffect(() => {
-    const initialSelected = values.filter((option) =>
+    const initialSelected = values?.filter((option) =>
       selectedValues.includes(option.value),
     );
     setSelected(initialSelected);
@@ -147,7 +147,7 @@ export default function MultiSelect({
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          selected.some((item) => item.value === option.value)
+                          selected?.some((item) => item.value === option.value)
                             ? "opacity-100"
                             : "opacity-0",
                         )}
