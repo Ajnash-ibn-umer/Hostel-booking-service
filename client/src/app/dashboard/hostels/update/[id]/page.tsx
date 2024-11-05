@@ -84,7 +84,7 @@ interface CreateHostelInput {
     floor: number | null;
     name: string | null;
     roomTypeId: string | null;
-    totalBeds: number | null;
+    totalBeds: string | null;
     galleryIds: string[] | null;
   }>;
 }
@@ -97,8 +97,8 @@ interface TransformedHostelData {
   sellingPrice: string;
   standardPrice: string;
   totalRooms: string;
+  totalBeds: number;
   shortDescription: string;
-  totalBeds: string;
   categoryId: string;
   locationId: string;
   availabilityStatus: string;
@@ -126,6 +126,7 @@ export type HostelProps = {
   sellingPrice: number;
   standardPrice: number;
   totalRooms: number;
+  totalBeds: number;
   propertyNo: string;
   availabilityStatus: number;
   createdAt: string;
@@ -137,7 +138,7 @@ type Inputs = {
   standardPrice: string;
   totalRooms: string;
   shortDescription: string;
-  totalBeds: string;
+  totalBeds: number;
   categoryId: string;
   locationId: string;
   availabilityStatus: string;
@@ -199,7 +200,7 @@ const formSchema = z.object({
   standardPrice: z.string().optional(),
   totalRooms: z.string().optional(),
   shortDescription: z.string().optional(),
-  totalBeds: z.string().optional(),
+  totalBeds: z.number().optional(),
   categoryId: z.string().optional(),
   locationId: z.string().optional(),
   availabilityStatus: z.string(),
@@ -253,7 +254,7 @@ type Room = {
   _id: string;
   aminityIds: string[];
   beds: Bed[];
-  floor: number;
+  floor: string;
   name: string;
   roomTypeId: string;
   totalBeds: number;
@@ -378,7 +379,7 @@ function UpdateHostelForm({ params }: any) {
       standardPrice: "0",
       totalRooms: "0",
       shortDescription: "",
-      totalBeds: "0",
+      totalBeds: 0,
       categoryId: "",
       locationId: "",
       availabilityStatus: "0",
@@ -414,6 +415,7 @@ function UpdateHostelForm({ params }: any) {
       const galleryFiles = data?.galleries.map((gallery: any) => {
         const blob = new Blob([], { type: "image/jpeg" });
         const file = new File([blob], gallery._id, { type: "image/jpeg" });
+        console.log("preview url",gallery.url)
         return Object.assign(file, { preview: gallery.url });
       });
       // setImages(galleryFiles);
@@ -423,9 +425,9 @@ function UpdateHostelForm({ params }: any) {
       name: data?.name,
       sellingPrice: data?.sellingPrice?.toString(),
       standardPrice: data?.standardPrice?.toString(),
-      totalRooms: data?.totalRooms?.toString(),
+      totalRooms: data?.totalRooms?.toString() ?? "",
       shortDescription: "",
-      totalBeds: "",
+      totalBeds: data?.totalBeds,
       categoryId: "",
       locationId: data?.locationId,
       availabilityStatus: data?.availabilityStatus?.toString(),
@@ -452,7 +454,7 @@ function UpdateHostelForm({ params }: any) {
         _id: room._id,
         aminityIds: room.amenities,
         beds: room.beds,
-        floor: Number(room.floor),
+        floor: room.floor,
         name: room.name,
         roomTypeId: room.roomTypeId,
         totalBeds: room.totalBeds,
@@ -527,9 +529,9 @@ function UpdateHostelForm({ params }: any) {
 
       let galleryIds: string[] = [];
       if (images && images.length > 0) {
-        galleryIds = await galleryUpload({ images, createGallery });
+        galleryIds = await galleryUpload({ images: images, createGallery });
       }
-
+      console.log("total beds", values.totalBeds);
       const inputData = {
         updateHostelInput: {
           _id: id,

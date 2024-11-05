@@ -5,10 +5,14 @@ interface IfileUploadLib {
   createGallery: Function;
 }
 
-export default ({ images,createGallery }: IfileUploadLib):Promise<string[]> => {
+export default ({
+  images,
+  createGallery,
+}: IfileUploadLib): Promise<string[]> => {
   return new Promise(async (resolve, reject) => {
     try {
       if (images && images.length > 0) {
+        console.log("mine images", images);
         const fileUploadReponses: any[] = (await s3Upload(images)) as any;
         console.log("file UploadReponses", fileUploadReponses);
         const galleryData = fileUploadReponses.map((resp: any) => ({
@@ -47,13 +51,3 @@ export default ({ images,createGallery }: IfileUploadLib):Promise<string[]> => {
     }
   });
 };
-
-
-
-
-
-
-
-
-
-

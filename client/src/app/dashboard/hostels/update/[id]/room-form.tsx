@@ -31,7 +31,7 @@ type Room = {
   _id: string;
   aminityIds: string[];
   beds: Bed[];
-  floor: number;
+  floor: string;
   name: string;
   roomTypeId: string;
   totalBeds: number;
@@ -71,9 +71,9 @@ export default function RoomCreationForm({
           name: "",
           aminityIds: [],
           beds: [],
-          floor: 0,
+          floor: "",
           roomTypeId: "",
-          totalBeds: 0,
+          totalBeds: "",
           files: [],
         },
       ],
