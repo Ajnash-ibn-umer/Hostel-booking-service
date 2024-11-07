@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { BED_POSITION, BookingStatus, PRICE_BASE_MODE } from "./_lib/enums";
 import { Booking } from "./page";
 import { EyeOpenIcon } from "@radix-ui/react-icons";
+import { Download } from "lucide-react";
 
 interface BookingDetailsSheetProps {
   booking?: Booking;
@@ -56,7 +57,7 @@ export default function BookingDetailsSheet({
             </div>
             <div>
               <h4 className="text-sm font-medium">Registration Number</h4>
-              <p className="text-sm text-gray-500">{booking.regNo}</p>
+              <p className="text-sm text-gray-500">{booking.bookingNumber}</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -73,21 +74,26 @@ export default function BookingDetailsSheet({
             <div>
               <h4 className="text-sm font-medium">Check-in Date</h4>
               <p className="text-sm text-gray-500">
-                {new Date(booking.checkInDate).toLocaleDateString()}
+                {booking.checkInDate
+                  ? new Date(booking.checkInDate).toLocaleDateString()
+                  : "Not Check-in Yet"}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-medium">Check-out Date</h4>
+              <h4 className="text-sm font-medium">Booking Date</h4>
               <p className="text-sm text-gray-500">
-                {new Date(booking.checkOutDate).toLocaleDateString()}
+                {new Date(booking.createdAt).toLocaleDateString()}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-medium">Arrival Time</h4>
+              <h4 className="text-sm font-medium">Payment Base</h4>
               <p className="text-sm text-gray-500">
-                {new Date(booking.arrivalTime).toLocaleDateString()}
+                {PRICE_BASE_MODE[
+                  booking.selectedPaymentBase as any
+                ].toLowerCase()}
               </p>
             </div>
+            
             <div>
               <h4 className="text-sm font-medium">Booking Status</h4>
               <p className="text-sm text-gray-500">
@@ -101,21 +107,19 @@ export default function BookingDetailsSheet({
             <div>
               <h4 className="text-sm font-medium">Base Price</h4>
               <p className="text-sm text-gray-500">
-                RS{booking.basePrice.toFixed(2)}
+                RS {booking.basePrice.toFixed(2)}
               </p>
             </div>
             <div>
               <h4 className="text-sm font-medium">Security Deposit</h4>
               <p className="text-sm text-gray-500">
-                RS{booking.securityDeposit.toFixed(2)}
+                RS {booking.securityDeposit.toFixed(2)}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-medium">Payment Base</h4>
+              <h4 className="text-sm font-medium">Laundry Facility</h4>
               <p className="text-sm text-gray-500">
-                {PRICE_BASE_MODE[
-                  booking.selectedPaymentBase as any
-                ].toLowerCase()}
+                {booking.laudryFacility ? "Yes" : "No"}
               </p>
             </div>
             <div>
@@ -123,6 +127,47 @@ export default function BookingDetailsSheet({
               <p className="text-sm text-gray-500">
                 {booking.canteenFacility ? "Yes" : "No"}
               </p>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-medium">ID documents</h4>
+              <div>
+                {booking.idProofDocUrls &&
+                  booking.idProofDocUrls.length > 0 &&
+                  booking.idProofDocUrls.map((url) => (
+                    <Button
+                      style={{
+                        backgroundColor: "#f0f0f0",
+                        color: "#333",
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        border: "1px solid #ccc",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px", // Add space between URL and download button
+                      }}
+                      onClick={() => {
+                        fetch(url)
+                          .then((response) => response.blob())
+                          .then((blob) => {
+                            const downloadUrl =
+                              window.URL.createObjectURL(blob);
+                            const a: any = document.createElement("a");
+                            a.style.display = "none";
+                            a.href = downloadUrl;
+                            a.download = url.split("/").pop();
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(downloadUrl);
+                          })
+                          .catch(() => alert("Failed to download file"));
+                      }}
+                    >
+                      {url.split("/").pop()}
+                      <Download size={"15px"}></Download>
+                    </Button>
+                  ))}
+              </div>
             </div>
           </div>
         </div>

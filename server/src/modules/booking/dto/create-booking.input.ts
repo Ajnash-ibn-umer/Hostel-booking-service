@@ -122,6 +122,6 @@ export class BookingCreateInput {
   @Field(() => Number, { description: 'Other Amount', nullable: true })
   otherAmount?: number;
 
-  @Field(() => String, { description: 'ID Proof Document', nullable: true })
-  idProofDocUrl?: string;
+  @Field(() => [String], { description: 'ID Proof Document', nullable: true })
+  idProofDocUrls?: string[];
 }

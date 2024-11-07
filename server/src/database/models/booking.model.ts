@@ -59,8 +59,8 @@ export class Booking extends Base {
   @Prop({ default: null })
   arrivalTime: Date;
 
-  @Prop({ default: '' })
-  idProofDocUrl?: string;
+  @Prop({ type: [String], default: [] })
+  idProofDocUrls?: string[];
 
   @Prop({ default: '' })
   fatherName: string;
