@@ -307,6 +307,7 @@ function UpdateHostelForm({ params }: any) {
       },
     ],
   });
+  
   const [createGallery, { loading: galleryLoading, error: galleryError }] =
     useMutation(GALLERY_CREATE_MULTIPLE_GQL);
 

@@ -2,7 +2,7 @@ export enum BookingStatus {
   INIT = 1,
   FORM_COMPLETED = 2,
   PAYMENT_FAILED = 3,
-  PAYMENT_SUCCESS = 4,
+  BOOKING_COMPLETED = 4,
   ADMIN_APPROVED = 5,
   CHECK_IN = 6,
 }

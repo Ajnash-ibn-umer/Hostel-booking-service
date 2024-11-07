@@ -153,6 +153,9 @@ export class Booking extends PartialType(Base) {
 
   @Field(() => Hostel, { nullable: true })
   property: Hostel;
+
+  @Field(() => [String], { description: 'ID Proof Document', nullable: true })
+  idProofDocUrls?: string[];
 }
 
 @ObjectType()

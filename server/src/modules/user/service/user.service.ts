@@ -443,4 +443,12 @@ export class UserService {
       });
     }
   }
+
+  async findOneActivatedUserByPhone(phone: string, isActivated: boolean) {
+    return this.userRepo.findOne({
+      phoneNumber: phone,
+      isActive: isActivated,
+      status: 1,
+    });
+  }
 }

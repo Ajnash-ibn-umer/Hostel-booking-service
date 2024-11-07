@@ -66,6 +66,7 @@ export type Booking = {
   bookingNumber: string;
   bookingStatus: BookingStatus;
   canteenFacility: string;
+  laudryFacility:string;
   email: string;
   name: string;
   phone: string;
@@ -74,8 +75,10 @@ export type Booking = {
   roomId: string;
   securityDeposit: number;
   bedPosition: number;
+  idProofDocUrls:string[],
   selectedPaymentBase: string;
   status: number;
+  createdAt:Date;
   checkInDate: Date;
   checkOutDate: Date;
   property: {
@@ -146,11 +149,11 @@ function ApprovalOperationsCell({
       });
 
       if (data) {
-        toast({
-          variant: "default",
-          title: "Status changed successfully",
-          description: "Booking Status Changed successfully",
-        });
+          toast({
+            color:"green",
+            title: data.Booking_ApprovalStatusChange.message,
+          });
+
         setIsDialogOpen(false);
         refetch(); // Refetch the room bed list
       }
@@ -243,8 +246,8 @@ function CheckInOperationsCell({
       if (data) {
         toast({
           variant: "default",
-          title: "Status changed successfully",
-          description: "Booking Status Changed successfully",
+          title: data.Booking_ApprovalStatusChange.message,
+          // description: "Booking Status Changed successfully",
         });
         setIsDialogOpen(false);
         refetch(); // Refetch the room bed list
@@ -312,10 +315,10 @@ function Booking() {
       },
     },
     {
-      accessorKey: "arrivalTime",
-      header: "Check-In Date",
+      accessorKey: "createdAt",
+      header: "Booking Date",
       cell: ({ row }) =>
-        new Date(row.getValue("arrivalTime")).toLocaleDateString(),
+        new Date(row.getValue("createdAt")).toLocaleDateString(),
     },
     {
       accessorKey: "bookingStatus",
@@ -402,7 +405,6 @@ function Booking() {
               document.body.appendChild(link);
               link.click();
 
-              // Cleanup
               link.remove();
               window.URL.revokeObjectURL(url);
             }}

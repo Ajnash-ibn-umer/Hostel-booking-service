@@ -189,7 +189,11 @@ export class BookingService {
         status: 1,
         bookingStatus: { $gte: BOOKING_STATUS.PAYMENT_SUCCESS },
       });
-      if (bookingExist) {
+      const phoneExists = await this.userService.findOneActivatedUserByPhone(
+        dto.phone,
+        true,
+      );
+      if (phoneExists || bookingExist) {
         throw 'User with this same phone number already exists. try another number';
       }
       const newBooking = await this.bookingRepository.create(
@@ -426,14 +430,30 @@ export class BookingService {
 
     await txnSession.startTransaction();
     try {
+      let responseMsg = 'Booking status updated successfully';
       if (dto.bookingIds.length === 0) {
         throw 'No booking ids provided';
       }
+      const user = await this.userService.findOneUserByBookingId(
+        dto.bookingIds,
+      );
       const updateData = {
         bookingStatus: dto.status,
         updatedAt: startTime,
         updatedUserId: userId,
       };
+
+      const updatedBooking = await this.bookingRepository.findOneAndUpdate(
+        {
+          _id: dto.bookingIds,
+        },
+        updateData,
+        txnSession,
+      );
+      console.log({ updatedBooking });
+      if (!updatedBooking) {
+        throw 'Booking Status update failed';
+      }
       if (dto.status === BOOKING_STATUS.ADMIN_APPROVED) {
         if (!dto.selectedBedId) {
           throw 'Bed not selected';
@@ -452,19 +472,19 @@ export class BookingService {
           },
           txnSession,
         );
-        console.log({ bedUpdate });
-        console.log({ email: bedUpdate.email });
+        console.log({ user });
+        console.log({ email: user.email });
         if (!bedUpdate) {
           throw 'Selected Bed not found Or This bed already Booked!';
         }
-
+        responseMsg = `Booking approved successfully for booking number: ${updatedBooking.bookingNumber}`;
         this.mailService.send({
           subject: `Booking Approved`,
-          to: bedUpdate.email,
+          to: user.email,
           template: EMAIL_TEMPLATES.BOOKING_APPROVAL,
           context: {
-            guestName: bedUpdate.name,
-            bookingNumber: bedUpdate.bookingNumber,
+            guestName: user.name,
+            bookingNumber: updatedBooking.bookingNumber,
             approvalDate: new Date().toLocaleDateString(),
           },
         });
@@ -472,12 +492,11 @@ export class BookingService {
 
       if (dto.status === BOOKING_STATUS.CHECK_IN) {
         updateData['checkInDate'] = dto.date;
-        const user = await this.userService.findOneUserByBookingId(
-          dto.bookingIds,
-        );
+
         console.log({ email: user.email, e: user.name });
         await this.userService.activateUser(user._id, txnSession);
         console.log('activated', user);
+        responseMsg = `Check-in confirmed for user: ${user.name} on ${dto.date.toLocaleDateString()}`;
         this.mailService.send({
           subject: `Check In Confirmed`,
           to: user.email,
@@ -489,17 +508,7 @@ export class BookingService {
           },
         });
       }
-      const updatedBooking = await this.bookingRepository.findOneAndUpdate(
-        {
-          _id: dto.bookingIds,
-        },
-        updateData,
-        txnSession,
-      );
-      console.log({ updatedBooking });
-      if (!updatedBooking) {
-        throw 'Booking Status update failed';
-      }
+
       const bookingStatusHistoryEntries = {
         bookingId: dto.bookingIds,
         bookingStatus: dto.status,
@@ -514,7 +523,7 @@ export class BookingService {
       );
       await txnSession.commitTransaction();
       return {
-        message: 'Booking status updated successfully',
+        message: responseMsg,
       };
     } catch (error) {
       await txnSession.abortTransaction();

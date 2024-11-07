@@ -357,9 +357,12 @@ export const BOOKING_LIST_MINIMAL_GQL = gql`
         propertyId
         regNo
         roomId
+        laudryFacility
         securityDeposit
         selectedPaymentBase
         status
+        createdAt
+        idProofDocUrls
         property {
           _id
           name
