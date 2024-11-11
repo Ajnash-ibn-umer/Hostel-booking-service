@@ -363,6 +363,16 @@ export const BOOKING_LIST_MINIMAL_GQL = gql`
         status
         createdAt
         idProofDocUrls
+        dob
+        emergencyMobile
+        emergencyName
+        emergenyRelation
+        address
+        bloodGroup
+        city
+        companyName
+        jobTitle
+        userRemark
         property {
           _id
           name
