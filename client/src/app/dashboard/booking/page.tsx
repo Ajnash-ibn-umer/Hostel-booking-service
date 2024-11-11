@@ -81,6 +81,16 @@ export type Booking = {
   createdAt:Date;
   checkInDate: Date;
   checkOutDate: Date;
+  address: string;
+  bloodGroup: string;
+  city: string;
+  companyName: string;
+  dob: Date;
+  emergencyName: string;
+  emergencyMobile: string;
+  emergenyRelation: string;
+  jobTitle: string;
+  userRemark: string;
   property: {
     name: string;
     _id: string;
@@ -297,6 +307,7 @@ function Booking() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleOpenDialog = () => setIsDialogOpen(true);
   const handleCloseDialog = () => setIsDialogOpen(false);
+
   const columns: ColumnDef<Booking>[] = [
     {
       accessorKey: "bookingNumber",

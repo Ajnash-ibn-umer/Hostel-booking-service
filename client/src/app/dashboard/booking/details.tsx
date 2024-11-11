@@ -93,7 +93,7 @@ export default function BookingDetailsSheet({
                 ].toLowerCase()}
               </p>
             </div>
-            
+
             <div>
               <h4 className="text-sm font-medium">Booking Status</h4>
               <p className="text-sm text-gray-500">
@@ -130,7 +130,50 @@ export default function BookingDetailsSheet({
             </div>
 
             <div>
-              <h4 className="text-sm font-medium">ID documents</h4>
+           
+
+              <div>
+                <h4 className="text-sm font-medium">Guest Information</h4>
+                <p className="text-sm text-gray-500">
+                  Date of Birth:{" "}
+                  {booking.dob !== null
+                    ? new Date(booking.dob).toLocaleDateString()
+                    : "Not found"}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Address: {booking.address}
+                </p>
+                <p className="text-sm text-gray-500">City: {booking.city}</p>
+                <p className="text-sm text-gray-500">
+                  Company Name: {booking.companyName}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Job Title: {booking.jobTitle}
+                </p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium">Emergency Contact</h4>
+                <p className="text-sm text-gray-500">
+                  Name: {booking.emergencyName}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Contact No: {booking.emergencyMobile}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Relation: {booking.emergenyRelation}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Blood Group: {booking.bloodGroup}
+                </p>
+              </div>
+              {booking.userRemark && booking.userRemark !== "" && (
+                <div>
+                  <h4 className="text-sm font-medium">Health Issues</h4>
+                  <p className="text-sm text-gray-500">{booking.userRemark}</p>
+                </div>
+              )}
+
+<h4 className="text-sm font-medium">ID documents</h4>
               <div>
                 {booking.idProofDocUrls &&
                   booking.idProofDocUrls.length > 0 &&
@@ -144,7 +187,7 @@ export default function BookingDetailsSheet({
                         border: "1px solid #ccc",
                         display: "flex",
                         alignItems: "center",
-                        gap: "5px", // Add space between URL and download button
+                        gap: "5px", 
                       }}
                       onClick={() => {
                         fetch(url)
