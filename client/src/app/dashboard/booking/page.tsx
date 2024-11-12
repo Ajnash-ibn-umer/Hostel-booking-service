@@ -384,26 +384,28 @@ function Booking() {
               const blob = await pdf(
                 MembershipPDF({
                   formData: {
-                    address: "",
-                    companyName: "",
-                    contactNumber: "",
+                    address: data.address,
+                    companyName: data.companyName,
+                    contactNumber: data.phone,
                     date:
-                      (data.checkInDate &&
-                        data?.checkInDate?.toLocaleDateString()) ??
+                      (data.createdAt &&
+                       dayjs(data?.createdAt).format("DD/MM/YYYY")) ??
                       "",
-                    dob: "",
+                    dob:   (data.dob &&
+                      dayjs(data?.dob).format("DD/MM/YYYY")) ??
+                     "",
                     email: data.email,
-                    emergencyContact: "",
-                    emergencyContactNumber: "",
+                    emergencyContact: data.emergencyName,
+                    emergencyContactNumber: data.emergencyMobile,
                     idCardNumber: data.bookingNumber,
-                    jobTitle: "",
+                    jobTitle: data.jobTitle,
                     name: data.name,
-                    relation: "",
+                    relation: data.emergenyRelation,
                     roomPreference: data.bedName,
                     stayDuration: "",
-                    bloodGroup: "",
+                    bloodGroup:data.bloodGroup,
                     roomName: "",
-                    healthIssue: "",
+                    healthIssue: data.userRemark,
                   },
                 }),
               ).toBlob();
