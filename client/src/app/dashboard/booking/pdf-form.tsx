@@ -1,5 +1,4 @@
-import React from "react";
-import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 export interface FormData {
   date: string;
@@ -21,154 +20,218 @@ export interface FormData {
   stayDuration: string;
 }
 
-// Colors scheme for PDF
-const primaryColor = "#000859";
-const secondaryColor = "#EC8305";
-const lightGray = "#F1F2F7";
-const darkGray = "#D9DBEB";
-
 const styles = StyleSheet.create({
   page: {
     padding: 30,
-    fontSize: 10,
-    fontFamily: "Helvetica",
+    backgroundColor: "#ffffff",
   },
-  header: {
-    fontSize: 18,
+  title: {
+    fontSize: 20,
+    marginTop: 40,
+    marginBottom: 20,
     textAlign: "center",
-    color: primaryColor,
-    fontWeight: "black",
-    marginBottom: 10,
-  },
-  subHeader: {
-    borderRadius: 5,
-    backgroundColor: primaryColor,
-    color: "#fff",
-    textAlign: "center",
-    fontSize: 10,
     fontWeight: "bold",
-    padding: 5,
-    marginBottom: 10,
+  },
+  titleHostel: {
+    color: "#000859",
+  },
+  titleJoining: {
+    color: "#ff8c00",
+  },
+  subtitle: {
+    fontSize: 11,
+    backgroundColor: "#000859",
+    borderRadius: 5,
+    color: "white",
+    padding: 8,
+    marginBottom: 5,
+    textAlign: "center",
   },
   section: {
-    marginBottom: 10,
-    padding: 5,
+    borderRadius: 5,
+    overflow: "hidden",
   },
   row: {
     flexDirection: "row",
-    // marginBottom: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: primaryColor,
-    borderBottomStyle: "solid",
+    borderBottom: "0.75 solid #000859",
+  },
+  lastRow: {
+    flexDirection: "column",
+    gap: 5,
+    borderBottom: "none",
+    borderRadius: 5,
+    overflow: "hidden",
+  },
+  column: {
+    flex: 1,
+    flexDirection: "row",
   },
   label: {
-    width: "20%",
-    fontWeight: "bold",
-    color: primaryColor,
-    backgroundColor: darkGray,
-  },
-  inputField: {
-    backgroundColor: lightGray,
-    width: "80%",
+    width: 120,
     fontSize: 10,
-    paddingVertical: 2,
+    fontWeight: "bold",
+    padding: 6,
+    color: "#000859",
+    backgroundColor: "#e2e4ed",
+  },
+  field: {
+    flex: 1,
+    fontSize: 10,
+    padding: 6,
+    backgroundColor: "#f0f2f8",
+  },
+  fullWidthLabel: {
+    width: 120,
+    fontSize: 10,
+    fontWeight: "bold",
+    padding: 6,
+    color: "#000859",
+    backgroundColor: "#e2e4ed",
+  },
+  fullWidthField: {
+    flex: 1,
+    fontSize: 10,
+    padding: 6,
+    backgroundColor: "#f0f2f8",
+  },
+  emergencySection: {
+    marginTop: 20,
+  },
+  healthSection: {
+    marginTop: 20,
+  },
+  textArea: {
+    height: 100,
+    fontSize: 10,
+    padding: 6,
+    marginTop: 20,
+    backgroundColor: "#f0f2f8",
+    width: "100%",
+  },
+  noBorderBottom: {
+    borderBottom: "none",
   },
 });
 
 const MembershipPDF = ({ formData }: { formData: FormData }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      {/* Header */}
-      <View style={{ flexDirection: "row", justifyContent: "center" }}>
-        <Text style={{ ...styles.header, color: primaryColor }}>
-          HOSTEL
+      <View>
+        <Text style={styles.title}>
+          <Text style={styles.titleHostel}>HOSTEL </Text>
+          <Text style={styles.titleJoining}>JOINING FORM</Text>
         </Text>
-        <Text
-          style={{
-            ...styles.header,
-            color: secondaryColor,
-            marginLeft: 5,
-          }}
-        >
-          JOINING FORM
+
+        <Text style={styles.subtitle}>
+          TO APPLY FOR MEMBERSHIP PLEASE COMPLETE ALL QUESTIONS.
         </Text>
-      </View>
 
-      {/* Instructions */}
-      <Text style={styles.subHeader}>
-        TO APPLY FOR MEMBERSHIP PLEASE COMPLETE ALL QUESTIONS.
-      </Text>
+        <View style={styles.section}>
+          {/* Personal Information */}
+          <View style={styles.row}>
+            <Text style={styles.fullWidthLabel}>Applicants Name</Text>
+            <Text style={styles.fullWidthField}>{formData.name || ""}</Text>
+          </View>
 
-      {/* Section: Applicant Details */}
-      <View style={styles.section}>
-        <View style={styles.row}>
-          <Text style={styles.label}>Applicant's Name:</Text>
-          <Text style={styles.inputField}>{formData.name || ""}</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Contact Number:</Text>
-          <Text style={styles.inputField}>{formData.contactNumber || ""}</Text>
-          {/* <Text style={styles.label}>ID Card Number:</Text>
-          <Text style={styles.inputField}>{formData.idCardNumber || ""}</Text> */}
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>E-Mail:</Text>
-          <Text style={styles.inputField}>{formData.email || ""}</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Address:</Text>
-          <Text style={styles.inputField}>{formData.address || ""}</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Job Title:</Text>
-          <Text style={styles.inputField}>{formData.jobTitle || ""}</Text>
-          <Text style={styles.label}>Company Name:</Text>
-          <Text style={styles.inputField}>{formData.companyName || ""}</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Room Preference:</Text>
-          <Text style={styles.inputField}>{formData.roomPreference || ""}</Text>
-          <Text style={styles.label}>Room Name:</Text>
-          <Text style={styles.inputField}>{formData.roomName || "N/A"}</Text>
-        </View>
-      </View>
+          <View style={styles.row}>
+            <View style={styles.column}>
+              <Text style={styles.label}>Contact Number</Text>
+              <Text style={styles.field}>{formData.contactNumber || ""}</Text>
+            </View>
+            <View style={styles.column}>
+              <Text style={styles.label}>ID Card Number</Text>
+              <Text style={styles.field}>{formData.idCardNumber || ""}</Text>
+            </View>
+          </View>
 
-      {/* Emergency Contact */}
-      <Text style={styles.subHeader}>EMERGENCY CONTACT NAME</Text>
-      <View style={styles.section}>
-        <View style={styles.row}>
-          <Text style={styles.label}>Name:</Text>
-          <Text style={styles.inputField}>
-            {formData.emergencyContact || ""}
-          </Text>
-          <Text style={styles.label}>Contact No:</Text>
-          <Text style={styles.inputField}>
-            {formData.emergencyContactNumber || ""}
-          </Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Relation:</Text>
-          <Text style={styles.inputField}>{formData.relation || ""}</Text>
-        </View>
-      </View>
+          <View style={styles.row}>
+            <Text style={styles.fullWidthLabel}>E-Mail</Text>
+            <Text style={styles.fullWidthField}>{formData.email || ""}</Text>
+          </View>
 
-      {/* Additional Information */}
-      <View style={styles.section}>
-        <View style={styles.row}>
-          <Text style={styles.label}>Date of Birth:</Text>
-          <Text style={styles.inputField}>{formData.dob || ""}</Text>
-          <Text style={styles.label}>Blood Group:</Text>
-          <Text style={styles.inputField}>{formData.bloodGroup || ""}</Text>
+          <View style={styles.row}>
+            <Text style={styles.fullWidthLabel}>Address</Text>
+            <Text style={styles.fullWidthField}>{formData.address || ""}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <View style={styles.column}>
+              <Text style={styles.label}>Job Title</Text>
+              <Text style={styles.field}>{formData.jobTitle || ""}</Text>
+            </View>
+            <View style={styles.column}>
+              <Text style={styles.label}>Company Name</Text>
+              <Text style={styles.field}>{formData.companyName || ""}</Text>
+            </View>
+          </View>
+
+          <View style={[styles.row, styles.noBorderBottom]}>
+            <View style={styles.column}>
+              <Text style={styles.label}>Room Preference</Text>
+              <Text style={styles.field}>{formData.roomPreference || ""}</Text>
+            </View>
+            <View style={styles.column}>
+              <Text style={styles.label}>Room Name</Text>
+              <Text style={styles.field}>{formData.roomName || ""}</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Any health issue:</Text>
-          <Text style={styles.inputField}>
-            {formData.healthIssue || "None"}
-          </Text>
+
+        {/* Emergency Contact */}
+        <View style={styles.emergencySection}>
+          <Text style={styles.subtitle}>EMERGENCY CONTACT NAME</Text>
+
+          <View style={styles.section}>
+            <View style={styles.row}>
+              <View style={styles.column}>
+                <Text style={styles.label}>Name</Text>
+                <Text style={styles.field}>
+                  {formData.emergencyContact || ""}
+                </Text>
+              </View>
+              <View style={styles.column}>
+                <Text style={styles.label}>Contact No</Text>
+                <Text style={styles.field}>
+                  {formData.emergencyContactNumber || ""}
+                </Text>
+              </View>
+            </View>
+
+            <View style={[styles.row, styles.noBorderBottom]}>
+              <Text style={styles.fullWidthLabel}>Relation</Text>
+              <Text style={styles.fullWidthField}>
+                {formData.relation || ""}
+              </Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>How long you plan to stay:</Text>
-          <Text style={styles.inputField}>{formData.stayDuration || ""}</Text>
+
+        {/* Health Information */}
+        <View style={styles.healthSection}>
+          <View style={styles.section}>
+            <View style={styles.row}>
+              <View style={styles.column}>
+                <Text style={styles.label}>Date of Birth</Text>
+                <Text style={styles.field}>{formData.dob || ""}</Text>
+              </View>
+              <View style={styles.column}>
+                <Text style={styles.label}>Blood Group</Text>
+                <Text style={styles.field}>{formData.bloodGroup || ""}</Text>
+              </View>
+            </View>
+
+            <View style={[styles.row, styles.noBorderBottom]}>
+              <Text style={styles.fullWidthLabel}>Any health issue</Text>
+              <Text style={styles.fullWidthField}>
+                {formData.healthIssue || ""}
+              </Text>
+            </View>
+          </View>
+
+          <View style={[styles.lastRow, styles.textArea]}>
+            <Text>How long are you planning to stay?</Text>
+            <Text>{formData.stayDuration || ""}</Text>
+          </View>
         </View>
       </View>
     </Page>
