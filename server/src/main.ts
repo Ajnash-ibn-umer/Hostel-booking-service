@@ -44,7 +44,7 @@ async function bootstrap() {
   // app.use('/public', express.static(join(__dirname, '../../client/public')));
   // app.use('/_next', express.static(join(__dirname, '../../client/.next')));
 
-  ///
+  //
   await app
     .listen(process.env.PORT)
     .then(() => console.log(`server running on port ${process.env.PORT}`));

@@ -128,8 +128,8 @@ function ApprovalOperationsCell({
             BedAvailabilityStatus.AVAILABLE,
             BedAvailabilityStatus.ENGAGED,
           ],
-          bedPositions: [booking.bedPosition],
-          priceBaseModes: [booking.selectedPaymentBase, PRICE_BASE_MODE.BOTH],
+          // bedPositions: [booking.bedPosition],
+          priceBaseModes: [booking.selectedPaymentBase, PRICE_BASE_MODE.BOTH,],
         },
       },
     },
@@ -438,6 +438,7 @@ function Booking() {
       statusArray: number[];
       limit: number;
       skip: number;
+      bookingStatus:number[];
       searchingText: string | null;
       sortOrder: number;
       sortType?: number;
@@ -445,6 +446,7 @@ function Booking() {
   }>({
     dto: {
       statusArray: [1],
+      bookingStatus:[3,4,5,6],
       limit: 10,
       skip: 0,
       searchingText: null,

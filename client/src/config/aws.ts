@@ -21,7 +21,14 @@ export const s3Upload = async (files: File[]) => {
     try {
       for (let file of files) {
         console.log("bucket", { file });
-        responses.push(uploadFile(file, config));
+        const myNewFile =await new File(
+          [file],
+          file.name + new Date().getTime().toString(),
+          {
+            type: file.type,
+          },
+        );
+        responses.push(uploadFile(myNewFile, config));
       }
       const resp = await Promise.all(responses);
       console.log({ resp });
