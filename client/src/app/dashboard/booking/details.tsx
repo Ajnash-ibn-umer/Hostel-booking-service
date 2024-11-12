@@ -15,7 +15,7 @@ import { BED_POSITION, BookingStatus, PRICE_BASE_MODE } from "./_lib/enums";
 import { Booking } from "./page";
 import { EyeOpenIcon } from "@radix-ui/react-icons";
 import { Download } from "lucide-react";
-
+import dayjs from "dayjs";
 interface BookingDetailsSheetProps {
   booking?: Booking;
 }
@@ -75,14 +75,14 @@ export default function BookingDetailsSheet({
               <h4 className="text-sm font-medium">Check-in Date</h4>
               <p className="text-sm text-gray-500">
                 {booking.checkInDate
-                  ? new Date(booking.checkInDate).toLocaleDateString()
+                  ? dayjs(booking.checkInDate).format("DD/MM/YYYY")
                   : "Not Check-in Yet"}
               </p>
             </div>
             <div>
               <h4 className="text-sm font-medium">Booking Date</h4>
               <p className="text-sm text-gray-500">
-                {new Date(booking.createdAt).toLocaleDateString()}
+                {dayjs(booking.createdAt).format("DD/MM/YYYY")}
               </p>
             </div>
             <div>
@@ -130,14 +130,12 @@ export default function BookingDetailsSheet({
             </div>
 
             <div>
-           
-
               <div>
                 <h4 className="text-sm font-medium">Guest Information</h4>
                 <p className="text-sm text-gray-500">
                   Date of Birth:{" "}
                   {booking.dob !== null
-                    ? new Date(booking.dob).toLocaleDateString()
+                    ? dayjs(booking.dob).format("DD/MM/YYYY") 
                     : "Not found"}
                 </p>
                 <p className="text-sm text-gray-500">
@@ -173,7 +171,7 @@ export default function BookingDetailsSheet({
                 </div>
               )}
 
-<h4 className="text-sm font-medium">ID documents</h4>
+              <h4 className="text-sm font-medium">ID documents</h4>
               <div>
                 {booking.idProofDocUrls &&
                   booking.idProofDocUrls.length > 0 &&
@@ -187,7 +185,7 @@ export default function BookingDetailsSheet({
                         border: "1px solid #ccc",
                         display: "flex",
                         alignItems: "center",
-                        gap: "5px", 
+                        gap: "5px",
                       }}
                       onClick={() => {
                         fetch(url)

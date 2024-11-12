@@ -66,7 +66,7 @@ export type Booking = {
   bookingNumber: string;
   bookingStatus: BookingStatus;
   canteenFacility: string;
-  laudryFacility:string;
+  laudryFacility: string;
   email: string;
   name: string;
   phone: string;
@@ -75,10 +75,10 @@ export type Booking = {
   roomId: string;
   securityDeposit: number;
   bedPosition: number;
-  idProofDocUrls:string[],
+  idProofDocUrls: string[];
   selectedPaymentBase: string;
   status: number;
-  createdAt:Date;
+  createdAt: Date;
   checkInDate: Date;
   checkOutDate: Date;
   address: string;
@@ -99,6 +99,7 @@ export type Booking = {
 import { Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import dynamic from "next/dynamic";
 import MembershipPDF from "./pdf-form";
+import dayjs from "dayjs";
 
 function ApprovalOperationsCell({
   booking,
@@ -129,7 +130,7 @@ function ApprovalOperationsCell({
             BedAvailabilityStatus.ENGAGED,
           ],
           // bedPositions: [booking.bedPosition],
-          priceBaseModes: [booking.selectedPaymentBase, PRICE_BASE_MODE.BOTH,],
+          priceBaseModes: [booking.selectedPaymentBase, PRICE_BASE_MODE.BOTH],
         },
       },
     },
@@ -159,10 +160,10 @@ function ApprovalOperationsCell({
       });
 
       if (data) {
-          toast({
-            color:"green",
-            title: data.Booking_ApprovalStatusChange.message,
-          });
+        toast({
+          color: "green",
+          title: data.Booking_ApprovalStatusChange.message,
+        });
 
         setIsDialogOpen(false);
         refetch(); // Refetch the room bed list
@@ -328,8 +329,7 @@ function Booking() {
     {
       accessorKey: "createdAt",
       header: "Booking Date",
-      cell: ({ row }) =>
-        new Date(row.getValue("createdAt")).toLocaleDateString(),
+      cell: ({ row }) => dayjs(row.getValue("createdAt")).format("DD/MM/YYYY"),
     },
     {
       accessorKey: "bookingStatus",
@@ -438,7 +438,7 @@ function Booking() {
       statusArray: number[];
       limit: number;
       skip: number;
-      bookingStatus:number[];
+      bookingStatus: number[];
       searchingText: string | null;
       sortOrder: number;
       sortType?: number;
@@ -446,7 +446,7 @@ function Booking() {
   }>({
     dto: {
       statusArray: [1],
-      bookingStatus:[3,4,5,6],
+      bookingStatus: [3, 4, 5, 6],
       limit: 10,
       skip: 0,
       searchingText: null,
@@ -455,6 +455,7 @@ function Booking() {
   });
 
   const { loading, data, error, refetch } = useQuery(BOOKING_LIST_MINIMAL_GQL, {
+    fetchPolicy: "no-cache",
     variables: inputVariables,
   });
 

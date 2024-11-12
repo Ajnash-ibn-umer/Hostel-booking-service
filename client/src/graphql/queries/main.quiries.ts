@@ -344,6 +344,7 @@ export const BOOKING_LIST_MINIMAL_GQL = gql`
         _id
         arrivalTime
         basePrice
+        checkInDate
         bedId
         bedName
         bedPosition
@@ -494,7 +495,7 @@ export const CHECK_IN_GUEST = gql`
       list {
         phoneNumber
         email
-        namez
+        name
         isActive
         userNo
         _id
