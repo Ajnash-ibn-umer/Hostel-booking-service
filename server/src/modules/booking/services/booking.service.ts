@@ -193,6 +193,7 @@ export class BookingService {
         dto.phone,
         true,
       );
+      console.log(bookingExist, phoneExists);
       if (phoneExists || bookingExist) {
         throw 'User with this same phone number already exists. try another number';
       }
@@ -434,9 +435,7 @@ export class BookingService {
       if (dto.bookingIds.length === 0) {
         throw 'No booking ids provided';
       }
-      const user = await this.userService.findOneUserByBookingId(
-        dto.bookingIds,
-      );
+
       const updateData = {
         bookingStatus: dto.status,
         updatedAt: startTime,
@@ -455,6 +454,9 @@ export class BookingService {
         throw 'Booking Status update failed';
       }
       if (dto.status === BOOKING_STATUS.ADMIN_APPROVED) {
+        const user = await this.userService.findOneUserByBookingId(
+          dto.bookingIds,
+        );
         if (!dto.selectedBedId) {
           throw 'Bed not selected';
         }
@@ -492,7 +494,9 @@ export class BookingService {
 
       if (dto.status === BOOKING_STATUS.CHECK_IN) {
         updateData['checkInDate'] = dto.date;
-
+        const user = await this.userService.findOneUserByBookingId(
+          dto.bookingIds,
+        );
         console.log({ email: user.email, e: user.name });
         await this.userService.activateUser(user._id, txnSession);
         console.log('activated', user);
@@ -561,6 +565,8 @@ export class BookingService {
       if (!bookingData) {
         throw 'Booking Not Found';
       }
+      console.log('in booking 2');
+
       if (!paymentStatus) {
         const transaction = await this.transactionRepository.create(
           {
@@ -577,7 +583,11 @@ export class BookingService {
           txnSession,
         );
       }
+      console.log('in booking 3');
+
       if (paymentStatus === true) {
+        console.log('in booking 4');
+
         const updatedBooking = await this.bookingApprovalStatusChange(
           {
             bookingIds: dto.bookingId,
@@ -588,10 +598,11 @@ export class BookingService {
           },
           null,
         );
+
         if (!updatedBooking) {
           throw ` Booking Update Failed!`;
         }
-
+        console.log('Status change updated');
         // TODO: create invoice
         //  create new user and contract
 
