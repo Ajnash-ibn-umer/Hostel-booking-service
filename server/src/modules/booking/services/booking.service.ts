@@ -44,7 +44,7 @@ import { UserService } from 'src/modules/user/service/user.service';
 import { VACCATE_STATUS } from 'src/database/models/contract.model';
 import { MailerService } from 'src/modules/mailer/mailer.service';
 import { EMAIL_TEMPLATES } from 'src/modules/mailer/dto/create-mailer.input';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 @Injectable()
 export class BookingService {
   constructor(
@@ -484,7 +484,7 @@ export class BookingService {
           context: {
             guestName: user.name,
             bookingNumber: bookingInfo.bookingNumber,
-            approvalDate: dayjs(new Date()).format('DD/MM/YYYY'),
+            approvalDate: dayjs(startTime).format('DD/MM/YYYY'),
           },
         });
       }
@@ -622,7 +622,7 @@ export class BookingService {
           },
           txnSession,
         );
-
+        console.log('User created');
         const newContract = await this.contractRepository.create(
           {
             userId: newUser._id,
@@ -639,8 +639,11 @@ export class BookingService {
           },
           txnSession,
         );
-        //  TODO: send notification
+        console.log('Email', startTime);
 
+        //  TODO: send notification
+        const bookingDate = dayjs(startTime).format('DD/MM/YYYY');
+        console.log({ bookingDate: bookingDate });
         this.mailService.send({
           subject: `Booking Successful`,
           to: bookingData.email,
@@ -648,7 +651,7 @@ export class BookingService {
           context: {
             customerName: bookingData.name,
             bookingNumber: bookingData.bookingNumber,
-            bookingDate: dayjs(bookingData.createdAt).format('DD/MM/YYYY'),
+            bookingDate: bookingDate,
             securityDeposit: bookingData.securityDeposit.toString(),
             rent: bookingData.basePrice.toString(),
           },
