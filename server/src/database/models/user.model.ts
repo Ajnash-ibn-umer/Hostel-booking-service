@@ -48,10 +48,6 @@ UserSchema.index({ email: 1, _id: 1 });
 UserSchema.index({ _userType: 1 });
 
 UserSchema.index(
-  { email: 1 },
-  { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
-);
-UserSchema.index(
   { phoneNumber: 1 },
   { unique: true, partialFilterExpression: { status: { $lt: 2 } } },
 );
