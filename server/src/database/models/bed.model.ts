@@ -3,6 +3,7 @@ import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 import { Base } from './base.model';
 import { AVAILABILITY_STATUS, PRICE_BASE_MODE } from './hostel.model';
 import { BED_POSITION } from 'src/shared/variables/main.variable';
+import { MODEL_NAMES } from '../modelNames';
 
 export type BedDocument = HydratedDocument<Bed>;
 
@@ -23,10 +24,20 @@ export class Bed extends Base {
   @Prop({ type: SchemaTypes.ObjectId, required: true, default: null })
   roomId: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, required: true, default: null })
+  @Prop({
+    type: SchemaTypes.ObjectId,
+    ref: MODEL_NAMES.HOSTEL,
+    required: true,
+    default: null,
+  })
   propertyId: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, required: true, default: null })
+  @Prop({
+    type: SchemaTypes.ObjectId,
+    ref: MODEL_NAMES.ROOM_TYPES,
+    required: true,
+    default: null,
+  })
   roomTypeId: string;
 
   @Prop({ required: false, default: '' })

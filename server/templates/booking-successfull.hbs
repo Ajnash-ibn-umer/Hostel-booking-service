@@ -1,25 +1,36 @@
-<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Booking Successful</title>
-</head>
-<body>
-  <h1>Booking Successful</h1>
-  <p>Dear {{customerName}},</p>
-  <p>We are pleased to inform you that your booking  has been confirmed.</p>
-  <p>Here are the details of your booking:</p>
-  <ul>
-    <li><strong>Booking Number:</strong> {{bookingNumber}}</li>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Booking Successful</title>
+  </head>
+  <body>
+    <h1>Booking Successful</h1>
+    <p>Dear {{customerName}},</p>
+    <p>We are pleased to inform you that your booking has been confirmed.</p>
+    <p>Here are the details of your booking:</p>
+    <ul>
+      <li><strong>Booking Number:</strong> {{bookingNumber}}</li>
 
-    {{!-- <li><strong>Room:</strong> {{room}}</li> --}}
-    {{!-- <li><strong>Bed Position:</strong> {{bedPosition}}</li> --}}
-    <li><strong>Booking Date:</strong> {{bookingDate}}</li>
-    <li><strong>Security Deposit:</strong> {{securityDeposit}}</li>
-    <li><strong>Rent:</strong> {{rent}}</li>
-  </ul>
-  <p>If you have any questions or need further assistance, please feel free to contact us.</p>
-  <p>Best regards,</p>
-  <p>The Hostel Team</p>
-</body>
+      {{!-- <li><strong>Room:</strong> {{room}}</li> --}}
+      {{!-- <li><strong>Bed Position:</strong> {{bedPosition}}</li> --}}
+      <li><strong>Booking Date:</strong> {{bookingDate}}</li>
+      <li><strong>Security Deposit:</strong> {{securityDeposit}}</li>
+      <li><strong>Rent:</strong> {{rent}}</li>
+      {{#if totalDays}}
+        <li><strong>Total Days:</strong> {{totalDays}}</li>
+        <li><strong>Total Amount:</strong>
+          {{totalAmount}}
+          ({{rent}}
+          X
+          {{totalDays}})</li>
+      {{else}}
+        <li><strong>Total Amount:</strong> {{totalAmount}}</li>
+      {{/if}}
+
+    </ul>
+    <p>If you have any questions or need further assistance, please feel free to
+      contact us.</p>
+    <p>Best regards,</p>
+    <p>The Hostel Team</p>
+  </body>
 </html>
