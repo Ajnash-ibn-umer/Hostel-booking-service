@@ -238,3 +238,12 @@ mutation Booking_ApprovalStatusChange($dto: AdminBookingStatusChangeInput!) {
     message
   }
 }`;
+
+
+export const COMPLAINT_APPROVAL_STATUS_CHANGE = gql`
+mutation Complaint_UpdateApprovalStatus($updateApprovalStatusInput: UpdateComplaintApprovalStatus!) {
+  Complaint_UpdateApprovalStatus(updateApprovalStatusInput: $updateApprovalStatusInput) {
+    _id
+  }
+}
+`

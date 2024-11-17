@@ -4,7 +4,6 @@ import ChartThree from "../../components/Charts/ChartThree";
 import ChartTwo from "../../components/Charts/ChartTwo";
 import ChatCard from "../../components/Chat/ChatCard";
 import TableOne from "../../components/Tables/TableOne";
-import MapOne from "../../components/Maps/MapOne";
 import DataStatsOne from "@/components/DataStats/DataStatsOne";
 import ChartOne from "@/components/Charts/ChartOne";
 
