@@ -50,13 +50,16 @@ import { EyeOpenIcon } from "@radix-ui/react-icons";
 import BookingDetailsSheet from "./details";
 import { Badge } from "@/components/ui/badge";
 import { Document, pdf, usePDF } from "@react-pdf/renderer";
-const PDFDownloadLink = dynamic(
-  () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
-  {
-    ssr: false,
-    loading: () => <p>Loading...</p>,
-  },
-);
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
+
 export type Booking = {
   _id: string;
   arrivalTime: Date;
@@ -179,9 +182,17 @@ function ApprovalOperationsCell({
 
   return (
     <div className="flex gap-2">
-      <Button onClick={() => setIsDialogOpen(true)} variant="secondary">
+      <DropdownMenuItem
+        disabled={booking.bookingStatus >= BookingStatus.ADMIN_APPROVED}
+        className="w-full"
+        onClick={(e) => {
+          e.preventDefault();
+          setIsDialogOpen(true);
+        }}
+      >
         Approve
-      </Button>
+      </DropdownMenuItem>
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -274,9 +285,16 @@ function CheckInOperationsCell({
 
   return (
     <div className="flex gap-2">
-      <Button onClick={() => setIsDialogOpen(true)} variant="secondary">
+      <DropdownMenuItem
+        disabled={booking.bookingStatus !== BookingStatus.ADMIN_APPROVED}
+        className="w-full"
+        onClick={(e) => {
+          e.preventDefault();
+          setIsDialogOpen(true);
+        }}
+      >
         Check In
-      </Button>
+      </DropdownMenuItem>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -371,14 +389,9 @@ function Booking() {
 
       cell: ({ row }) => (
         <div className="flex gap-1">
-          {row.original.bookingStatus < BookingStatus.ADMIN_APPROVED && (
-            <ApprovalOperationsCell booking={row.original} refetch={refetch} />
-          )}
           <BookingDetailsSheet booking={row.original}></BookingDetailsSheet>
-          {row.original.bookingStatus === BookingStatus.ADMIN_APPROVED && (
-            <CheckInOperationsCell booking={row.original} refetch={refetch} />
-          )}
-          <Button
+
+          {/* <Button
             onClick={async (e) => {
               const data = row.original;
               const blob = await pdf(
@@ -389,11 +402,10 @@ function Booking() {
                     contactNumber: data.phone,
                     date:
                       (data.createdAt &&
-                       dayjs(data?.createdAt).format("DD/MM/YYYY")) ??
+                        dayjs(data?.createdAt).format("DD/MM/YYYY")) ??
                       "",
-                    dob:   (data.dob &&
-                      dayjs(data?.dob).format("DD/MM/YYYY")) ??
-                     "",
+                    dob:
+                      (data.dob && dayjs(data?.dob).format("DD/MM/YYYY")) ?? "",
                     email: data.email,
                     emergencyContact: data.emergencyName,
                     emergencyContactNumber: data.emergencyMobile,
@@ -403,7 +415,7 @@ function Booking() {
                     relation: data.emergenyRelation,
                     roomPreference: data.bedName,
                     stayDuration: "",
-                    bloodGroup:data.bloodGroup,
+                    bloodGroup: data.bloodGroup,
                     roomName: "",
                     healthIssue: data.userRemark,
                   },
@@ -424,8 +436,72 @@ function Booking() {
             style={{ background: "transparent" }}
           >
             <Download color="green" size={"15px"}></Download>
-          </Button>
-      
+          </Button> */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+              <ApprovalOperationsCell
+                booking={row.original}
+                refetch={refetch}
+              />
+              <CheckInOperationsCell booking={row.original} refetch={refetch} />
+
+              <DropdownMenuItem
+                onClick={async (e) => {
+                  const data = row.original;
+                  const blob = await pdf(
+                    MembershipPDF({
+                      formData: {
+                        address: data.address,
+                        companyName: data.companyName,
+                        contactNumber: data.phone,
+                        date:
+                          (data.createdAt &&
+                            dayjs(data?.createdAt).format("DD/MM/YYYY")) ??
+                          "",
+                        dob:
+                          (data.dob && dayjs(data?.dob).format("DD/MM/YYYY")) ??
+                          "",
+                        email: data.email,
+                        emergencyContact: data.emergencyName,
+                        emergencyContactNumber: data.emergencyMobile,
+                        idCardNumber: data.bookingNumber,
+                        jobTitle: data.jobTitle,
+                        name: data.name,
+                        relation: data.emergenyRelation,
+                        roomPreference: data.bedName,
+                        stayDuration: "",
+                        bloodGroup: data.bloodGroup,
+                        roomName: "",
+                        healthIssue: data.userRemark,
+                      },
+                    }),
+                  ).toBlob();
+
+                  console.log(blob);
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.download = `${row.original.bookingNumber}.pdf`;
+                  document.body.appendChild(link);
+                  link.click();
+
+                  link.remove();
+                  window.URL.revokeObjectURL(url);
+                }}
+              >
+                Download PDF
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       ),
     },

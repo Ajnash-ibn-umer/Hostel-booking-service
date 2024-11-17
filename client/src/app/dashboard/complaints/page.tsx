@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import Pageniation from "@/components/pagination/pagination";
 import { DataTable } from "@/components/Datatables/data-table";
 import { COMPLAINT_GQL } from "@/graphql/queries/main.quiries";
@@ -16,10 +16,22 @@ import dayjs from "dayjs";
 import ComplaintDetailsSheet from "./details";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
+import { COMPLAINT_APPROVAL_STATUS_CHANGE } from "@/graphql/queries/main.mutations";
 
 function Complaints() {
   const router = useRouter();
   const { toast } = useToast();
+  const [changeStatus] = useMutation(COMPLAINT_APPROVAL_STATUS_CHANGE);
+
   const [inputVariables, setInputVariables] = useState<{
     dto: {
       limit: number;
@@ -35,7 +47,39 @@ function Complaints() {
       statusArray: [1],
     },
   });
+  const approvalStatusChange = async (
+    complaintId: string,
+    status: number,
+    remarks: string,
+  ) => {
+    try {
+      console.log(complaintId, { status });
+      const { data, errors } = await changeStatus({
+        variables: {
+          updateApprovalStatusInput: {
+            complaintId: complaintId,
+            remark: remarks ?? "",
+            requestStatus: status,
+          },
+        },
+      });
 
+      if (data) {
+        toast({
+          variant: "default",
+          title: "Successfully Status changed for",
+          // description: "Booking Status Changed successfully",
+        });
+        refetch(); // Refetch the room bed list
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Status Change Failed",
+        description: error.toString(),
+      });
+    }
+  };
   const { data, error, refetch } = useQuery(COMPLAINT_GQL, {
     variables: inputVariables,
   });
@@ -58,29 +102,96 @@ function Complaints() {
     {
       accessorKey: "user.name",
       header: "User Name",
-      cell: ({ row }) => `${row.original?.user?.name ?? ""}` ?? "",
+      cell: ({ row }) => row.original?.user?.name ?? "",
     },
     {
       accessorKey: "requestStatus",
       header: "Approval Status",
-      cell: ({ row }) => (
-        <Badge variant={"secondary"} >
-        
-          {COMPLAINT_STATUS[row.original?.requestStatus]
-            .toUpperCase()
-            .replaceAll("_", " ")}
-        
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const status = row.getValue("requestStatus");
+        switch (status) {
+          case COMPLAINT_STATUS.PENDING:
+            return (
+              <Badge style={{ background: "#2cbf93", color: "white" }}>
+                {COMPLAINT_STATUS[row.original?.requestStatus]
+                  .toUpperCase()
+                  .replaceAll("_", " ")}
+              </Badge>
+            );
+          case COMPLAINT_STATUS.REJECTED:
+            return (
+              <Badge variant={"destructive"}>
+                {COMPLAINT_STATUS[row.original?.requestStatus]
+                  .toUpperCase()
+                  .replaceAll("_", " ")}
+              </Badge>
+            );
+          case COMPLAINT_STATUS.ACTION_TAKEN:
+            return (
+              <Badge style={{ background: "green", color: "white" }}>
+                {COMPLAINT_STATUS[row.original?.requestStatus]
+                  .toUpperCase()
+                  .replaceAll("_", " ")}
+              </Badge>
+            );
+          default:
+            return (
+              <Badge variant={"default"}>
+                {COMPLAINT_STATUS[row.original?.requestStatus]
+                  .toUpperCase()
+                  .replaceAll("_", " ")}
+              </Badge>
+            );
+        }
+      },
     },
     {
       accessorKey: "Action",
       header: "Actions",
+      enableHiding: false,
+
       cell: ({ row }) => (
         <>
-          <ComplaintDetailsSheet
-            complaint={row.original}
-          ></ComplaintDetailsSheet>
+          <div className="flex gap-2">
+            <ComplaintDetailsSheet
+              complaint={row.original}
+            ></ComplaintDetailsSheet>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() =>
+                    approvalStatusChange(
+                      row.original._id,
+                      COMPLAINT_STATUS.REJECTED,
+                      "",
+                    )
+                  }
+                >
+                  Reject this Complaint
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    approvalStatusChange(
+                      row.original._id,
+                      COMPLAINT_STATUS.ACTION_TAKEN,
+                      "",
+                    )
+                  }
+                >
+                  Approve as action taked this Complaint
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </>
       ),
     },

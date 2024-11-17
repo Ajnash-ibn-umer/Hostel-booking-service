@@ -13,6 +13,7 @@ import {
 import { Complaint, COMPLAINT_STATUS } from "./_lib/complaint.model";
 import { Download } from "lucide-react";
 import dayjs from "dayjs";
+import Image from "next/image";
 
 interface ComplaintDetailsSheetProps {
   complaint?: Complaint;
@@ -74,7 +75,9 @@ export default function ComplaintDetailsSheet({
             <div>
               <h4 className="text-sm font-medium">Request Status</h4>
               <p className="text-sm text-gray-500">
-                {COMPLAINT_STATUS[complaint?.requestStatus].toUpperCase().replaceAll("_"," ")}
+                {COMPLAINT_STATUS[complaint?.requestStatus]
+                  .toUpperCase()
+                  .replaceAll("_", " ")}
               </p>
             </div>
             <div>
@@ -98,37 +101,40 @@ export default function ComplaintDetailsSheet({
               {complaint.galleries &&
                 complaint.galleries.length > 0 &&
                 complaint.galleries.map((gallery) => (
-                  <Button
-                    key={gallery._id}
-                    style={{
-                      backgroundColor: "#f0f0f0",
-                      color: "#333",
-                      padding: "5px 10px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "5px",
-                    }}
-                    onClick={() => {
-                      fetch(gallery.url)
-                        .then((response) => response.blob())
-                        .then((blob) => {
-                          const downloadUrl = window.URL.createObjectURL(blob);
-                          const a: any = document.createElement("a");
-                          a.style.display = "none";
-                          a.href = downloadUrl;
-                          a.download = gallery.name;
-                          document.body.appendChild(a);
-                          a.click();
-                          window.URL.revokeObjectURL(downloadUrl);
-                        })
-                        .catch(() => alert("Failed to download file"));
-                    }}
-                  >
-                    {gallery.name}
-                    <Download size={"15px"}></Download>
-                  </Button>
+                  <>
+                    <Button
+                      key={gallery._id}
+                      style={{
+                        backgroundColor: "#f0f0f0",
+                        color: "#333",
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        border: "1px solid #ccc",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px",
+                      }}
+                      onClick={() => {
+                        fetch(gallery.url)
+                          .then((response) => response.blob())
+                          .then((blob) => {
+                            const downloadUrl =
+                              window.URL.createObjectURL(blob);
+                            const a: any = document.createElement("a");
+                            a.style.display = "none";
+                            a.href = downloadUrl;
+                            a.download = gallery.name;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(downloadUrl);
+                          })
+                          .catch(() => alert("Failed to download file"));
+                      }}
+                    >
+                      {gallery.name}
+                      <Download size={"15px"}></Download>
+                    </Button>
+                  </>
                 ))}
             </div>
           </div>
