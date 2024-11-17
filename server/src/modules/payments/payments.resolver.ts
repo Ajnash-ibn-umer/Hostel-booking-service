@@ -45,7 +45,9 @@ export class PaymentsResolver {
   ) {
     const userId = context.req.user.userId;
     const projection = getProjection(info.fieldNodes[0]);
-
+    if (context.req.user.userType === USER_TYPES.USER) {
+      listPaymentInput.userIds = [...(listPaymentInput.userIds ?? []), userId];
+    }
     return this.paymentsService.listPayments(listPaymentInput, projection);
   }
 }

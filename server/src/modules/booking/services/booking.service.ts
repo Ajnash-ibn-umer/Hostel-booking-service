@@ -44,6 +44,7 @@ import { UserService } from 'src/modules/user/service/user.service';
 import { VACCATE_STATUS } from 'src/database/models/contract.model';
 import { MailerService } from 'src/modules/mailer/mailer.service';
 import { EMAIL_TEMPLATES } from 'src/modules/mailer/dto/create-mailer.input';
+import dayjs from 'dayjs';
 @Injectable()
 export class BookingService {
   constructor(
@@ -163,16 +164,17 @@ export class BookingService {
       if (!bedAvailablity) {
         throw 'Bed not available OR already occupied';
       }
-      console.log({ dto });
+
       const rentData = (await this.calculateBedRent({
         bedPosition: dto.bedPosition,
         paymentBase: dto.selectedPaymentBase,
         roomId: dto.roomId,
       })) as RentCalculatorResponse;
-      console.log({ rentData });
+
       if (rentData.rent !== dto.basePrice) {
         throw new Error('Rent amount mismatch, please try again');
       }
+
       if (rentData.securityDeposit !== dto.securityDeposit) {
         throw new Error('Security Deposit amount mismatch, please try again');
       }
@@ -482,7 +484,7 @@ export class BookingService {
           context: {
             guestName: user.name,
             bookingNumber: bookingInfo.bookingNumber,
-            approvalDate: new Date().toLocaleDateString(),
+            approvalDate: dayjs(new Date()).format('DD/MM/YYYY'),
           },
         });
       }
@@ -495,7 +497,7 @@ export class BookingService {
 
         await this.userService.activateUser(user._id, txnSession);
 
-        responseMsg = `Check-in confirmed for user: ${user.name} on ${dto.date.toLocaleDateString()}`;
+        responseMsg = `Check-in confirmed for user: ${user.name} on ${dayjs(dto.date).format('DD/MM/YYYY')}`;
         this.mailService.send({
           subject: `Check In Confirmed`,
           to: user.email,
@@ -646,7 +648,7 @@ export class BookingService {
           context: {
             customerName: bookingData.name,
             bookingNumber: bookingData.bookingNumber,
-            bookingDate: bookingData.createdAt.toLocaleDateString(),
+            bookingDate: dayjs(bookingData.createdAt).format('DD/MM/YYYY'),
             securityDeposit: bookingData.securityDeposit.toString(),
             rent: bookingData.basePrice.toString(),
           },

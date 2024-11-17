@@ -28,25 +28,25 @@ const formSchema = z.object({
   description: z.string().min(2, {
     message: "Description must be at least 2 characters.",
   }),
-  bedCount: z.string().min(1, {
+  bedCount: z.number().min(1, {
     message: "Bed count must be at least 1.",
   }),
-  rentDailyLower: z.string().min(0, {
+  rentDailyLower: z.number().min(0, {
     message: "Rent daily lower must be at least 0.",
   }),
-  rentDailyUpper: z.string().min(0, {
+  rentDailyUpper: z.number().min(0, {
     message: "Rent daily upper must be at least 0.",
   }),
-  rentMonthlyLower: z.string().min(0, {
+  rentMonthlyLower: z.number().min(0, {
     message: "Rent monthly lower must be at least 0.",
   }),
-  rentMonthlyUpper: z.string().min(0, {
+  rentMonthlyUpper: z.number().min(0, {
     message: "Rent monthly upper must be at least 0.",
   }),
-  securityDepositForLower: z.string().min(0, {
+  securityDepositForLower: z.number().min(0, {
     message: "Security deposit must be at least 0.",
   }),
-  securityDepositForUpper: z.string().min(0, {
+  securityDepositForUpper: z.number().min(0, {
     message: "Security deposit must be at least 0.",
   }),
 });
@@ -61,13 +61,13 @@ function UpdateRoomType({ params }: any) {
     defaultValues: {
       name: "",
       description: "",
-      bedCount: "1",
-      rentDailyLower: "0",
-      rentDailyUpper: "0",
-      rentMonthlyLower: "0",
-      rentMonthlyUpper: "0",
-      securityDepositForLower: "0",
-      securityDepositForUpper: "0",
+      bedCount: 1,
+      rentDailyLower: 0,
+      rentDailyUpper: 0,
+      rentMonthlyLower: 0,
+      rentMonthlyUpper: 0,
+      securityDepositForLower: 0,
+      securityDepositForUpper: 0,
     },
   });
 
@@ -103,7 +103,7 @@ function UpdateRoomType({ params }: any) {
         rentMonthlyLower,
         rentMonthlyUpper,
         securityDepositForLower,
-        securityDepositForUpper
+        securityDepositForUpper,
       } = roomTypeData.RoomType_List.list[0];
       console.log({ name, description });
       form.reset({
@@ -115,7 +115,7 @@ function UpdateRoomType({ params }: any) {
         rentMonthlyLower,
         rentMonthlyUpper,
         securityDepositForLower,
-        securityDepositForUpper
+        securityDepositForUpper,
       });
     }
   }, [roomTypeData, form, id]);
@@ -130,13 +130,13 @@ function UpdateRoomType({ params }: any) {
             _id: id,
             name: values.name,
             description: values.description,
-            bedCount: parseFloat(values.bedCount),
-            rentDailyLower: parseFloat(values.rentDailyLower),
-            rentDailyUpper: parseFloat(values.rentDailyUpper),
-            rentMonthlyLower: parseFloat(values.rentMonthlyLower),
-            rentMonthlyUpper: parseFloat(values.rentMonthlyUpper),
-            securityDepositForLower: parseFloat(values.securityDepositForLower),
-            securityDepositForUpper: parseFloat(values.securityDepositForUpper),
+            bedCount: values.bedCount,
+            rentDailyLower: values.rentDailyLower,
+            rentDailyUpper: values.rentDailyUpper,
+            rentMonthlyLower: values.rentMonthlyLower,
+            rentMonthlyUpper: values.rentMonthlyUpper,
+            securityDepositForLower: values.securityDepositForLower,
+            securityDepositForUpper: values.securityDepositForUpper,
           },
         },
       });
@@ -308,7 +308,7 @@ function UpdateRoomType({ params }: any) {
                       </FormItem>
                     )}
                   />
-                    <FormField
+                  <FormField
                     control={form.control}
                     name="securityDepositForUpper"
                     render={({ field }) => (

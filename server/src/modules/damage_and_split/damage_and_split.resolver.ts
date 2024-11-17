@@ -48,7 +48,9 @@ export class DamageAndSplitResolver {
   ) {
     const userId = context.req.user.userId;
     const projection = getProjection(info.fieldNodes[0]);
-
+    if (context.req.user.userType === USER_TYPES.USER) {
+      dto.userIds = [...(dto.userIds ?? []), userId];
+    }
     return this.damageAndSplitService.listDamageAndSplit(dto, projection);
   }
 

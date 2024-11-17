@@ -199,6 +199,7 @@ export class ComplaintsService {
     if (dto.searchingText && dto.searchingText !== '') {
       pipeline.push(Search(['description', 'title'], dto.searchingText));
     }
+    console.log(dto.createdUserIds);
     pipeline.push(
       ...MatchList([
         {
@@ -208,6 +209,11 @@ export class ComplaintsService {
         },
         {
           match: { _id: dto.complaintIds },
+          _type_: 'objectId',
+          required: false,
+        },
+        {
+          match: { createdUserId: dto.createdUserIds },
           _type_: 'objectId',
           required: false,
         },
