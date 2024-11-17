@@ -428,7 +428,7 @@ export const HOSTEL_DETAILS = gql`
           name
           floor
           totalBeds
-          roomTypeId  
+          roomTypeId
           roomType {
             name
             description
@@ -514,6 +514,48 @@ export const ME_ADMIN = gql`
         email
       }
       message
+    }
+  }
+`;
+
+export const COMPLAINT_GQL = gql`
+  query Complaint_List($dto: ListInputComplaint!) {
+    Complaint_List(dto: $dto) {
+      totalCount
+      list {
+        _id
+        createdAt
+        createdUserId
+        description
+        propertyId
+        requestStatus
+        roomId
+        status
+        title
+        updatedAt
+        updatedUserId
+        userId
+        property {
+        name
+        _id
+      }
+        galleries {
+          _id
+          name
+          status
+          url
+        }
+        room {
+          _id
+          name
+        }
+        user {
+          email
+          name
+          _id
+          userNo
+        }
+      }
     }
   }
 `;

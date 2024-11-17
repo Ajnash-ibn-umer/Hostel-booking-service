@@ -58,7 +58,9 @@ export class ComplaintsResolver {
   ) {
     const userId = context.req.user.userId;
     const projection = getProjection(info.fieldNodes[0]);
-
+    if (context.req.user.userType === USER_TYPES.USER) {
+      dto.createdUserIds = [...(dto.createdUserIds ?? []), userId];
+    }
     return this.complaintsService.listComplaints(dto, projection);
   }
 }

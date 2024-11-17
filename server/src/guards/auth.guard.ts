@@ -13,6 +13,11 @@ import { Observable } from 'rxjs';
 import { UserTypes } from 'src/shared/decorators';
 import { USER_TYPES } from 'src/shared/variables/main.variable';
 
+interface DecodedTokenData {
+  userType: USER_TYPES;
+  userId: string;
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
@@ -24,6 +29,7 @@ export class AuthGuard implements CanActivate {
     context: GqlExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const ctx = GqlExecutionContext.create(context);
+    console.log('Token verifying');
     try {
       const userTypes = this.reflector.get(UserTypes, context.getHandler());
       console.log({ userTypes });
@@ -40,7 +46,7 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException();
       }
 
-      const decoded = this.jwtService.verify(token);
+      const decoded: DecodedTokenData = this.jwtService.verify(token);
       console.log({ decoded });
       if (!decoded) {
         console.log('decode failed');
@@ -53,7 +59,7 @@ export class AuthGuard implements CanActivate {
         throw 'This User dosn`t have permission to access this request';
       }
       console.log({ decoded });
-      ctx.getContext().req['user'] = decoded;
+      ctx.getContext().req['user'] = decoded as DecodedTokenData;
       return true;
     } catch (error) {
       console.log({ error });

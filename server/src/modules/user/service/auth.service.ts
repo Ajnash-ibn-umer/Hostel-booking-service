@@ -119,17 +119,17 @@ export class AuthService {
       // TODO: verify login with firebase
       // Logic to verify the token and userId
       let data;
-      try {
-        const isValidToken = await app.auth().verifyIdToken(dto.token);
-        data = isValidToken;
-      } catch (error) {
-        return {
-          message: 'Invalid token or user ID.',
-          accessToken: '',
-          refreshToken: '',
-          loginStatus: false,
-        };
-      }
+      // try {
+      //   const isValidToken = await app.auth().verifyIdToken(dto.token);
+      //   data = isValidToken;
+      // } catch (error) {
+      //   return {
+      //     message: 'Invalid token or user ID.',
+      //     accessToken: '',
+      //     refreshToken: '',
+      //     loginStatus: false,
+      //   };
+      // }
 
       // Generate new access and refresh tokens
       const userVerfication = await this.userRepo.findOne({

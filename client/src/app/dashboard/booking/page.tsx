@@ -425,11 +425,7 @@ function Booking() {
           >
             <Download color="green" size={"15px"}></Download>
           </Button>
-          {/* <PDFDownloadLink document={<MyDocument />} fileName="somename.pdf">
-            {({ blob, url, loading, error }) =>
-              loading ? "Loading document..." : "Download now!"
-            }
-          </PDFDownloadLink> */}
+      
         </div>
       ),
     },

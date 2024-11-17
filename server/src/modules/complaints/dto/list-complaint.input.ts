@@ -18,5 +18,8 @@ export class ListInputComplaint extends PartialType(GenericListInput) {
   roomIds?: string[];
 
   @Field(() => [ID], { nullable: true })
+  createdUserIds?: string[];
+
+  @Field(() => [ID], { nullable: true })
   propertyIds?: string[];
 }
