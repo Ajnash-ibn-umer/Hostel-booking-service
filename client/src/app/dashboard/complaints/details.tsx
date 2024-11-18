@@ -38,7 +38,7 @@ export default function ComplaintDetailsSheet({
           <SheetTitle>Complaint Details</SheetTitle>
           <SheetDescription>{complaint.title}</SheetDescription>
         </SheetHeader>
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 overflow-auto">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h4 className="text-sm font-medium">User Name</h4>
