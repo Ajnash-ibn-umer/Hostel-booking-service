@@ -106,24 +106,31 @@ export default function BookingDetailsSheet({
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium">Base Price</h4>
-                <p className="text-sm text-gray-500">
-                  RS {booking.basePrice.toFixed(2)}
-                </p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium">Security Deposit</h4>
-                <p className="text-sm text-gray-500">
-                  RS {booking.securityDeposit.toFixed(2)}
-                </p>
-              </div>
+            <div>
+              <h4 className="text-sm font-medium">Base Price</h4>
+              <p className="text-sm text-gray-500">
+                RS {booking.basePrice.toFixed(2)}
+              </p>
+            </div>
+            <div>
+              <h4 className="text-sm font-medium">Security Deposit</h4>
+              <p className="text-sm text-gray-500">
+                RS {booking.securityDeposit.toFixed(2)}
+              </p>
+            </div>
+            <div>
+              <h4 className="text-sm font-medium">Total Amount</h4>
+              <p className="text-sm text-gray-500">RS {booking.netAmount ?? 0}</p>
+            </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <h4 className="text-sm font-medium">Laundry Facility</h4>
                 <p className="text-sm text-gray-500">
                   {booking.laudryFacility ? "Yes" : "No"}
                 </p>
               </div>
+
               <div>
                 <h4 className="text-sm font-medium">Canteen Facility</h4>
                 <p className="text-sm text-gray-500">

@@ -17,13 +17,17 @@ export const s3Upload = async (files: File[]) => {
   return new Promise(async (resolve, reject) => {
     console.log({ config });
     const responses: any[] = [];
-
+   
     try {
       for (let file of files) {
+        const lastDotIndex = file.name.lastIndexOf(".");
+        const baseName = file.name.substring(0, lastDotIndex); // Get everything before the last dot
+        const extension = file.name.substring(lastDotIndex + 1); // Get everything after the last dot
+        const newFileName = `${baseName}-${Date.now()}.${extension}`;
         console.log("bucket", { file });
         const myNewFile =await new File(
           [file],
-          file.name + new Date().getTime().toString(),
+          newFileName ?? file.name,
           {
             type: file.type,
           },

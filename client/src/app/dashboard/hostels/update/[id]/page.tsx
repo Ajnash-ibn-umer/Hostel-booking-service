@@ -109,7 +109,7 @@ interface TransformedHostelData {
 }
 
 export type HostelProps = {
-  galleries: { _id: string }[];
+  galleries: { _id: string; url: string; name: string }[];
   amenities: { _id: string; icon: string; name: string }[];
   name: string;
   description: string;
@@ -269,7 +269,7 @@ type RoomInputType = {
   name: string;
   roomTypeId: string;
   totalBeds: number;
-  galleries: { url: string }[];
+  galleries: { url: string; _id: string }[];
 };
 
 type Hostel = {
@@ -307,7 +307,7 @@ function UpdateHostelForm({ params }: any) {
       },
     ],
   });
-  
+
   const [createGallery, { loading: galleryLoading, error: galleryError }] =
     useMutation(GALLERY_CREATE_MULTIPLE_GQL);
 
@@ -410,18 +410,22 @@ function UpdateHostelForm({ params }: any) {
       // ],
     },
   });
-
-  const handleHostelData = (data: HostelProps): TransformedHostelData => {
+  const handleImageData = async (data: HostelProps) => {
     if (data?.galleries) {
-      const galleryFiles = data?.galleries.map((gallery: any) => {
-        const blob = new Blob([], { type: "image/jpeg" });
+      const galleryFiles = [];
+      for (const gallery of data?.galleries) {
+        const img = await fetch(gallery.url as string);
+        const blob = await img.blob();
         const file = new File([blob], gallery._id, { type: "image/jpeg" });
-        console.log("preview url",gallery.url)
-        return Object.assign(file, { preview: gallery.url });
-      });
-      // setImages(galleryFiles);
+        console.log("preview url", blob);
+        galleryFiles.push(Object.assign(file, { preview: gallery.url as any }));
+      }
+      setImages(galleryFiles);
       setFiles(galleryFiles);
     }
+  };
+  const handleHostelData = (data: HostelProps): TransformedHostelData => {
+    console.log({ data });
     return {
       name: data?.name,
       sellingPrice: data?.sellingPrice?.toString(),
@@ -438,30 +442,62 @@ function UpdateHostelForm({ params }: any) {
       galleryIds: data?.galleries?.map((gallery: { _id: any }) => gallery._id),
     };
   };
-
-  const handleHostelRoom = (rooms: RoomInputType[]): Hostel => {
+  const handleRoomImges = async (rooms: RoomInputType[]): Promise<void> => {
+    if (rooms && rooms.length > 0) {
+      const data = [];
+      for (const room of rooms) {
+        const roomFiles = [];
+        if (room.galleries && room.galleries.length > 0) {
+          for (const gallery of room.galleries) {
+            const img = await fetch(gallery.url as string);
+            const blob = await img.blob();
+            const file = new File([blob], gallery._id, { type: "image/jpeg" });
+            console.log("preview url", blob);
+            roomFiles.push(
+              Object.assign(file, { preview: gallery.url as any }),
+            );
+          }
+          data.push(roomFiles);
+        }
+      }
+    }
+  };
+  const handleHostelRoom = async (rooms: RoomInputType[]): Promise<Hostel> => {
     if (!rooms || rooms.length === 0) return { rooms: [] };
 
-    const data = rooms.map((room) => {
-      const roomFiles: File[] = room.galleries.map((gallery) => {
-        const blob = new Blob([], { type: "image/jpeg" });
-        const file = new File([blob], gallery.url.split("/").pop() || "", {
-          type: "image/jpeg",
-        });
-        return Object.assign(file, { preview: gallery.url });
-      });
-
-      return {
-        _id: room._id,
-        aminityIds: room.amenities,
-        beds: room.beds,
-        floor: room.floor,
-        name: room.name,
-        roomTypeId: room.roomTypeId,
-        totalBeds: room.totalBeds,
-        files: roomFiles,
-      };
-    });
+    const data = await Promise.all(
+      rooms.map(async (room) => {
+        // const roomFiles: File[] = room.galleries.map((gallery) => {
+        //   const blob = new Blob([], { type: "image/jpeg" });
+        //   const file = new File([blob], gallery.url.split("/").pop() || "", {
+        //     type: "image/jpeg",
+        //   });
+        //   return Object.assign(file, { preview: gallery.url });
+        // });
+        const roomFiles = [];
+        if (room.galleries && room.galleries.length > 0) {
+          for (const gallery of room.galleries) {
+            const img = await fetch(gallery.url as string);
+            const blob = await img.blob();
+            const file = new File([blob], gallery._id, { type: "image/jpeg" });
+            console.log("preview url", blob);
+            roomFiles.push(
+              Object.assign(file, { preview: gallery.url as any }),
+            );
+          }
+        }
+        return {
+          _id: room._id,
+          aminityIds: room.amenities,
+          beds: room.beds,
+          floor: room.floor,
+          name: room.name,
+          roomTypeId: room.roomTypeId,
+          totalBeds: room.totalBeds,
+          files: roomFiles,
+        };
+      }),
+    );
 
     return { rooms: data };
   };
@@ -472,8 +508,10 @@ function UpdateHostelForm({ params }: any) {
     if (data?.Hostel_List?.list?.[0]) {
       const hostel = data.Hostel_List.list[0];
       const result = handleHostelData(hostel);
-      const hostelRoom = handleHostelRoom(hostel.rooms);
-      setHostel(hostelRoom);
+      handleHostelRoom(hostel.rooms).then((hostelRoom) => {
+        setHostel(hostelRoom);
+      });
+      handleImageData(hostel);
       reset((v) => ({
         ...v,
         ...result,

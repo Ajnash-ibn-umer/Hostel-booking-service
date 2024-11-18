@@ -22,11 +22,13 @@ export default function MultiFileUploader({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    console.log("setting file", files);
     onChange(files);
   }, [files]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
+      console.log("files", event.target.files);
       const newFiles = Array.from(event.target.files).map((file) =>
         Object.assign(file, {
           preview: file.type.startsWith("image/")
@@ -109,7 +111,10 @@ export default function MultiFileUploader({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => removeFile(file)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    removeFile(file);
+                  }}
                   aria-label={`Remove ${file.name}`}
                 >
                   <X className="h-4 w-4" />
