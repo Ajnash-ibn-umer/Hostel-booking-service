@@ -75,6 +75,7 @@ export type Booking = {
   phone: string;
   propertyId: string;
   regNo: string;
+  netAmount: number;
   roomId: string;
   securityDeposit: number;
   bedPosition: number;

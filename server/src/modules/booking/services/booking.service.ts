@@ -489,6 +489,7 @@ export class BookingService {
           context: {
             guestName: user.name,
             allottedBed: bedData?.name ?? '',
+            berthType: BED_POSITION[bedData.bedPosition].toLowerCase(),
             roomShareType: bedData?.roomTypeId?.name ?? '',
             hostelName: bedData?.propertyId?.name ?? '',
             bookingNumber: bookingInfo.bookingNumber,

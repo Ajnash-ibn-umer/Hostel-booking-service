@@ -60,7 +60,7 @@ export default function RoomCreationForm({
   hostel,
   setHostel,
 }: RoomCreationProps) {
-  const [files, setFiles] = useState<FileWithPreview[]>([]);
+  const [files, setFiles] = useState<FileWithPreview[][]>([]);
 
   const addRoom = () => {
     setHostel((prev: { rooms: any }) => ({
@@ -286,14 +286,17 @@ export default function RoomCreationForm({
                       <Card className="mb-10 flex w-full flex-col p-5">
                         <MultiFileUploader
                           onChange={(files: File[]) => {
+                            console.log("room file", files);
                             updateRoom(roomIndex, "files", files);
                           }}
-                          files={
-                            hostel.rooms[roomIndex].files as FileWithPreview[]
-                          }
-                          setFiles={(updatedFiles: FileWithPreview[]) =>
-                            setFiles(updatedFiles)
-                          }
+                          files={files[roomIndex] as FileWithPreview[]}
+                          setFiles={(data: FileWithPreview[]) => {
+                            setFiles((prev) =>
+                              prev.map((item, i) =>
+                                i === roomIndex ? data : item,
+                              ),
+                            );
+                          }}
                         ></MultiFileUploader>
                       </Card>
                       <div className="space-y-2">

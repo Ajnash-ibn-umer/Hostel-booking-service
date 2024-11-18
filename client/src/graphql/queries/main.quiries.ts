@@ -316,6 +316,7 @@ export const BOOKING_LIST_GQL = gql`
         motherName
         name
         netAmount
+        netAmount
         otherAmount
         phone
         propertyId
@@ -348,6 +349,7 @@ export const BOOKING_LIST_MINIMAL_GQL = gql`
         bedId
         bedName
         bedPosition
+        netAmount
         bookingNumber
         bookingStatus
         bedPosition

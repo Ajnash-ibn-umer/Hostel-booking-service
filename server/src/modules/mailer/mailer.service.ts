@@ -29,6 +29,7 @@ export class MailerService {
     }
   }
   send(dto: MailParams) {
+    console.log({ dto });
     this.nodeMailerService
       .sendMail({
         to: dto.to,
