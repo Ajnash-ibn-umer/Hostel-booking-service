@@ -448,34 +448,39 @@ export class BookingService {
       const bookingInfo = await this.bookingRepository.findOne({
         _id: dto.bookingIds,
       });
-      console.log({ bookingInfo });
 
       if (dto.status === BOOKING_STATUS.ADMIN_APPROVED) {
+        console.log('admin apporval');
         const user = await this.userService.findOneUserByBookingId(
           dto.bookingIds,
         );
         if (!dto.selectedBedId) {
           throw 'Bed not selected';
         }
-        updateData['bedId'] = dto.selectedBedId;
-        const bedUpdate = await this.bedRepository.findOneAndUpdate(
+        const bedData: any = await this.bedRepository.findOne(
           {
             _id: dto.selectedBedId,
             status: STATUS_NAMES.ACTIVE,
             availabilityStatus: AVAILABILITY_STATUS.AVAILABLE,
           },
-          {
+          {},
+          txnSession,
+          ['roomTypeId', 'propertyId'],
+        );
+
+        if (!bedData) {
+          throw 'Selected Bed not found Or This bed already Booked!';
+        }
+        const update = await bedData
+          .updateOne({
             availabilityStatus: AVAILABILITY_STATUS.OCCUPIED,
             updatedAt: startTime,
             updatedUserId: userId,
-          },
-          txnSession,
-        );
-        updateData['bedName'] = bedUpdate.name;
+          })
+          .session(txnSession);
+        updateData['bedName'] = bedData.name;
+        updateData['bedId'] = dto.selectedBedId;
 
-        if (!bedUpdate) {
-          throw 'Selected Bed not found Or This bed already Booked!';
-        }
         responseMsg = `Booking approved successfully for booking number: ${bookingInfo.bookingNumber}`;
         this.mailService.send({
           subject: `Booking Approved`,
@@ -483,6 +488,9 @@ export class BookingService {
           template: EMAIL_TEMPLATES.BOOKING_APPROVAL,
           context: {
             guestName: user.name,
+            allottedBed: bedData?.name ?? '',
+            roomShareType: bedData?.roomTypeId?.name ?? '',
+            hostelName: bedData?.propertyId?.name ?? '',
             bookingNumber: bookingInfo.bookingNumber,
             approvalDate: dayjs(startTime).format('DD/MM/YYYY'),
           },
@@ -643,7 +651,10 @@ export class BookingService {
 
         //  TODO: send notification
         const bookingDate = dayjs(startTime).format('DD/MM/YYYY');
-        console.log({ bookingDate: bookingDate });
+        const totalDays =
+          bookingData.totalDays && bookingData.totalDays !== 0
+            ? bookingData.totalDays.toString()
+            : null;
         this.mailService.send({
           subject: `Booking Successful`,
           to: bookingData.email,
@@ -653,6 +664,8 @@ export class BookingService {
             bookingNumber: bookingData.bookingNumber,
             bookingDate: bookingDate,
             securityDeposit: bookingData.securityDeposit.toString(),
+            totalAmount: bookingData.netAmount.toString() ?? '0',
+            totalDays: totalDays,
             rent: bookingData.basePrice.toString(),
           },
         });

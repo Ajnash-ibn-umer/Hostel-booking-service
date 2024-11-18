@@ -68,7 +68,7 @@ UserSchema.post('updateMany', async function (error, doc, next) {
 });
 function schemaPostFunctionForDuplicate(error, doc, next) {
   if (error.code == 11000) {
-    next(new Error('User already existing with same email or password'));
+    next(new Error('User already existing with same phone number'));
   } else {
     next();
   }
