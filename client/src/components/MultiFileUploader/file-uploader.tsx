@@ -11,11 +11,14 @@ interface FileWithPreview extends File {
 interface MultiFileUplaoderProps {
   onChange: Function;
   setFiles: Function;
+  images?: any;
+  setImages?: Function;
   files: FileWithPreview[];
 }
 export default function MultiFileUploader({
   onChange,
   setFiles,
+  setImages,
   files,
 }: Readonly<MultiFileUplaoderProps>) {
   // const [files, setFiles] = useState<FileWithPreview[]>([]);
@@ -42,6 +45,8 @@ export default function MultiFileUploader({
 
   const removeFile = (fileToRemove: FileWithPreview) => {
     setFiles(files.filter((file) => file !== fileToRemove));
+    setImages && setImages(files.filter((file) => file !== fileToRemove));
+
     if (fileToRemove.preview) {
       URL.revokeObjectURL(fileToRemove.preview);
     }

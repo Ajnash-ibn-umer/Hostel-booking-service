@@ -17,6 +17,7 @@ import { FormField, FormMessage } from "@/components/ui/form";
 import MultiSelect from "@/components/MultiSelect/multi-selector";
 import { UseFormReturn } from "react-hook-form";
 import MultiFileUploader from "@/components/MultiFileUploader/file-uploader";
+import RoomMultiFileUploader from "@/components/MultiFileUploader/room-file-uploader";
 export type Bed = {
   _id: string;
   availabilityStatus: number;
@@ -79,7 +80,7 @@ export default function RoomCreationForm({
       ],
     }));
   };
-
+  console.log("room FIle", { files });
   const addBed = (roomIndex: number) => {
     setHostel((prev) => ({
       ...prev,
@@ -118,7 +119,14 @@ export default function RoomCreationForm({
       ),
     }));
   };
-
+  const updateRoomFiles = (roomIndex: number, newFiles: File[]) => {
+    setHostel((prev) => ({
+      ...prev,
+      rooms: prev.rooms.map((room, idx) =>
+        idx === roomIndex ? { ...room, files: newFiles } : room,
+      ),
+    }));
+  };
   const updateBed = (
     roomIndex: number,
     bedIndex: number,
@@ -284,20 +292,12 @@ export default function RoomCreationForm({
                         </div>
                       </div>
                       <Card className="mb-10 flex w-full flex-col p-5">
-                        <MultiFileUploader
-                          onChange={(files: File[]) => {
-                            console.log("room file", files);
-                            updateRoom(roomIndex, "files", files);
-                          }}
-                          files={files[roomIndex] as FileWithPreview[]}
-                          setFiles={(data: FileWithPreview[]) => {
-                            setFiles((prev) =>
-                              prev.map((item, i) =>
-                                i === roomIndex ? data : item,
-                              ),
-                            );
-                          }}
-                        ></MultiFileUploader>
+                        <RoomMultiFileUploader
+                          onChange={(files: File[]) =>
+                            updateRoomFiles(roomIndex, files)
+                          }
+                          files={room.files as FileWithPreview[]}
+                        />
                       </Card>
                       <div className="space-y-2">
                         <CardTitle className="font-bold:300">Beds</CardTitle>{" "}
