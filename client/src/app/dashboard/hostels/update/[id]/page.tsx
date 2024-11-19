@@ -56,6 +56,7 @@ import Loader from "@/components/common/Loader";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import galleryUpload from "@/_lib/gallery-upload";
+import { debounce } from "../../_lib/util";
 
 interface CreateHostelInput {
   totalBeds: number | null;
@@ -208,46 +209,6 @@ const formSchema = z.object({
   amenityIds: z.array(z.string()).optional(),
   description: z.string().optional(),
   galleryIds: z.array(z.string()).optional(),
-  // rooms: z.array(
-  //   z.object({
-  //     aminityIds: z.array(z.string()).optional(),
-  //     beds: z.array(
-  //       z.object({
-  //         availabilityStatus: z.number().min(1, {
-  //           message: "Bed Availability Status is required.",
-  //         }),
-  //         bedPosition: z.number().min(1, {
-  //           message: "Bed Position is required.",
-  //         }),
-  //         floor: z.string().min(1, {
-  //           message: "Bed Floor is required.",
-  //         }),
-  //         name: z.string().min(1, {
-  //           message: "Bed Name is required.",
-  //         }),
-  //         paymentBase: z.number().min(1, {
-  //           message: "Bed Payment Base is required.",
-  //         }),
-  //         roomTypeId: z.string().min(1, {
-  //           message: "Bed Room Type is required.",
-  //         }),
-  //       }),
-  //     ),
-  //     floor: z.string().min(1, {
-  //       message: "Room Floor is required.",
-  //     }),
-  //     name: z.string().min(1, {
-  //       message: "Room Name is required.",
-  //     }),
-  //     roomTypeId: z.string().min(1, {
-  //       message: "Room Type is required.",
-  //     }),
-  //     totalBeds: z.number().min(1, {
-  //       message: "Total Beds is required.",
-  //     }),
-  //     galleryIds: z.array(z.string()).optional(),
-  //   }),
-  // ),
 });
 
 type Room = {
@@ -269,7 +230,7 @@ type RoomInputType = {
   name: string;
   roomTypeId: string;
   totalBeds: number;
-  galleries: { url: string; _id: string }[];
+  galleries: { url: string; _id: string; name: string }[];
 };
 
 type Hostel = {
@@ -388,37 +349,24 @@ function UpdateHostelForm({ params }: any) {
       amenityIds: [],
       description: "",
       galleryIds: [],
-      // rooms: [
-      //   {
-      //     name: "Default Room",
-      //     aminityIds: ["Default Amenity ID"],
-      //     beds: [
-      //       {
-      //         name: "Default Bed",
-      //         availabilityStatus: 0,
-      //         bedPosition: 0,
-      //         floor: "0",
-      //         paymentBase: 0,
-      //         roomTypeId: "Default Room Type ID",
-      //       },
-      //     ],
-      //     floor: "0",
-      //     roomTypeId: "Default Room Type ID",
-      //     totalBeds: 0,
-      //     galleryIds: ["Default Gallery ID"],
-      //   },
-      // ],
     },
   });
   const handleImageData = async (data: HostelProps) => {
     if (data?.galleries) {
       const galleryFiles = [];
       for (const gallery of data?.galleries) {
-        const img = await fetch(gallery.url as string);
-        const blob = await img.blob();
-        const file = new File([blob], gallery._id, { type: "image/jpeg" });
-        console.log("preview url", blob);
-        galleryFiles.push(Object.assign(file, { preview: gallery.url as any }));
+        if (gallery.url) {
+          try {
+            const img = await fetch(gallery.url as string);
+            const blob = await img.blob();
+            const file = new File([blob], gallery.name, { type: "image/jpeg" });
+            galleryFiles.push(
+              Object.assign(file, { preview: gallery.url as any }),
+            );
+          } catch {
+            console.error("gallery not found");
+          }
+        }
       }
       setImages(galleryFiles);
       setFiles(galleryFiles);
@@ -442,48 +390,30 @@ function UpdateHostelForm({ params }: any) {
       galleryIds: data?.galleries?.map((gallery: { _id: any }) => gallery._id),
     };
   };
-  const handleRoomImges = async (rooms: RoomInputType[]): Promise<void> => {
-    if (rooms && rooms.length > 0) {
-      const data = [];
-      for (const room of rooms) {
-        const roomFiles = [];
-        if (room.galleries && room.galleries.length > 0) {
-          for (const gallery of room.galleries) {
-            const img = await fetch(gallery.url as string);
-            const blob = await img.blob();
-            const file = new File([blob], gallery._id, { type: "image/jpeg" });
-            console.log("preview url", blob);
-            roomFiles.push(
-              Object.assign(file, { preview: gallery.url as any }),
-            );
-          }
-          data.push(roomFiles);
-        }
-      }
-    }
-  };
+
   const handleHostelRoom = async (rooms: RoomInputType[]): Promise<Hostel> => {
     if (!rooms || rooms.length === 0) return { rooms: [] };
 
     const data = await Promise.all(
       rooms.map(async (room) => {
-        // const roomFiles: File[] = room.galleries.map((gallery) => {
-        //   const blob = new Blob([], { type: "image/jpeg" });
-        //   const file = new File([blob], gallery.url.split("/").pop() || "", {
-        //     type: "image/jpeg",
-        //   });
-        //   return Object.assign(file, { preview: gallery.url });
-        // });
         const roomFiles = [];
         if (room.galleries && room.galleries.length > 0) {
           for (const gallery of room.galleries) {
-            const img = await fetch(gallery.url as string);
-            const blob = await img.blob();
-            const file = new File([blob], gallery._id, { type: "image/jpeg" });
-            console.log("preview url", blob);
-            roomFiles.push(
-              Object.assign(file, { preview: gallery.url as any }),
-            );
+            if (gallery.url) {
+              try {
+                const img = await fetch(gallery.url as string);
+                const blob = await img.blob();
+                const file = new File([blob], gallery.name, {
+                  type: "image/jpeg",
+                });
+                console.log("preview url", blob);
+                roomFiles.push(
+                  Object.assign(file, { preview: gallery.url as any }),
+                );
+              } catch {
+                console.log("gallery not found");
+              }
+            }
           }
         }
         return {
@@ -633,28 +563,31 @@ function UpdateHostelForm({ params }: any) {
       // Handle login error (e.g., show error message)
     }
   }
+  const debouncedSubmit = debounce(onSubmit, 300);
 
   return (
     <div>
       <Breadcrumb pageName="EditHostel" />
 
       <div className="flex  gap-10">
+        {isLoading ? <Loader></Loader> : <></>}
+
         <div className="flex w-full">
           <Form {...form}>
             <form
               key={isDone ? 0 : 1}
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={form.handleSubmit(debouncedSubmit)}
               className="relative flex w-full flex-col space-y-8"
             >
               <div className="relative z-10 w-full flex-row">
-                {isLoading ? <Loader></Loader> : <></>}
-
                 <Card className=" relative -z-10 flex w-full flex-col p-4">
                   <Card className="mb-10 flex w-full flex-col p-5">
                     <MultiFileUploader
                       onChange={(files: File[]) => {
                         setImages(files);
                       }}
+                      images={images}
+                      setImages={setImages}
                       setFiles={setFiles}
                       files={files}
                     ></MultiFileUploader>

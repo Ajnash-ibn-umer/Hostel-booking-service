@@ -414,6 +414,7 @@ export const HOSTEL_DETAILS = gql`
         galleries {
           _id
           url
+          name
         }
         amenities {
           _id
@@ -426,6 +427,8 @@ export const HOSTEL_DETAILS = gql`
           _id
           galleries {
             url
+            _id
+            name
           }
           name
           floor

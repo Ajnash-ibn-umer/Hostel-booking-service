@@ -472,9 +472,9 @@ function CreateHostelForm() {
                   <Card className="mb-10 flex w-full flex-col p-5">
                     <MultiFileUploader
                       onChange={(files: File[]) => {
-                        // console.log({ files });
                         setImages(files);
                       }}
+                      
                       files={files}
                       setFiles={setFiles}
                     ></MultiFileUploader>
