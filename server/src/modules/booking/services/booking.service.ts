@@ -202,6 +202,7 @@ export class BookingService {
       const newBooking = await this.bookingRepository.create(
         {
           ...dto,
+          netAmount: dto.netAmount,
           dob: new Date(dto.dob),
           bookingNumber: `${bookingNumber.prefix}${bookingNumber.count}`,
           bookingStatus: BOOKING_STATUS.FORM_COMPLETED,
@@ -480,7 +481,7 @@ export class BookingService {
           .session(txnSession);
         updateData['bedName'] = bedData.name;
         updateData['bedId'] = dto.selectedBedId;
-
+        updateData['roomId'] = bedData.roomId;
         responseMsg = `Booking approved successfully for booking number: ${bookingInfo.bookingNumber}`;
         this.mailService.send({
           subject: `Booking Approved`,
