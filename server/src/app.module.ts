@@ -31,6 +31,7 @@ const configService = new ConfigService();
       envFilePath: '.env',
       load: [ENV],
     }),
+
     MongooseModule.forRoot(
       `${configService.get<string>('DB_URL')}/${configService.get<string>('DB_NAME')}`,
       {},
