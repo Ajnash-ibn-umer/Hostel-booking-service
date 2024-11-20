@@ -482,6 +482,20 @@ export class BookingService {
         updateData['bedName'] = bedData.name;
         updateData['bedId'] = dto.selectedBedId;
         updateData['roomId'] = bedData.roomId;
+
+        // update contract
+        await this.contractRepository.findOneAndUpdate(
+          {
+            bookingId: bookingInfo._id,
+            status: STATUS_NAMES.ACTIVE,
+          },
+          {
+            roomId: bedData.roomId,
+            bedId: bedData._id,
+          },
+          txnSession,
+        );
+
         responseMsg = `Booking approved successfully for booking number: ${bookingInfo.bookingNumber}`;
         this.mailService.send({
           subject: `Booking Approved`,
@@ -515,7 +529,7 @@ export class BookingService {
           context: {
             name: user.name,
             userNumber: user.userNo,
-            checkInDate: dto.date.toLocaleDateString(),
+            checkInDate: dayjs(dto.date).format('DD/MM/YYYY'),
           },
         });
       }
