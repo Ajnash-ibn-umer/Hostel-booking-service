@@ -77,6 +77,7 @@ export class DamageAndSplitService {
             voucherType: VOUCHER_TYPE.DAMAGE_AND_SPLIT,
             dueDate: dto.dueDate,
             voucherId: newDamageAndSplit._id,
+            remark: 'Damage and split',
             userId: detail.userId,
             payAmount: detail.amount,
           });

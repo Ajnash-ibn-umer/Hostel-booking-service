@@ -13,8 +13,11 @@ export class Base {
   @Field(() => ID, { nullable: true })
   _id?: string | any;
 
-  @Field(() => Int, { nullable: true, description: enumToString(STATUS_NAMES) })
-  @Prop({ type: Number, enum: STATUS_NAMES })
+  @Field(() => Int, {
+    nullable: true,
+    description: enumToString(STATUS_NAMES),
+  })
+  @Prop({ type: Number, default: 1, enum: STATUS_NAMES })
   status?: STATUS_NAMES;
 
   @Field(() => Date, { nullable: true })
