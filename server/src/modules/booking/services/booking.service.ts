@@ -45,12 +45,15 @@ import { VACCATE_STATUS } from 'src/database/models/contract.model';
 import { MailerService } from 'src/modules/mailer/mailer.service';
 import { EMAIL_TEMPLATES } from 'src/modules/mailer/dto/create-mailer.input';
 import * as dayjs from 'dayjs';
+import { PaymentsService } from 'src/modules/payments/payments.service';
+import { VOUCHER_TYPE } from 'src/database/models/payments.model';
 @Injectable()
 export class BookingService {
   constructor(
     private readonly hostelRepository: HostelRepository,
     private readonly userService: UserService,
     private readonly mailService: MailerService,
+    private readonly paymentService: PaymentsService,
 
     private readonly roomRepository: RoomRepository,
     private readonly bedRepository: BedRepository,
@@ -429,7 +432,7 @@ export class BookingService {
     dto: AdminBookingStatusChangeInput,
     userId: string,
   ): Promise<generalResponse | GraphQLError> {
-    const startTime = Date.now();
+    const startTime = new Date();
     const txnSession = await this.connection.startSession();
 
     await txnSession.startTransaction();
@@ -482,7 +485,7 @@ export class BookingService {
         updateData['bedName'] = bedData.name;
         updateData['bedId'] = dto.selectedBedId;
         updateData['roomId'] = bedData.roomId;
-
+        updateData['bedPosition'] = bedData.bedPosition;
         // update contract
         await this.contractRepository.findOneAndUpdate(
           {
@@ -495,7 +498,33 @@ export class BookingService {
           },
           txnSession,
         );
-
+        // create payment bills
+        const paymentSd = await this.paymentService.create(
+          [
+            {
+              dueDate: bookingInfo.createdAt,
+              payedDate: startTime,
+              voucherId: bookingInfo._id,
+              userId: user._id,
+              payAmount: bookingInfo.securityDeposit,
+              paymentStatus: PAYMENT_STATUS.SUCCESS,
+              remark: 'Rent 1',
+              voucherType: VOUCHER_TYPE.RENT,
+            },
+            {
+              dueDate: bookingInfo.createdAt,
+              voucherId: bookingInfo._id,
+              payedDate: startTime,
+              userId: user._id,
+              payAmount: bookingInfo.securityDeposit,
+              paymentStatus: PAYMENT_STATUS.SUCCESS,
+              remark: 'Security Deposit',
+              voucherType: VOUCHER_TYPE.SECURITY_DEPOSIT,
+            },
+          ],
+          userId,
+          txnSession,
+        );
         responseMsg = `Booking approved successfully for booking number: ${bookingInfo.bookingNumber}`;
         this.mailService.send({
           subject: `Booking Approved`,
@@ -587,6 +616,7 @@ export class BookingService {
         null,
         txnSession,
       );
+
       console.log('in booking');
 
       if (!bookingData) {
@@ -663,6 +693,7 @@ export class BookingService {
           },
           txnSession,
         );
+
         console.log('Email', startTime);
 
         //  TODO: send notification

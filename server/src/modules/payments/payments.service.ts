@@ -14,6 +14,8 @@ import {
 import { responseFormat } from 'src/shared/graphql/queryProjection';
 import { PaymentsListResponse } from './entities/payment.entity';
 import { ListInputPayments } from './dto/list-payment.input';
+import { STATUS_NAMES } from 'src/shared/variables/main.variable';
+import { database } from 'firebase-admin';
 
 @Injectable()
 export class PaymentsService {
@@ -36,10 +38,13 @@ export class PaymentsService {
         dueDate: data.dueDate,
         voucherId: data.voucherId,
         payAmount: data.payAmount,
+        payedDate: data.payedDate ?? null,
         userId: data.userId,
         createdUserId: userId,
+        remark: data.remark,
+        status: STATUS_NAMES.ACTIVE,
         createdAt: new Date(),
-        paymentStatus: PaymentStatus.PENDING,
+        paymentStatus: data.paymentStatus ?? PaymentStatus.PENDING,
       }));
 
       const response = await this.paymentRepo.insertMany(

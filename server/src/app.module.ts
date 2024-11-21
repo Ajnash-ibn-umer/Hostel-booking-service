@@ -43,6 +43,7 @@ const configService = new ConfigService();
       signOptions: { expiresIn: configService.get('JWT_ACCESS_TOKEN_EXPIRY') },
       global: true,
     }),
+
     GraphqlConfig(),
     NodeMailerModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

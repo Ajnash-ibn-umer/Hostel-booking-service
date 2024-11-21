@@ -13,7 +13,8 @@ export enum VOUCHER_TYPE {
   RENT = 1,
   LAUNDRY = 2,
   DAMAGE_AND_SPLIT = 3,
-  OTHER = 4,
+  SECURITY_DEPOSIT = 4,
+  OTHER = 10,
 }
 
 export type PaymentDocument = HydratedDocument<Payment>;
@@ -33,9 +34,13 @@ export class Payment extends Base {
   @Prop({ required: false, default: null })
   payedDate: Date;
 
-  @Field(() => ID)
+  @Field(() => ID, { nullable: true })
   @Prop({ type: SchemaTypes.ObjectId, required: false, default: null })
   voucherId: string;
+
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false, default: '' })
+  remark: string;
 
   @Field({ nullable: true })
   @Prop({ required: true })
