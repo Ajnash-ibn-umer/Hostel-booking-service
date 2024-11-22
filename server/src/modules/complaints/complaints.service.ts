@@ -65,6 +65,7 @@ export class ComplaintsService {
       const newComplaint = await this.complaintsRepository.create(
         {
           ...dto,
+          roomId: dto.roomId,
           userId: userId,
           _id: complaintId,
           title: dto.title,
