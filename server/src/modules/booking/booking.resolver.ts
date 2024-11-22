@@ -85,7 +85,6 @@ export class BookingResolver {
     @Context() context,
   ): Promise<generalResponse | GraphQLError> {
     console.log('Verifying payment');
-    const userId = context.req.user.userId;
     return this.bookingsService.verifyPayment(dto);
   }
 }
