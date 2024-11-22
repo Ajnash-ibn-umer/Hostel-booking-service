@@ -508,7 +508,7 @@ export class BookingService {
               userId: user._id,
               payAmount: bookingInfo.securityDeposit,
               paymentStatus: PAYMENT_STATUS.SUCCESS,
-              remark: 'Rent 1',
+              remark: 'First Month Rent',
               voucherType: VOUCHER_TYPE.RENT,
             },
             {
