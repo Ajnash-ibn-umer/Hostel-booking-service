@@ -189,17 +189,17 @@ export class BookingService {
         1,
         txnSession,
       );
-      const bookingExist = await this.bookingRepository.findOne({
-        phone: dto.phone,
-        status: 1,
-        bookingStatus: { $gte: BOOKING_STATUS.PAYMENT_SUCCESS },
-      });
+      // const bookingExist = await this.bookingRepository.findOne({
+      //   phone: dto.phone,
+      //   status: 1,
+      //   bookingStatus: { $gte: BOOKING_STATUS.PAYMENT_SUCCESS },
+      // });
       const phoneExists = await this.userService.findOneActivatedUserByPhone(
         dto.phone,
         true,
       );
-      console.log(bookingExist, phoneExists);
-      if (phoneExists || bookingExist) {
+      console.log(phoneExists);
+      if (phoneExists) {
         throw 'User with this same phone number already exists. try another number';
       }
       const newBooking = await this.bookingRepository.create(

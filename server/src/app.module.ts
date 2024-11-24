@@ -22,6 +22,8 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { MailerModule as NodeMailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailerModule } from './modules/mailer/mailer.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CheckoutModule } from './modules/checkout/checkout.module';
 
 const configService = new ConfigService();
 @Module({
@@ -69,6 +71,7 @@ const configService = new ConfigService();
       }),
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     UserModule,
     CounterModule,
     BookingModule,
@@ -80,6 +83,7 @@ const configService = new ConfigService();
     DamageAndSplitModule,
     PaymentsModule,
     MailerModule,
+    CheckoutModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver, ContactUsRepository],
