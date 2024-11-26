@@ -55,7 +55,7 @@ export class CheckoutService {
           guestNo: dto.guestNo,
           vaccatingDate: dto.vaccatingDate,
           checkoutApprovalStatus: CHECKOUT_APPROVAL_STATUS.PENDING,
-
+          hostelId: dto.hostelId,
           description: dto.description,
           createdUserId: userId,
           createdAt: startTime,
