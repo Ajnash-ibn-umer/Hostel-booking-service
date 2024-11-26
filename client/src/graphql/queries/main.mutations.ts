@@ -62,30 +62,30 @@ export const HOSTEL_CREATE_GQL = gql`
 `;
 
 export const HOSTEL_UPDATE_GQL = gql`
-mutation Hostel_Update($updateHostelInput: UpdateHostelInput!) {
-  Hostel_Update(updateHostelInput: $updateHostelInput) {
-    _id
-    availabilityStatus
-    categoryId
-    createdAt
-    createdUserId
-    description
-    locationId
-    name
-    priceBaseMode
-    propertyNo
-    sellingPrice
-    shortDescription
-    slug
-    standardPrice
-    status
-    totalBeds
-    totalRooms
-    updatedAt
-    updatedUserId
+  mutation Hostel_Update($updateHostelInput: UpdateHostelInput!) {
+    Hostel_Update(updateHostelInput: $updateHostelInput) {
+      _id
+      availabilityStatus
+      categoryId
+      createdAt
+      createdUserId
+      description
+      locationId
+      name
+      priceBaseMode
+      propertyNo
+      sellingPrice
+      shortDescription
+      slug
+      standardPrice
+      status
+      totalBeds
+      totalRooms
+      updatedAt
+      updatedUserId
+    }
   }
-}`;
-
+`;
 
 export const HOSTEL_DELETE_GQL = gql`
   mutation Hostel_StatusChange($statusChangeInput: statusChangeInput!) {
@@ -233,17 +233,33 @@ export const ROOM_TYPE_DELETE_GQL = gql`
 `;
 
 export const BOOKING_STATUS_CHANGE = gql`
-mutation Booking_ApprovalStatusChange($dto: AdminBookingStatusChangeInput!) {
-  Booking_ApprovalStatusChange(dto: $dto) {
-    message
+  mutation Booking_ApprovalStatusChange($dto: AdminBookingStatusChangeInput!) {
+    Booking_ApprovalStatusChange(dto: $dto) {
+      message
+    }
   }
-}`;
-
+`;
 
 export const COMPLAINT_APPROVAL_STATUS_CHANGE = gql`
-mutation Complaint_UpdateApprovalStatus($updateApprovalStatusInput: UpdateComplaintApprovalStatus!) {
-  Complaint_UpdateApprovalStatus(updateApprovalStatusInput: $updateApprovalStatusInput) {
-    _id
+  mutation Complaint_UpdateApprovalStatus(
+    $updateApprovalStatusInput: UpdateComplaintApprovalStatus!
+  ) {
+    Complaint_UpdateApprovalStatus(
+      updateApprovalStatusInput: $updateApprovalStatusInput
+    ) {
+      _id
+    }
   }
-}
-`
+`;
+
+export const PAYMENT_PAY_APPROVAL = gql`
+  mutation Payment_Approval(
+    $updatePaymentApprovalStatus: UpdatePaymentApprovalStatus!
+  ) {
+    Payment_Approval(
+      updatePaymentApprovalStatus: $updatePaymentApprovalStatus
+    ) {
+      message
+    }
+  }
+`;

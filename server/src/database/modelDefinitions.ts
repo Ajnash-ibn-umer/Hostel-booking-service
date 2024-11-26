@@ -1,9 +1,11 @@
+import { Schema } from 'mongoose';
 import { MODEL_NAMES } from './modelNames';
 import { AmenitySchema } from './models/amenity.model';
 import { BedSchema } from './models/bed.model';
 import { BookingStatusHistorySchema } from './models/booking-status.model';
 import { BookingSchema } from './models/booking.model';
 import { CategorySchema } from './models/category.model';
+import { CheckoutRequestSchema } from './models/checkout-request.model';
 import { ComplaintReportStatusHistorySchema } from './models/complaints-history.model';
 import { ComplaintSchema } from './models/complaints.model';
 import { ContactUsSchema } from './models/contact-us.model';
@@ -139,5 +141,9 @@ export const ModelDefinitions = {
   damageAndSplitDetailsModel: {
     name: MODEL_NAMES.DAMAGE_AND_SPLIT_DETAILS,
     schema: DamageAndSplitDetailsSchema,
+  },
+  checkoutRequestModel: {
+    name: MODEL_NAMES.CHECKOUT_REQUEST,
+    schema: CheckoutRequestSchema,
   },
 };

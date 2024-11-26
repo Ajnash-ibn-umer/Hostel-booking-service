@@ -4,6 +4,7 @@ import { Base } from './base.model';
 import { Field, ID, Int, ObjectType, PartialType } from '@nestjs/graphql';
 import enumToString from 'src/shared/utils/enumTostring';
 import { MODEL_NAMES } from '../modelNames';
+import { User } from 'src/modules/user/entities/user.entity';
 
 export enum PaymentStatus {
   PENDING = 0,
@@ -32,7 +33,7 @@ export class Payment extends Base {
 
   @Field({ nullable: true })
   @Prop({ required: false, default: null })
-  payedDate: Date;
+  payedDate?: Date;
 
   @Field(() => ID, { nullable: true })
   @Prop({ type: SchemaTypes.ObjectId, required: false, default: null })
@@ -44,7 +45,7 @@ export class Payment extends Base {
 
   @Field({ nullable: true })
   @Prop({ required: true })
-  payAmount: number;
+  payAmount?: number;
 
   @Field(() => ID, { nullable: true })
   @Prop({
@@ -58,7 +59,7 @@ export class Payment extends Base {
 
   @Field({ nullable: true })
   @Prop({ required: false, default: 0 })
-  receivedAmount: number;
+  receivedAmount?: number;
 
   @Field(() => Int, {
     nullable: true,
@@ -69,7 +70,10 @@ export class Payment extends Base {
 
   @Field(() => ID, { nullable: true })
   @Prop({ type: SchemaTypes.ObjectId, required: false, ref: 'Invoice' })
-  invoiceId: string;
+  invoiceId?: string;
+
+  @Field(() => User, { nullable: true })
+  user?: User;
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
