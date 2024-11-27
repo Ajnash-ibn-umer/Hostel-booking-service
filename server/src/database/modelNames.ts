@@ -29,4 +29,5 @@ export enum MODEL_NAMES {
   DAMAGE_AND_SPLIT_DETAILS = 'damage_and_split_details',
   PAYMENTS = 'payments',
   INVOICE = 'invoices',
+  CHECKOUT_REQUEST = 'checkout_requests',
 }

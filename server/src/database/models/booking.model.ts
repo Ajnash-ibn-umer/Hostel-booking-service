@@ -3,6 +3,7 @@ import { Document, SchemaTypes, HydratedDocument } from 'mongoose';
 import { Base } from './base.model';
 import { BED_POSITION } from 'src/shared/variables/main.variable';
 import { MODEL_NAMES } from '../modelNames';
+import { PRICE_BASE_MODE } from './hostel.model';
 
 export enum BOOKING_STATUS {
   INIT = 1,
@@ -90,7 +91,7 @@ export class Booking extends Base {
   userRemark: string;
 
   //   ----
-  @Prop({ default: 0 })
+  @Prop({ default: 0, enum: PRICE_BASE_MODE })
   selectedPaymentBase: number;
 
   @Prop({

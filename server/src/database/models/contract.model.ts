@@ -3,6 +3,7 @@ import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { Base } from './base.model';
 import { MODEL_NAMES } from '../modelNames';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import enumToString from 'src/shared/utils/enumTostring';
 
 export type ContractDocument = HydratedDocument<Contract>;
 
@@ -43,7 +44,10 @@ export class Contract extends Base {
   @Prop({ required: false, type: Date })
   contractTo: Date;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int, {
+    nullable: true,
+    description: enumToString(VACCATE_STATUS),
+  })
   @Prop({ type: Number, required: false, default: 1, enum: VACCATE_STATUS })
   vaccatStatus: number;
 

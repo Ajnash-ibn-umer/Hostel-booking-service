@@ -541,9 +541,9 @@ export const COMPLAINT_GQL = gql`
         updatedUserId
         userId
         property {
-        name
-        _id
-      }
+          name
+          _id
+        }
         galleries {
           _id
           name
@@ -564,7 +564,72 @@ export const COMPLAINT_GQL = gql`
     }
   }
 `;
+export const PAYMENT_LIST_GQL = gql`
+  query Payment_list($listPaymentInput: ListInputPayments!) {
+    Payment_list(listPaymentInput: $listPaymentInput) {
+      totalCount
+      list {
+        _id
+        createdAt
+        createdUserId
+        dueDate
+        invoiceId
+        payAmount
+        payedDate
+        paymentStatus
+        receivedAmount
+        status
+        updatedAt
+        updatedUserId
+        userId
+        voucherId
+        voucherType
+        user {
+          name
+          _id
+          userNo
+        }
+      }
+    }
+  }
+`;
 
+export const CHECKOUT_REQUEST_LIST_GQL = gql`
+  query CHECKOUT_REQUEST_LIST(
+    $listCheckoutRequestInput: ListInputCheckoutRequest!
+  ) {
+    CHECKOUT_REQUEST_LIST(listCheckoutRequestInput: $listCheckoutRequestInput) {
+      totalCount
+      list {
+        _id
+        bedId
+        bookingId
+        checkoutApprovalStatus
+        contractId
+        createdAt
+        createdUserId
+        description
+        guestId
+        guestNo
+        hostelId
+        roomId
+        status
+        updatedAt
+        updatedUserId
+        vaccatingDate
+        bed {
+          _id
+          name
+        }
+        guest {
+          _id
+          name
+          email
+        }
+      }
+    }
+  }
+`;
 
 export const DAMAGE_AND_SPLIT_LIST_QUERY = gql`
   query DamageAndSplitList($dto: ListInputDamageAndSpit!) {

@@ -68,7 +68,7 @@ export class BookingCreateInput {
   @Field({ description: 'User Remark', nullable: true })
   userRemark?: string;
 
-  @Field(() => Number, { description: 'Selected Payment Base' })
+  @Field(() => Number, { description: enumToString(PRICE_BASE_MODE) })
   selectedPaymentBase: number;
 
   @Field({ description: enumToString(BED_POSITION) })

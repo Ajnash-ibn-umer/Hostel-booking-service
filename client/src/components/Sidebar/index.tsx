@@ -1,5 +1,5 @@
 "use client";
-import { MdOutlineBedroomParent } from "react-icons/md";
+import { MdOutlineBedroomParent, MdPayments } from "react-icons/md";
 import { TbCategory } from "react-icons/tb";
 import { TbSmartHome } from "react-icons/tb";
 import { PiUserCircleCheckThin } from "react-icons/pi";
@@ -19,7 +19,7 @@ import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { Type } from "lucide-react";
+import { OutdentIcon, Type } from "lucide-react";
 import { ChatBubbleIcon } from "@radix-ui/react-icons";
 
 interface SidebarProps {
@@ -73,26 +73,35 @@ const menuGroups = [
       // },
 
       {
-        icon: (
-         <ChatBubbleIcon/>
-        ),
+        icon: <ChatBubbleIcon />,
         label: "Contact Us",
         route: "/dashboard/contact-us",
       },
       {
-        icon: (
-         <PiUserCircleCheckThin />
-        ),
+        icon: <PiUserCircleCheckThin />,
         label: "Checked-In Guests",
         route: "/dashboard/checked-in-guest",
       },
     ],
-  }
-
-  ,
+  },
   {
     name: "MANAGEMENT",
     menuItems: [
+      {
+        icon: <RiSendPlaneLine />,
+        label: "Complaints",
+        route: "/dashboard/complaints",
+      },
+      {
+        icon: <MdPayments />,
+        label: "Payments",
+        route: "/dashboard/payments",
+      },
+      {
+        icon: <OutdentIcon />,
+        label: "Checkout Requests",
+        route: "/dashboard/checkout-requests",
+      },
       {
         icon: <MdLocalLaundryService />,
         label: "Laundry Booking",
@@ -102,11 +111,6 @@ const menuGroups = [
         icon: <MdVerticalSplit />,
         label: "Damage And Split",
         route: "/dashboard/damage-and-split",
-      },
-      {
-        icon: <RiSendPlaneLine />,
-        label: "Complaints",
-        route: "/dashboard/complaints",
       },
     ],
   },
