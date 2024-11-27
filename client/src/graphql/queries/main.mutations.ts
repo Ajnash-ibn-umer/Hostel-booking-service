@@ -263,3 +263,13 @@ export const PAYMENT_PAY_APPROVAL = gql`
     }
   }
 `;
+
+export const CHECKOUT_REQUEST_STATUS_UPDATE = gql`
+  mutation CHECKOUT_REQUEST_UPDATE_STATUS(
+    $updateCheckoutInput: UpdateCHeqoutRequestApprovalStatus!
+  ) {
+    CHECKOUT_REQUEST_UPDATE_STATUS(updateCheckoutInput: $updateCheckoutInput) {
+      message
+    }
+  }
+`;
