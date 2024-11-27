@@ -250,7 +250,54 @@ export const COMPLAINT_APPROVAL_STATUS_CHANGE = gql`
       _id
     }
   }
-`;
+`
+
+export const CREATE_DAMAGE_AND_SPLITS = gql`
+mutation DamageAndSplit_Create($createDamageAndSplitInput: CreateDamageAndSplitInput!) {
+  DamageAndSplit_Create(createDamageAndSplitInput: $createDamageAndSplitInput) {
+    _id
+    amountStatus
+    createdAt
+    createdUserId
+    description
+    documentUrl
+    dueDate
+    hostel {
+      _id
+    }
+    hostelId
+    receivedAmount
+    splitDetails {
+      _id
+      amount
+    }
+    status
+    title
+    totalAmount
+    updatedAt
+  }
+}
+`
+export const HOSTEL_LIST = gql`
+query Hostel_List($listInputHostel: ListInputHostel!) {
+  Hostel_List(listInputHostel: $listInputHostel) {
+    list {
+      _id
+      name
+
+    }
+  }
+}`;
+
+export const USER_LIST = gql`
+query User_List($listUserInput: ListUserInput!) {
+  User_List(listUserInput: $listUserInput) {
+    list {
+      _id
+      name
+    }
+  }
+}`
 
 export const PAYMENT_PAY_APPROVAL = gql`
   mutation Payment_Approval(
@@ -262,4 +309,4 @@ export const PAYMENT_PAY_APPROVAL = gql`
       message
     }
   }
-`;
+`
