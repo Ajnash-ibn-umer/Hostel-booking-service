@@ -28,6 +28,7 @@ import { RoomSchema } from './models/room.model';
 import { RoomTypeSchema } from './models/roomTytpe.model';
 import { PaymentTransactionSchema } from './models/transaction.model';
 import { UserSchema } from './models/user.model';
+import { LaundryBookingSchema } from './models/laundry.model';
 
 export const ModelDefinitions = {
   userModel: {
@@ -145,5 +146,9 @@ export const ModelDefinitions = {
   checkoutRequestModel: {
     name: MODEL_NAMES.CHECKOUT_REQUEST,
     schema: CheckoutRequestSchema,
+  },
+  laundryBookingModel: {
+    name: MODEL_NAMES.LAUNDRY_BOOKING,
+    schema: LaundryBookingSchema,
   },
 };

@@ -24,6 +24,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { MailerModule } from './modules/mailer/mailer.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CheckoutModule } from './modules/checkout/checkout.module';
+import { LaundryModule } from './modules/laundry/laundry.module';
 
 const configService = new ConfigService();
 @Module({
@@ -84,6 +85,7 @@ const configService = new ConfigService();
     PaymentsModule,
     MailerModule,
     CheckoutModule,
+    LaundryModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver, ContactUsRepository],

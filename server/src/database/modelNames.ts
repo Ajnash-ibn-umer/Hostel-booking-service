@@ -30,4 +30,5 @@ export enum MODEL_NAMES {
   PAYMENTS = 'payments',
   INVOICE = 'invoices',
   CHECKOUT_REQUEST = 'checkout_requests',
+  LAUNDRY_BOOKING = 'laundry_bookings',
 }

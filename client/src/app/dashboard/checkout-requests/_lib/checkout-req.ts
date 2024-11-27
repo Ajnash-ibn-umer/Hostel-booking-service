@@ -1,0 +1,7 @@
+export enum CHECKOUT_REQUEST_STATUS {
+  PENDING = 1,
+
+  CANCELED = 2,
+
+  APPROVED = 3,
+}
