@@ -564,3 +564,27 @@ export const COMPLAINT_GQL = gql`
     }
   }
 `;
+
+
+export const DAMAGE_AND_SPLIT_LIST_QUERY = gql`
+  query DamageAndSplitList($dto: ListInputDamageAndSpit!) {
+    DamageAndSplit_List(dto: $dto) {
+      list {
+        title
+        totalAmount
+        dueDate
+        status
+        receivedAmount
+        amountStatus
+        splitDetails {
+          _id
+          amount
+        }
+        hostel {
+          _id
+          name
+        }
+      }
+    }
+  }
+`;
