@@ -214,6 +214,17 @@ export class UserService {
           }),
         );
       }
+      if (projection['list']['contract']) {
+        userAggregationArray.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.CONTRACTS,
+            params: { id: '$_id' },
+            conditions: { $userId: '$$id' },
+            project: responseFormat(projection['list']['contract']),
+            responseName: 'contract',
+          }),
+        );
+      }
       const userData = await this.userRepo.aggregate(userAggregationArray);
       console.log(userData);
 

@@ -8,7 +8,7 @@ import {
   Info,
 } from '@nestjs/graphql';
 import { LaundryService } from './laundry.service';
-import { LaundryListResponse } from './entities/laundry.entity';
+import { LaundryLimit, LaundryListResponse } from './entities/laundry.entity';
 import { CreateLaundryBookingInput } from './dto/create-laundry.input';
 import { UpdateLaundryBookingInput } from './dto/update-laundry.input';
 import { LaundryBooking } from 'src/database/models/laundry.model';
@@ -49,5 +49,16 @@ export class LaundryResolver {
       dto.guestIds = [...(dto.guestIds ?? []), userId];
     }
     return this.laundryService.listLaundryBookings(dto, projection);
+  }
+
+  @UserTypes([USER_TYPES.USER, USER_TYPES.ADMIN])
+  @Query(() => LaundryLimit, { name: 'Laundry_getUserLaundryLimit' })
+  async getUserLaundryLimit(
+    @Args('userId', { type: () => String, nullable: true }) userId: string,
+    @Context() context,
+  ) {
+    const uid = userId ?? context.req.user.userId;
+
+    return this.laundryService.getUserLaundryLimit(uid);
   }
 }

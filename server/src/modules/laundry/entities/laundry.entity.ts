@@ -9,3 +9,12 @@ export class LaundryListResponse {
   @Field(() => Number, { nullable: true })
   totalCount: number;
 }
+
+@ObjectType()
+export class LaundryLimit {
+  @Field(() => Number, { nullable: true })
+  laundryTotalMonthlyLimit: number;
+
+  @Field(() => Number, { nullable: true })
+  laundryMonthlyUsedCount: number;
+}

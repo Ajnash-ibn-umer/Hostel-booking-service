@@ -44,6 +44,7 @@ const configService = new ConfigService();
     JwtModule.register({
       secret: String(configService.get('JWT_ACCESS_TOKEN_SECRET_KEY')),
       signOptions: { expiresIn: configService.get('JWT_ACCESS_TOKEN_EXPIRY') },
+
       global: true,
     }),
 

@@ -20,7 +20,7 @@ import {
   VOUCHER_TYPE,
 } from 'src/database/models/payments.model';
 import { ListInputLaundryBooking } from './dto/list-laundry-booking.input';
-import { LaundryListResponse } from './entities/laundry.entity';
+import { LaundryLimit, LaundryListResponse } from './entities/laundry.entity';
 import {
   MatchList,
   Paginate,
@@ -29,6 +29,7 @@ import {
 import { responseFormat } from 'src/shared/graphql/queryProjection';
 import { Lookup } from 'src/shared/utils/mongodb/lookupGenerator';
 import { MODEL_NAMES } from 'src/database/modelNames';
+import { decodeAction } from 'next/dist/server/app-render/entry-base';
 
 @Injectable()
 export class LaundryService {
@@ -46,6 +47,7 @@ export class LaundryService {
     session.startTransaction();
 
     try {
+      console.log({ userId });
       const userLaundryLimit = await this.contractRepo.findOne({
         userId: userId,
         status: STATUS_NAMES.ACTIVE,
@@ -163,7 +165,23 @@ export class LaundryService {
         },
       });
     }
-    console.log(dto.createdUserIds);
+
+    if (dto.monthlyFilter) {
+      pipeline.push(
+        {
+          $addFields: {
+            month: { $month: '$bookingDate' },
+            year: { $year: '$bookingDate' },
+          },
+        },
+        {
+          $match: {
+            month: dto.monthlyFilter,
+            year: new Date().getFullYear(),
+          },
+        },
+      );
+    }
     pipeline.push(
       ...MatchList([
         {
@@ -276,5 +294,38 @@ export class LaundryService {
       list,
       totalCount: totalCount,
     };
+  }
+
+  async getUserLaundryLimit(userId: string): Promise<LaundryLimit> {
+    try {
+      const date = new Date();
+      const userLaundryCount = await this.laundryBookingRepo.find(
+        {
+          createdUserId: userId,
+          requestStatus: LAUNDRY_REQUEST_STATUS.APPROVED,
+          bookingDate: {
+            $gte: new Date(date.getFullYear(), date.getMonth(), 1),
+            $lt: new Date(date.getFullYear(), date.getMonth() + 1, 1),
+          },
+        },
+        {},
+      );
+
+      const userLaundryLimit = await this.contractRepo.findOne({
+        userId: userId,
+        status: STATUS_NAMES.ACTIVE,
+      });
+
+      return {
+        laundryTotalMonthlyLimit: userLaundryLimit.laundryMonthlyCount ?? 0,
+        laundryMonthlyUsedCount: userLaundryCount.length ?? 0,
+      };
+    } catch (error) {
+      throw new GraphQLError(error, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    }
   }
 }
