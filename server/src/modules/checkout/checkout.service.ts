@@ -142,7 +142,7 @@ export class CheckoutService {
       !session && (await txnSession.startTransaction());
 
       try {
-        await this.bedRpo.findOneAndUpdate(
+        const bed = await this.bedRpo.findOneAndUpdate(
           {
             _id: checkout.bedId,
           },
@@ -154,7 +154,7 @@ export class CheckoutService {
           session,
         );
 
-        await this.contractRepo.findOneAndUpdate(
+        const contract = await this.contractRepo.findOneAndUpdate(
           {
             _id: checkout.contractId,
           },
@@ -166,7 +166,7 @@ export class CheckoutService {
           session,
         );
 
-        await this.userRepo.findOneAndUpdate(
+        const user = await this.userRepo.findOneAndUpdate(
           {
             _id: checkout.guestId,
           },
@@ -179,8 +179,7 @@ export class CheckoutService {
           session,
         );
         !session && (await txnSession.commitTransaction());
-
-        resolve('');
+        resolve('sucessful checkout');
       } catch (error) {
         !session && (await txnSession.abortTransaction());
         reject(new Error(error));

@@ -504,18 +504,41 @@ export const CHECK_IN_GUEST = gql`
         isActive
         userNo
         _id
-        contract {
-          _id
-          bedId
-          laundryMonthlyCount
-          status
-        }
       }
       totalCount
     }
   }
 `;
 
+export const CHECK_IN_GUEST_DETAILS = gql`
+  query User_List($listUserInput: ListUserInput!) {
+    User_List(listUserInput: $listUserInput) {
+      list {
+        phoneNumber
+        email
+        name
+        isActive
+        userNo
+        _id
+        contract {
+          _id
+          bedId
+          propertyId
+          laundryMonthlyCount
+          status
+          vaccatStatus
+          bed {
+            name
+          }
+          property {
+            name
+          }
+        }
+      }
+      totalCount
+    }
+  }
+`;
 export const ME_ADMIN = gql`
   query User {
     User_Me {

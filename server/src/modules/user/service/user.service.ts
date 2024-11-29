@@ -158,6 +158,61 @@ export class UserService {
           },
         );
       }
+
+      if (
+        (dto.roomIds && dto.roomIds.length > 0) ||
+        (dto.hostelIds && dto.hostelIds.length > 0) ||
+        (dto.contractIds && dto.contractIds.length > 0)
+      ) {
+        const queryPipe = [];
+        if (dto.roomIds && dto.roomIds.length > 0) {
+          const roomIds = dto.roomIds.map(
+            (id) => new mongoose.Types.ObjectId(id),
+          );
+
+          queryPipe.push({
+            $match: {
+              roomId: { $in: roomIds },
+            },
+          });
+        }
+        if (dto.hostelIds && dto.hostelIds.length > 0) {
+          const hostelIds = dto.hostelIds.map(
+            (id) => new mongoose.Types.ObjectId(id),
+          );
+
+          queryPipe.push({
+            $match: {
+              propertyId: { $in: hostelIds },
+            },
+          });
+        }
+        if (dto.contractIds && dto.contractIds.length > 0) {
+          const contractIds = dto.contractIds.map(
+            (id) => new mongoose.Types.ObjectId(id),
+          );
+
+          queryPipe.push({
+            $match: {
+              _id: { $in: contractIds },
+            },
+          });
+        }
+        userAggregationArray.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.CONTRACTS,
+            params: { id: '$_id' },
+            conditions: { $userId: '$$id' },
+            innerPipeline: queryPipe,
+            responseName: 'con',
+          }),
+          {
+            $match: {
+              con: { $ne: null },
+            },
+          },
+        );
+      }
       switch (dto.sortType) {
         case 0:
           userAggregationArray.push({
@@ -215,11 +270,78 @@ export class UserService {
         );
       }
       if (projection['list']['contract']) {
+        let contractPipe = [];
+        if (projection['list']['contract']['property']) {
+          contractPipe.push(
+            ...Lookup({
+              modelName: MODEL_NAMES.HOSTEL,
+              params: { id: '$propertyId' },
+              project: responseFormat(
+                projection['list']['contract']['property'],
+              ),
+              conditions: { $_id: '$$id' },
+              responseName: 'property',
+            }),
+          );
+        }
+
+        if (projection['list']['contract']['bed']) {
+          contractPipe.push(
+            ...Lookup({
+              modelName: MODEL_NAMES.BED,
+              params: { id: '$bedId' },
+              project: responseFormat(projection['list']['contract']['bed']),
+              conditions: { $_id: '$$id' },
+              responseName: 'bed',
+            }),
+          );
+        }
+        if (projection['list']['contract']['room']) {
+          let roomPipe = [];
+          if (projection['list']['contract']['room']['galleries']) {
+            roomPipe.push(
+              ...Lookup({
+                modelName: MODEL_NAMES.GALLERY_ROOM_LINKS,
+                params: { id: '$_id' },
+                conditions: { $roomId: '$$id' },
+                responseName: 'galleries',
+                isNeedUnwind: false,
+                innerPipeline: [
+                  ...Lookup({
+                    modelName: MODEL_NAMES.GALLERY,
+                    params: { id: '$galleryId' },
+                    project: responseFormat(
+                      projection['list']['contract']['room']['galleries'],
+                    ),
+                    conditions: { $_id: '$$id' },
+                    responseName: 'galleries',
+                  }),
+                ],
+              }),
+              {
+                $addFields: {
+                  galleries: '$galleries.galleries',
+                },
+              },
+            );
+          }
+          contractPipe.push(
+            ...Lookup({
+              modelName: MODEL_NAMES.ROOM,
+              params: { id: '$roomId' },
+              innerPipeline: roomPipe,
+              project: responseFormat(projection['list']['contract']['room']),
+              conditions: { $_id: '$$id' },
+              responseName: 'room',
+            }),
+          );
+        }
         userAggregationArray.push(
           ...Lookup({
             modelName: MODEL_NAMES.CONTRACTS,
             params: { id: '$_id' },
             conditions: { $userId: '$$id' },
+            innerPipeline: contractPipe,
             project: responseFormat(projection['list']['contract']),
             responseName: 'contract',
           }),
