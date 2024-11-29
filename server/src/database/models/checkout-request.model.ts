@@ -3,7 +3,7 @@ import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 import { Base } from './base.model';
 import { AVAILABILITY_STATUS, PRICE_BASE_MODE } from './hostel.model';
 import { MODEL_NAMES } from '../modelNames';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import enumToString from 'src/shared/utils/enumTostring';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Hostel } from 'src/modules/booking/hostels/entities/hostel.entity';
@@ -48,12 +48,12 @@ export class CheckoutRequest extends Base {
   @Prop({ type: String, default: '' })
   guestNo: string;
 
-  @Field(() => String, {
+  @Field(() => Int, {
     nullable: true,
     description: enumToString(CHECKOUT_APPROVAL_STATUS),
   })
   @Prop({ required: true, default: 1, enum: CHECKOUT_APPROVAL_STATUS })
-  checkoutApprovalStatus: string;
+  checkoutApprovalStatus: number;
 
   @Field({ nullable: true })
   @Prop({ required: false, default: '' })

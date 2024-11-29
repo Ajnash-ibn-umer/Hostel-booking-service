@@ -687,7 +687,7 @@ export class BookingService {
             contractFrom: bookingData.contractFrom,
             contractTo: bookingData.contractTo,
             vaccatStatus: VACCATE_STATUS.IN_CONTRACT,
-            laundryMonthlyCount: 4,
+            laundryMonthlyCount: bookingData.laudryFacility ? 4 : 0,
             createdAt: startTime,
             status: STATUS_NAMES.ACTIVE,
           },

@@ -504,6 +504,12 @@ export const CHECK_IN_GUEST = gql`
         isActive
         userNo
         _id
+        contract {
+          _id
+          bedId
+          laundryMonthlyCount
+          status
+        }
       }
       totalCount
     }

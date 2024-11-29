@@ -94,7 +94,7 @@ const CreateDamageAndSplit: React.FC = () => {
 
   const { data: userData } = useQuery(USER_LIST, {
     variables: {
-      listUserInput: { limit: 10, skip: 1, sortType: 1, statusFilter: 1 },
+      listUserInput: { limit: 10, skip: 1, sortType: 1, statusFilter: [1] },
     },
   });
 
