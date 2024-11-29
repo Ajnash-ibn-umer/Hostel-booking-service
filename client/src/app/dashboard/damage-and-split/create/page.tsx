@@ -57,7 +57,6 @@ type HostelListResponse = {
 };
 
 type ListInputHostel = {
-  skip: number;
   limit: number;
   statusArray: number;
 };
@@ -90,7 +89,7 @@ const CreateDamageAndSplit: React.FC = () => {
     HostelListResponse,
     { listInputHostel: ListInputHostel }
   >(HOSTEL_LIST, {
-    variables: { listInputHostel: { skip: 1, limit: 10, statusArray: 1 } },
+    variables: { listInputHostel: { limit: -1, statusArray: 1 } },
   });
 
   const { data: userData } = useQuery(USER_LIST, {
