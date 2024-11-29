@@ -19,6 +19,7 @@ const DamageAndSplitList: React.FC = () => {
         limit: 10,
       },
     },
+    fetchPolicy: "network-only",
   });
 
   useEffect(() => {
@@ -29,7 +30,6 @@ const DamageAndSplitList: React.FC = () => {
 
   const tableHeadings = [
     "Title",
-    "Hostel",
     "Total Amount",
     "Received",
     "Due Date",
@@ -73,7 +73,6 @@ const DamageAndSplitList: React.FC = () => {
             const { label, color } = getStatusLabel(item.status);
             return {
               title: item?.title,
-              hostel: item?.hostel || "N/A",
               totalAmount: item?.totalAmount.toFixed(2),
               receivedAmount: item?.receivedAmount.toFixed(2),
               dueDate: new Date(item?.dueDate).toLocaleDateString(),

@@ -39,7 +39,7 @@ type FormData = {
   hostelId: string;
   title: string;
   description: string;
-  documentUrl: string;
+  // documentUrl: string;
   dueDate: string;
   totalAmount: number;
   splitDetails: SplitDetail[];
@@ -57,7 +57,6 @@ type HostelListResponse = {
 };
 
 type ListInputHostel = {
-  skip: number;
   limit: number;
   statusArray: number;
 };
@@ -73,7 +72,7 @@ const CreateDamageAndSplit: React.FC = () => {
     hostelId: "",
     title: "",
     description: "",
-    documentUrl: "",
+    // documentUrl: "",
     dueDate: "",
     totalAmount: 0,
     splitDetails: [],
@@ -90,12 +89,18 @@ const CreateDamageAndSplit: React.FC = () => {
     HostelListResponse,
     { listInputHostel: ListInputHostel }
   >(HOSTEL_LIST, {
-    variables: { listInputHostel: { skip: 1, limit: 10, statusArray: 1 } },
+    variables: { listInputHostel: { limit: -1, statusArray: 1 } },
   });
 
   const { data: userData } = useQuery(USER_LIST, {
     variables: {
-      listUserInput: { limit: 10, skip: 1, sortType: 1, statusFilter: [1] },
+      listUserInput: {
+        limit: -1,
+        skip: 1,
+        sortType: 1,
+        statusFilter: 1,
+        hostelIds: [selectedHostelId],
+      },
     },
   });
 
@@ -130,7 +135,7 @@ const CreateDamageAndSplit: React.FC = () => {
           description: "",
           dueDate: "",
           splitDetails: [],
-          documentUrl: "",
+          // documentUrl: "",
           totalAmount: 0,
         });
         router.back();
@@ -182,13 +187,13 @@ const CreateDamageAndSplit: React.FC = () => {
             setFormData({ ...formData, description: e.target.value })
           }
         />
-        <Input
+        {/* <Input
           placeholder="Document URL"
           value={formData.documentUrl}
           onChange={(e) =>
             setFormData({ ...formData, documentUrl: e.target.value })
           }
-        />
+        /> */}
         {/* <DatePickerTwo
           selected={formData.dueDate}
           onChange={(date) => setFormData({ ...formData, dueDate: date })}
