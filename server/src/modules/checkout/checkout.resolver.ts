@@ -57,14 +57,17 @@ export class CheckoutResolver {
 
   @UserTypes([USER_TYPES.USER, USER_TYPES.ADMIN])
   @Mutation(() => generalResponse, { name: 'CHECKOUT_REQUEST_CHECKOUT' })
-  forcedCheckout(
+  async forcedCheckout(
     @Args('forcedCheckoutInput')
     dto: ForcedCheckoutInput,
     @Context() context,
   ) {
     const userId = context.req.user.userId;
+    const resp = await this.checkoutService.checkout(dto, userId);
 
-    return this.checkoutService.checkout(dto, userId);
+    return {
+      message: resp,
+    };
   }
 
   @UserTypes([USER_TYPES.USER, USER_TYPES.ADMIN])

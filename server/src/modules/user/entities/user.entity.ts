@@ -41,8 +41,8 @@ export class User extends PartialType(Base) {
   @Field(() => Booking, { nullable: true })
   booking: Booking;
 
-  @Field(() => Contract, { nullable: true })
-  contract: Contract;
+  @Field(() => ContractInfo, { nullable: true })
+  contract: ContractInfo;
 }
 
 @ObjectType()
