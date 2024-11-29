@@ -19,6 +19,7 @@ const DamageAndSplitList: React.FC = () => {
         limit: 10,
       },
     },
+    fetchPolicy: "network-only",
   });
 
   useEffect(() => {

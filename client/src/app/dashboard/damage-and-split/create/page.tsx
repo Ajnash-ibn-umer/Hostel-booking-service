@@ -39,7 +39,7 @@ type FormData = {
   hostelId: string;
   title: string;
   description: string;
-  documentUrl: string;
+  // documentUrl: string;
   dueDate: string;
   totalAmount: number;
   splitDetails: SplitDetail[];
@@ -72,7 +72,7 @@ const CreateDamageAndSplit: React.FC = () => {
     hostelId: "",
     title: "",
     description: "",
-    documentUrl: "",
+    // documentUrl: "",
     dueDate: "",
     totalAmount: 0,
     splitDetails: [],
@@ -129,7 +129,7 @@ const CreateDamageAndSplit: React.FC = () => {
           description: "",
           dueDate: "",
           splitDetails: [],
-          documentUrl: "",
+          // documentUrl: "",
           totalAmount: 0,
         });
         router.back();
@@ -181,13 +181,13 @@ const CreateDamageAndSplit: React.FC = () => {
             setFormData({ ...formData, description: e.target.value })
           }
         />
-        <Input
+        {/* <Input
           placeholder="Document URL"
           value={formData.documentUrl}
           onChange={(e) =>
             setFormData({ ...formData, documentUrl: e.target.value })
           }
-        />
+        /> */}
         {/* <DatePickerTwo
           selected={formData.dueDate}
           onChange={(date) => setFormData({ ...formData, dueDate: date })}
