@@ -147,14 +147,20 @@ export class AuthService {
         throw `This user not found or not actvated in system. for more information please contact admin`;
       }
 
-      const accessToken = this.jwtService.sign({
-        userId: dto.userId,
-        userType: USER_TYPES.USER,
-      });
-      const refreshToken = this.jwtService.sign({
-        userId: dto.userId,
-        userType: USER_TYPES.USER,
-      });
+      const accessToken = this.jwtService.sign(
+        {
+          userId: dto.userId,
+          userType: USER_TYPES.USER,
+        },
+        { expiresIn: '10d' },
+      );
+      const refreshToken = this.jwtService.sign(
+        {
+          userId: dto.userId,
+          userType: USER_TYPES.USER,
+        },
+        { expiresIn: '300d' },
+      );
 
       return {
         message: 'Login verified successfully.',

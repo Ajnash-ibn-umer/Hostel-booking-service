@@ -325,3 +325,13 @@ export const CHECKOUT_REQUEST_STATUS_UPDATE = gql`
     }
   }
 `;
+
+export const CHECKOUT_FORCED = gql`
+  mutation CHECKOUT_REQUEST_CHECKOUT(
+    $forcedCheckoutInput: ForcedCheckoutInput!
+  ) {
+    CHECKOUT_REQUEST_CHECKOUT(forcedCheckoutInput: $forcedCheckoutInput) {
+      message
+    }
+  }
+`;
