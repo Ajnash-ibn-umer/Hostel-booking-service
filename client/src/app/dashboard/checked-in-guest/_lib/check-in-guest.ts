@@ -1,3 +1,5 @@
+import { Booking } from "../../booking/page";
+
 export interface CheckInGuestUserList {
   phoneNumber: string;
   email: string;
@@ -5,6 +7,7 @@ export interface CheckInGuestUserList {
   isActive: boolean;
   userNo: string;
   _id: string;
+  booking: Booking;
   contract: {
     _id: string;
     bedId: string;

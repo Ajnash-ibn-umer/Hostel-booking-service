@@ -410,6 +410,7 @@ export const ROOM_BED_LIST_GQL = gql`
 export const HOSTEL_DETAILS = gql`
   query Hostel_List($listInputHostel: ListInputHostel!) {
     Hostel_List(listInputHostel: $listInputHostel) {
+      totalCount
       list {
         galleries {
           _id
@@ -520,6 +521,30 @@ export const CHECK_IN_GUEST_DETAILS = gql`
         isActive
         userNo
         _id
+        bookingId
+        booking {
+          _id
+          bookingNumber
+          city
+          checkInDate
+          canteenFacility
+          userRemark
+          selectedPaymentBase
+          netAmount
+          laudryFacility
+          bloodGroup
+          jobTitle
+          idCardNumber
+          idProofDocUrls
+          emergenyRelation
+          emergencyName
+          emergencyMobile
+          email
+          dob
+          companyName
+          bedPosition
+          address
+        }
         contract {
           _id
           bedId
@@ -663,6 +688,7 @@ export const CHECKOUT_REQUEST_LIST_GQL = gql`
 export const DAMAGE_AND_SPLIT_LIST_QUERY = gql`
   query DamageAndSplitList($dto: ListInputDamageAndSpit!) {
     DamageAndSplit_List(dto: $dto) {
+      totalCount
       list {
         title
         totalAmount
@@ -670,9 +696,15 @@ export const DAMAGE_AND_SPLIT_LIST_QUERY = gql`
         status
         receivedAmount
         amountStatus
+        hostelId
         splitDetails {
           _id
           amount
+          userId
+          payed
+          user{
+            name
+          }
         }
         hostel {
           _id

@@ -220,6 +220,19 @@ export class DamageAndSplitService {
     projection && pipeline.push(responseFormat(projection['list']));
 
     if (projection['list']['splitDetails']) {
+      let splitPipe = [];
+      if (projection['list']['splitDetails']['user']) {
+        splitPipe.push(
+          ...Lookup({
+            modelName: MODEL_NAMES.USER,
+            params: { id: '$userId' },
+            project: responseFormat(projection['list']['splitDetails']['user']),
+            conditions: { $_id: '$$id' },
+
+            responseName: 'user',
+          }),
+        );
+      }
       pipeline.push(
         ...Lookup({
           modelName: MODEL_NAMES.DAMAGE_AND_SPLIT_DETAILS,
@@ -227,7 +240,7 @@ export class DamageAndSplitService {
           project: responseFormat(projection['list']['splitDetails']),
           conditions: { $damageAndSplitId: '$$id' },
           isNeedUnwind: false,
-
+          innerPipeline: splitPipe,
           responseName: 'splitDetails',
         }),
       );
