@@ -27,6 +27,7 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { CHECKOUT_FORCED } from "@/graphql/queries/main.mutations";
 import { CheckInGuestUserList } from "./_lib/check-in-guest";
+import GuestDetailsSheet from "./details";
 
 export type checkoutInput = {
   bedId: string;
@@ -123,7 +124,7 @@ function CheckedInGuest() {
             {/* <ComplaintDetailsSheet
     complaint={row.original}
   ></ComplaintDetailsSheet> */}
-
+            <GuestDetailsSheet userId={row.original._id} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -135,14 +136,19 @@ function CheckedInGuest() {
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
                 <DropdownMenuItem
-                  onClick={() =>
-                    approvalCheckout({
-                      bedId: row.original.contract.bedId ?? null,
-                      contractId: row.original.contract._id,
-                      guestId: row.original._id,
-                      remark: "admin forced checkouted",
-                    })
-                  }
+                  onClick={() => {
+                    const r = confirm(
+                      `Are you sure you want to Checkout this guest ${row.original.userNo}`,
+                    );
+                    if (r) {
+                      approvalCheckout({
+                        bedId: row.original.contract.bedId ?? null,
+                        contractId: row.original.contract._id,
+                        guestId: row.original._id,
+                        remark: "admin forced checkout",
+                      });
+                    }
+                  }}
                 >
                   Confirm Checkout
                 </DropdownMenuItem>

@@ -26,6 +26,17 @@ export class ListUserInput {
   @Field(() => [ID], { nullable: true })
   userIds: string[];
 
+  @Field(() => [ID], { nullable: true })
+  hostelIds: string[];
+
+  @Field(() => [ID], { nullable: true })
+  contractIds: string[];
+
+  @Field(() => [ID], { nullable: true })
+  roomIds: string[];
+
+  
+
   @Field(() => Int, { nullable: true })
   skip: number;
 
