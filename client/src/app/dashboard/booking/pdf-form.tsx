@@ -3,6 +3,7 @@ import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 export interface FormData {
   date: string;
   name: string;
+  
   contactNumber: string;
   email: string;
   idCardNumber: string;
