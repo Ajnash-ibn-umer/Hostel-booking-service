@@ -12,6 +12,7 @@ import { DataTable } from "@/components/Datatables/data-table";
 import {
   CONTACT_LIST_FOR_TABLE_GQL,
   CHECK_IN_GUEST,
+  CHECK_IN_GUEST_DETAILS,
 } from "@/graphql/queries/main.quiries";
 import { useToast } from "@/hooks/use-toast";
 import { ColumnDef } from "@tanstack/react-table";
@@ -87,7 +88,7 @@ function CheckedInGuest() {
     },
   });
 
-  const { data, error, refetch } = useQuery(CHECK_IN_GUEST, {
+  const { data, error, refetch } = useQuery(CHECK_IN_GUEST_DETAILS, {
     variables: inputVariables,
   });
 
@@ -124,7 +125,7 @@ function CheckedInGuest() {
             {/* <ComplaintDetailsSheet
     complaint={row.original}
   ></ComplaintDetailsSheet> */}
-            <GuestDetailsSheet userId={row.original._id} />
+            <GuestDetailsSheet userData={row.original} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">

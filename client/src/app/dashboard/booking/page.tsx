@@ -68,8 +68,8 @@ export type Booking = {
   bedName: string;
   bookingNumber: string;
   bookingStatus: BookingStatus;
-  canteenFacility: string;
-  laudryFacility: string;
+  canteenFacility: boolean;
+  laudryFacility: boolean;
   email: string;
   name: string;
   phone: string;

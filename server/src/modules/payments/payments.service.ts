@@ -31,12 +31,18 @@ import * as dayjs from 'dayjs';
 import { PRICE_BASE_MODE } from 'src/database/models/hostel.model';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { generalResponse } from 'src/shared/graphql/entities/main.entity';
+import { DamageAndSplitRepository } from '../damage_and_split/repositories/damage-and-split.repository';
+import { DamageAndSplitDetailsRepository } from '../damage_and_split/repositories/damage-and-split-details.repository';
+import { AmountStatus } from 'src/database/models/damage-and-split.model';
 @Injectable()
 export class PaymentsService {
   constructor(
     private readonly paymentRepo: PaymentsRepository,
     private readonly userRepo: UserRepository,
     private schedulerRegistry: SchedulerRegistry,
+    private damageAndSplitRepo: DamageAndSplitRepository,
+    private damageAndSplitDetailRepo: DamageAndSplitDetailsRepository,
+
     @InjectConnection()
     private readonly connection: mongoose.Connection,
   ) {}
@@ -312,7 +318,7 @@ export class PaymentsService {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
-      const complaint = await this.paymentRepo.findOneAndUpdate(
+      const payment = await this.paymentRepo.findOneAndUpdate(
         {
           _id: dto.paymentId,
           status: STATUS_NAMES.ACTIVE,
@@ -320,14 +326,45 @@ export class PaymentsService {
         {
           updatedAt: startTime,
           updatedUserId: userId,
+          payedDate: startTime,
           paymentStatus: dto.requestStatus,
         },
         session,
       );
-      if (!complaint) {
-        throw new Error('Complaint not found');
+      if (!payment) {
+        throw new Error('payment not found');
       }
 
+      if (payment.voucherType === VOUCHER_TYPE.DAMAGE_AND_SPLIT) {
+        const damageAndSplit = await this.damageAndSplitRepo.findOne({
+          _id: payment.voucherId,
+        });
+        await this.damageAndSplitDetailRepo.findOneAndUpdate(
+          {
+            userId: payment.userId,
+            damageAndSplitId: payment.voucherId,
+          },
+          {
+            received: payment.payAmount,
+            payed: true,
+          },
+          session,
+        );
+        const splitPayments = await this.damageAndSplitDetailRepo.find({
+          damageAndSplitId: payment.voucherId,
+        });
+        const fullyPayed = splitPayments.every((d) => d.payed === true);
+
+        await damageAndSplit
+          .updateOne({
+            receivedAmount: damageAndSplit.receivedAmount + payment.payAmount,
+            amountStatus:
+              fullyPayed === true
+                ? AmountStatus.FULLY_PAID
+                : AmountStatus.PARTIALY_PAID,
+          })
+          .session(session);
+      }
       await session.commitTransaction();
       return {
         message: 'Payment Approved',

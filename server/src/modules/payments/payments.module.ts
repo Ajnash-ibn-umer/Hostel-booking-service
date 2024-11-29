@@ -8,6 +8,8 @@ import { UserService } from '../user/service/user.service';
 import { UserRepository } from '../user/repository/user.repository';
 import { ContractRepository } from 'src/repositories/contract.repository';
 import { PaymentsController } from './payments.controller';
+import { DamageAndSplitRepository } from '../damage_and_split/repositories/damage-and-split.repository';
+import { DamageAndSplitDetailsRepository } from '../damage_and_split/repositories/damage-and-split-details.repository';
 
 @Global()
 @Module({
@@ -18,12 +20,18 @@ import { PaymentsController } from './payments.controller';
     UserService,
     UserRepository,
     ContractRepository,
+    DamageAndSplitRepository,
+    DamageAndSplitDetailsRepository
   ],
   imports: [
     MongooseModule.forFeature([
       ModelDefinitions.paymentsModel,
       ModelDefinitions.userModel,
       ModelDefinitions.contractsModel,
+      ModelDefinitions.damageAndSplitModel,
+      ModelDefinitions.damageAndSplitDetailsModel,
+
+
     ]),
   ],
   exports: [PaymentsService, PaymentsRepository],
