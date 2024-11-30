@@ -14,6 +14,9 @@ export class ListInputDamageAndSpit extends PartialType(GenericListInput) {
   @Field(() => [ID], { nullable: true })
   hostelIds: string[];
 
+  @Field(() => [Int], { nullable: true, description: '1 : for user based amount (single user)' })
+  screenTypes: number[];
+
   @Field(() => [ID], { nullable: true })
   userIds: string[];
 

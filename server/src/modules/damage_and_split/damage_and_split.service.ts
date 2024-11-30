@@ -221,6 +221,22 @@ export class DamageAndSplitService {
 
     if (projection['list']['splitDetails']) {
       let splitPipe = [];
+
+      // if (
+      //   dto.screenTypes.includes(1) &&
+      //   dto.userIds &&
+      //   dto.userIds.length === 1
+      // ) {
+      //   const uids = dto.userIds.map((id) => new mongoose.Types.ObjectId(id));
+
+      //   splitPipe.push({
+      //     $match: {
+      //       userId: { $in: uids },
+      //     },
+      //   });
+      // }
+
+      
       if (projection['list']['splitDetails']['user']) {
         splitPipe.push(
           ...Lookup({
