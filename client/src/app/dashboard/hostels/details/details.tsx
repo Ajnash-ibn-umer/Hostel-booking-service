@@ -24,8 +24,7 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HOSTEL_DETAILS } from "@/graphql/queries/main.quiries";
 import { useQuery } from "@apollo/client";
-
-
+import { BedAvailabilityStatus } from "../../booking/_lib/enums";
 
 interface HostelDetailsProps {
   hostelId: string;
@@ -36,6 +35,7 @@ function HostelDetailsSheet({ hostelId }: HostelDetailsProps) {
   const { toast } = useToast();
 
   const { data } = useQuery(HOSTEL_DETAILS, {
+    fetchPolicy: "cache-first",
     variables: {
       listInputHostel: {
         hostelIds: hostelId,
@@ -44,7 +44,7 @@ function HostelDetailsSheet({ hostelId }: HostelDetailsProps) {
       },
     },
   });
-  
+
   const hostelDetails = data?.Hostel_List?.list[0];
 
   // useEffect(() => {
@@ -92,24 +92,28 @@ function HostelDetailsSheet({ hostelId }: HostelDetailsProps) {
                     </span>
                   </div>
                   <div className="flex flex-row items-center justify-start gap-6">
-                    <span className="text-sm text-gray-500">
-                      Selling Price:
-                    </span>
-                    <span className="text-lg font-semibold">
-                      {hostelDetails.sellingPrice}
+                    <span className="text-sm text-gray-500">Total Beds:</span>
+                    <span className="text-sm font-semibold">
+                      {hostelDetails.totalBeds ?? 0}
                     </span>
                   </div>
                   <div className="flex flex-row items-center justify-start gap-6">
-                    <span className="text-sm text-gray-500">
-                      Standard Price:
-                    </span>
-                    <span className="text-lg font-semibold">
-                      {hostelDetails.standardPrice}
+                    <span className="text-sm text-gray-500">Location</span>
+                    <span className="text-sm font-semibold">
+                      {hostelDetails.location?.name ?? ""}
                     </span>
                   </div>
+                  {hostelDetails.category?.name && (
+                    <div className="flex flex-row items-center justify-start gap-6">
+                      <span className="text-sm text-gray-500">Category</span>
+                      <span className="text-sm font-semibold">
+                        {hostelDetails.category?.name ?? ""}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex flex-row items-center justify-start gap-6">
                     <span className="text-sm text-gray-500">Total Rooms:</span>
-                    <span className="text-lg font-semibold">
+                    <span className="text-sm font-semibold">
                       {hostelDetails.totalRooms}
                     </span>
                   </div>
@@ -123,20 +127,22 @@ function HostelDetailsSheet({ hostelId }: HostelDetailsProps) {
               </CardHeader>
               <Carousel className="hover" opts={{ loop: true }}>
                 <CarouselContent>
-                  {hostelDetails?.galleries?.map((gallery: any, index: number) => (
-                    <CarouselItem key={index} className="h-84 w-64">
-                      <CardContent className="relative flex aspect-square items-center justify-center p-6">
-                        {" "}
-                        {/* Adjust height and width here */}
-                        <Image
-                          src={gallery?.url}
-                          alt={`Gallery Image ${index + 1}`}
-                          className="h-full w-full transform rounded-3xl object-cover transition-transform duration-300 ease-in-out hover:scale-110 hover:shadow-lg"
-                          fill
-                        />
-                      </CardContent>
-                    </CarouselItem>
-                  ))}
+                  {hostelDetails?.galleries?.map(
+                    (gallery: any, index: number) => (
+                      <CarouselItem key={index} className="h-84 w-64">
+                        <CardContent className="relative flex aspect-square items-center justify-center p-6">
+                          {" "}
+                          {/* Adjust height and width here */}
+                          <Image
+                            src={gallery?.url}
+                            alt={`Gallery Image ${index + 1}`}
+                            className="h-full w-full transform rounded-3xl object-cover transition-transform duration-300 ease-in-out hover:scale-110 hover:shadow-lg"
+                            fill
+                          />
+                        </CardContent>
+                      </CarouselItem>
+                    ),
+                  )}
                 </CarouselContent>
 
                 {hostelDetails?.galleries?.length > 0 && (
@@ -153,19 +159,21 @@ function HostelDetailsSheet({ hostelId }: HostelDetailsProps) {
                 <CardTitle>Amenities</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-start justify-start gap-4">
-                {hostelDetails?.amenities?.map((amenity: any, index: number) => (
-                  <div
-                    key={index}
-                    className="flex flex-row items-center space-x-4"
-                  >
-                    <img
-                      src={amenity.icon}
-                      alt={amenity.name}
-                      className="h-8 w-8 object-cover"
-                    />
-                    <span>{amenity.name}</span>
-                  </div>
-                ))}
+                {hostelDetails?.amenities?.map(
+                  (amenity: any, index: number) => (
+                    <div
+                      key={index}
+                      className="flex flex-row items-center space-x-4"
+                    >
+                      <img
+                        src={amenity.icon}
+                        alt={amenity.name}
+                        className="h-8 w-8 object-cover"
+                      />
+                      <span>{amenity.name}</span>
+                    </div>
+                  ),
+                )}
               </CardContent>
             </Card>
             <Card className="p-2">
@@ -190,14 +198,26 @@ function HostelDetailsSheet({ hostelId }: HostelDetailsProps) {
 
                       <div className="flex-1 space-y-4">
                         <div>
-                          <strong>Room ID:</strong> {room._id}
+                          <strong>Room ID:</strong> {room.slug}
                         </div>
                         <div>
                           <strong>Beds:</strong> {room.beds.length}
                         </div>
                         {room.beds.map((bed: any, index: number) => (
-                          <Badge key={index} className="mr-2">
-                            Bed ID: {bed._id}
+                          <Badge
+                            style={{
+                              background:
+                                bed.availabilityStatus === 2
+                                  ? "wheat"
+                                  : bed.availabilityStatus === 0
+                                    ? "green"
+                                    : "black",
+                            }}
+                            key={index}
+                            className="mr-2"
+                          >
+                            Bed ID: {bed.name} (
+                            {BedAvailabilityStatus[bed.availabilityStatus]})
                           </Badge>
                         ))}
                       </div>

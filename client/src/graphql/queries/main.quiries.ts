@@ -426,6 +426,7 @@ export const HOSTEL_DETAILS = gql`
         description
         rooms {
           _id
+          slug
           galleries {
             url
             _id
@@ -463,6 +464,9 @@ export const HOSTEL_DETAILS = gql`
         createdAt
         availabilityStatus
         locationId
+        location {
+          name
+        }
         categoryId
         category {
           _id
@@ -702,7 +706,7 @@ export const DAMAGE_AND_SPLIT_LIST_QUERY = gql`
           amount
           userId
           payed
-          user{
+          user {
             name
           }
         }
