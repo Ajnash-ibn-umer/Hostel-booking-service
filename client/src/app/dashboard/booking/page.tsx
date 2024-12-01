@@ -104,6 +104,7 @@ import { Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import dynamic from "next/dynamic";
 import MembershipPDF from "./pdf-form";
 import dayjs from "dayjs";
+import { exportToExcel } from "@/app/_export-to-xl/export-to-exel";
 
 function ApprovalOperationsCell({
   booking,
@@ -392,52 +393,6 @@ function Booking() {
         <div className="flex gap-1">
           <BookingDetailsSheet booking={row.original}></BookingDetailsSheet>
 
-          {/* <Button
-            onClick={async (e) => {
-              const data = row.original;
-              const blob = await pdf(
-                MembershipPDF({
-                  formData: {
-                    address: data.address,
-                    companyName: data.companyName,
-                    contactNumber: data.phone,
-                    date:
-                      (data.createdAt &&
-                        dayjs(data?.createdAt).format("DD/MM/YYYY")) ??
-                      "",
-                    dob:
-                      (data.dob && dayjs(data?.dob).format("DD/MM/YYYY")) ?? "",
-                    email: data.email,
-                    emergencyContact: data.emergencyName,
-                    emergencyContactNumber: data.emergencyMobile,
-                    idCardNumber: data.bookingNumber,
-                    jobTitle: data.jobTitle,
-                    name: data.name,
-                    relation: data.emergenyRelation,
-                    roomPreference: data.bedName,
-                    stayDuration: "",
-                    bloodGroup: data.bloodGroup,
-                    roomName: "",
-                    healthIssue: data.userRemark,
-                  },
-                }),
-              ).toBlob();
-
-              console.log(blob);
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement("a");
-              link.href = url;
-              link.download = `${row.original.bookingNumber}.pdf`;
-              document.body.appendChild(link);
-              link.click();
-
-              link.remove();
-              window.URL.revokeObjectURL(url);
-            }}
-            style={{ background: "transparent" }}
-          >
-            <Download color="green" size={"15px"}></Download>
-          </Button> */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -559,6 +514,21 @@ function Booking() {
       <Breadcrumb pageName="Booking" />
 
       <div className="flex flex-col gap-10">
+        <div className="flex justify-end ">
+          <Button
+            className="gap-2"
+            style={{ background: "green" }}
+            onClick={async () => {
+              const resp = await refetch({
+                ...inputVariables,
+                limit: -1,
+              });
+              exportToExcel(resp.data.Booking_List?.list, "Bookings", false);
+            }}
+          >
+            Export {"   "} <Download size={"15"}></Download>
+          </Button>
+        </div>
         <DataTable columns={columns} data={data?.Booking_List?.list || []} />
         <Pageniation
           fetch={changePage}

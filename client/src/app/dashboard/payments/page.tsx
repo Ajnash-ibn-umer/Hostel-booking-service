@@ -22,8 +22,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { Download, MoreHorizontal } from "lucide-react";
 import { PAYMENT_PAY_APPROVAL } from "@/graphql/queries/main.mutations";
+import { exportToExcel } from "@/app/_export-to-xl/export-to-exel";
 
 function Payments() {
   const router = useRouter();
@@ -143,6 +144,7 @@ function Payments() {
 
   const { loading, data, error, refetch } = useQuery(PAYMENT_LIST_GQL, {
     variables: inputVariables,
+    
   });
   const changePage = (skip: number) => {
     console.log({ skip });
@@ -170,9 +172,19 @@ function Payments() {
 
       <div className="flex flex-col gap-10">
         <div className="flex justify-end ">
-          {/* <Button asChild>
-            <Link href={"payments/create"}>Create</Link>
-          </Button> */}
+        <Button
+            className="gap-2"
+            style={{ background: "green" }}
+            onClick={async () => {
+              const resp = await refetch({
+                ...inputVariables,
+                limit: -1,
+              });
+              exportToExcel(resp.data.Payment_list?.list, "Payments", false);
+            }}
+          >
+            Export {"   "} <Download size={"15"}></Download>
+          </Button>
         </div>
         <DataTable columns={columns} data={data?.Payment_list?.list || []} />
         <Pageniation

@@ -17,6 +17,7 @@ import { HOSTEL_DELETE_GQL } from "@/graphql/queries/main.mutations";
 import Pageniation from "@/components/pagination/pagination";
 import Link from "next/link";
 import HostelDetailsSheet from "./details/details";
+import { BedAvailabilityStatus } from "../booking/_lib/enums";
 type Hostel = {
   galleries: {
     url: string;
@@ -40,6 +41,7 @@ type Hostel = {
     }[];
     beds: {
       _id: string;
+      name: string;
     }[];
   }[];
   propertyNo: string;
@@ -53,6 +55,7 @@ interface HostelListInterface {
   _id: string;
   name: string;
   propertyNo: string;
+  availabilityStatus: number;
   sellingPrice: number;
   standardPrice: number;
   totalRooms: number;
@@ -95,12 +98,13 @@ function HostelList() {
       header: "Property Number",
     },
     {
-      accessorKey: "sellingPrice",
-      header: "Selling Price",
+      accessorKey: "availabilityStatus",
+      header: "Availability Status",
+      cell: ({ row }) => BedAvailabilityStatus[row.original.availabilityStatus],
     },
     {
-      accessorKey: "standardPrice",
-      header: "Standard Price",
+      accessorKey: "totalBeds",
+      header: "Total Beds",
     },
     {
       accessorKey: "totalRooms",
@@ -117,7 +121,7 @@ function HostelList() {
       cell: ({ row }) => {
         const { toast } = useToast();
         const [deleteData, { loading, error }] = useMutation(HOSTEL_DELETE_GQL);
-    
+
         const deleteHostel = async () => {
           try {
             const { data, errors } = await deleteData({
