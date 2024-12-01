@@ -15,8 +15,8 @@ import Auth from "@/components/Verifiy";
 
 export const metadata: Metadata = {
   title:
-    "Next.js E-commerce Dashboard Page | NextAdmin - Next.js Dashboard Kit",
-  description: "This is Next.js Home page for NextAdmin Dashboard Kit",
+    "Oxtel Hostel Booking Application",
+  description: "Welcome to the Oxtel Hostel Booking Application..",
 };
 
 export default async function Home() {

@@ -97,7 +97,7 @@ const DamageAndSplitList: React.FC = () => {
 
     {
       accessorKey: "hostel.name",
-      header: "Hostel",
+      header: "Hostel Name",
       cell: ({ row }) => {
         return row.original.hostel?.name ?? "";
       },
