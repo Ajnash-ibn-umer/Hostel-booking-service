@@ -1,57 +1,126 @@
-import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb'
-import Button from '@/components/Button/Button';
-import ButtonDefault from '@/components/Button/Button';
-import MainTable from '@/components/Tables/MainTable'
-import React from 'react'
+"use client";
 
-const UsersList: React.FC =()=> {
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
+import React, { useEffect, useState } from "react";
+import { useQuery } from "@apollo/client";
+import { LaundryBooking_List } from "@/graphql/queries/main.quiries";
+import dayjs from "dayjs";
+import Pageniation from "../../../components/pagination/pagination";
+import { DataTable } from "../../../components/Datatables/data-table";
+import { ColumnDef } from "@tanstack/react-table";
 
-const packageData: any[] = [
-  {
-    name: "Free package",
-    price: 0.0,
-    invoiceDate: `Jan 13,2023`,
-    status: "Paid",
-  },
-  {
-    name: "Standard Package",
-    price: 59.0,
-    invoiceDate: `Jan 13,2023`,
-    status: "Paid",
-  },
-  {
-    name: "Business Package",
-    price: 99.0,
-    invoiceDate: `Jan 13,2023`,
-    status: "Unpaid",
-  },
-  {
-    name: "Standard Package",
-    price: 59.0,
-    invoiceDate: `Jan 13,2023`,
-    status: "Paid",
-  },
-];
+export type LaundryBooking = {
+  _id: string;
+  bookingDate: string;
+  bookingType: string;
+  createdAt: string;
+  createdUser: { name: string };
+  hostel: { name: string };
+  requestStatus: number
+};
 
-const headings=["Name","Price","Invoice Date","Status"]
+function CheckoutRequests() {
+  const router = useRouter();
+
+  const columns: ColumnDef<LaundryBooking>[] = [
+    {
+      accessorKey: "bookingDate",
+      header: "Booking Date",
+      cell: ({ row }) =>
+        dayjs(row.getValue("bookingDate")).format("DD/MM/YYYY"),
+    },
+    {
+      accessorKey: "bookingType",
+      header: "Booking Type",
+      cell: ({ row }) => (row.getValue("bookingType") === 1 ? "Free" : "Pay"),
+    },
+    {
+      accessorKey: "createdUser",
+      header: "Created By",
+      cell: ({ row }) => row?.original?.createdUser?.name,
+    },
+    {
+      accessorKey: "hostel",
+      header: "Hostel Name",
+      cell: ({ row }) => row?.original?.hostel?.name,
+    },
+    {
+      accessorKey: "requestStatus",
+      header: "Request Status",
+      cell: ({ row }) => {
+        const status = row.getValue("requestStatus");
+        switch (status) {
+          case 1:
+            return "Approved";
+          case 2:
+            return "Pending";
+          case 3:
+            return "Rejected";
+          default:
+            return "Unknown";
+        }
+      },
+    }
+  ];
+  
+
+  const [inputVariables, setInputVariables] = useState<{
+    listInputLaundryBooking: {
+      limit: number;
+      skip: number;
+      sortOrder: number;
+    };
+  }>({
+    listInputLaundryBooking: {
+      limit: 10,
+      skip: 0,
+      sortOrder: -1,
+    },
+  });
+
+  const { loading, data, error, refetch } = useQuery(LaundryBooking_List, {
+    variables: inputVariables,
+  });
+
+  
+
+  const changePage = (skip: number) => {
+    setInputVariables({
+      listInputLaundryBooking: {
+        ...inputVariables.listInputLaundryBooking,
+        skip: skip || 0,
+      },
+    });
+    refetch(inputVariables);
+  };
+
+  useEffect(() => {
+    if (error) {
+      console.log(error.message);
+    }
+  }, [data, error]);
+
   return (
     <div>
-  <Breadcrumb pageName="Laundry Bookings" />
+      <Breadcrumb pageName="Laundry Bookings" />
 
-  {/* <p className="mt-[3px] text-body-sm font-medium">
-                    ${itemData.price}
-                  </p> */}
-
-  <div className="flex flex-col gap-10">
-    <div className='flex justify-end '>
-    <Button  background='primary' fontColor='white'   buttonType='rounded-corner' >Create</Button>
-
-    </div>
-        <MainTable headings={headings} data={packageData}  />
+      <div className="flex flex-col gap-10">
+        <DataTable
+          columns={columns}
+          data={data?.LaundryBooking_List?.list || []}
+        />
+        <Pageniation
+          fetch={changePage}
+          skip={inputVariables?.listInputLaundryBooking.skip || 0}
+          totalCount={data?.LaundryBooking_List?.totalCount || 0}
+          limit={inputVariables?.listInputLaundryBooking.limit || 10}
+        ></Pageniation>
       </div>
     </div>
-  )
+  );
 }
 
-export default UsersList
+export default CheckoutRequests;
