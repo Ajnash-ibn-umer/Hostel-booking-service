@@ -7,6 +7,7 @@ import { CheckoutRequestRepository } from './repositories/checkout-request.repos
 import { UserRepository } from '../user/repository/user.repository';
 import { ContractRepository } from 'src/repositories/contract.repository';
 import { BedRepository } from '../booking/hostels/repositories/bed.repository';
+import { MailerService } from '../mailer/mailer.service';
 
 @Module({
   providers: [
@@ -16,6 +17,7 @@ import { BedRepository } from '../booking/hostels/repositories/bed.repository';
     UserRepository,
     ContractRepository,
     BedRepository,
+    MailerService
   ],
   imports: [
     MongooseModule.forFeature([

@@ -12,10 +12,21 @@ import {
 import { Paginate, Search } from 'src/shared/utils/mongodb/filtration.util';
 import mongoose from 'mongoose';
 import { responseFormat } from 'src/shared/graphql/queryProjection';
+import { ComplaintRepository } from '../complaints/repository/complaints.repository';
+import { UserRepository } from '../user/repository/user.repository';
+import { RoomRepository } from '../booking/hostels/repositories/room.repository';
+import { PaymentsRepository } from '../payments/repositories/payments.repository';
+import { STATUS_NAMES, USER_TYPES } from 'src/shared/variables/main.variable';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly contactUsRepostitory: ContactUsRepository) {}
+  constructor(
+    private readonly contactUsRepostitory: ContactUsRepository,
+    private complaintsRepository: ComplaintRepository,
+    private readonly roomRepository: RoomRepository,
+    private readonly userRepository: UserRepository,
+    private readonly paymentRepository: PaymentsRepository,
+  ) {}
   getHello(): string {
     return 'Hello World!';
   }
@@ -114,5 +125,60 @@ export class AppService {
       list,
       totalCount: totalCount,
     };
+  }
+
+  async dashboard() {
+    try {
+      const [complaint, payments, rooms, users] = await Promise.all([
+        this.complaintsRepository.totalCount([
+          {
+            $match: {
+              status: STATUS_NAMES.ACTIVE,
+            },
+          },
+        ]),
+        this.paymentRepository.aggregate([
+          {
+            $match: {
+              status: STATUS_NAMES.ACTIVE,
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalPayment: { $sum: '$payAmount' },
+            },
+          },
+        ]),
+        this.roomRepository.totalCount([
+          {
+            $match: {
+              status: STATUS_NAMES.ACTIVE,
+            },
+          },
+        ]),
+        this.userRepository.totalCount([
+          {
+            $match: {
+              status: STATUS_NAMES.ACTIVE,
+              userType: USER_TYPES.USER,
+            },
+          },
+        ]),
+      ]);
+
+      return {
+        roomCount: rooms ?? 0,
+        userCount: users ?? 0,
+        complaintCount: complaint ?? 0,
+        paymentCount: payments[0]?.totalPayment  ?? 0,
+      };
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    }
   }
 }

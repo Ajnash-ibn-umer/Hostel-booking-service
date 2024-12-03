@@ -1,3 +1,4 @@
+import * as dayjs from 'dayjs';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCheckoutInput } from './dto/create-checkout.input';
 import {
@@ -29,6 +30,8 @@ import {
 import { responseFormat } from 'src/shared/graphql/queryProjection';
 import { Lookup } from 'src/shared/utils/mongodb/lookupGenerator';
 import { MODEL_NAMES } from 'src/database/modelNames';
+import { MailerService } from '../mailer/mailer.service';
+import { EMAIL_TEMPLATES } from '../mailer/dto/create-mailer.input';
 
 @Injectable()
 export class CheckoutService {
@@ -36,6 +39,8 @@ export class CheckoutService {
     private readonly checkoutRequestRepo: CheckoutRequestRepository,
     private readonly userRepo: UserRepository,
     private readonly contractRepo: ContractRepository,
+    private readonly mailService: MailerService,
+
     private readonly bedRpo: BedRepository,
     @InjectConnection()
     private readonly connection: mongoose.Connection,
@@ -131,7 +136,7 @@ export class CheckoutService {
   }
 
   async checkout(
-    checkout: CheckoutRequest | ForcedCheckoutInput,
+    checkout:  ForcedCheckoutInput | CheckoutRequest | any ,
     userId: string,
     session: SessionOption['session'] = null,
   ) {
@@ -178,6 +183,19 @@ export class CheckoutService {
           },
           session,
         );
+
+        this.mailService.send({
+          subject: `Checkout Request Approved`,
+          to: user.email,
+          template: EMAIL_TEMPLATES.CHECKOUT_CONFIRMED,
+          context: {
+            name: user.name,
+            userNumber: user.userNo ?? '',
+            checkOutDate: dayjs(checkout.vaccatingDate as any).format(
+              'DD/MM/YYYY',
+            ),
+          },
+        });
         !session && (await txnSession.commitTransaction());
         resolve('sucessful checkout');
       } catch (error) {

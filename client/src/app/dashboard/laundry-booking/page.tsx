@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import Pageniation from "../../../components/pagination/pagination";
 import { DataTable } from "../../../components/Datatables/data-table";
 import { ColumnDef } from "@tanstack/react-table";
+import { Badge } from "@/components/ui/badge";
 
 export type LaundryBooking = {
   _id: string;
@@ -18,8 +19,9 @@ export type LaundryBooking = {
   bookingType: string;
   createdAt: string;
   createdUser: { name: string };
+  user: { name: string };
   hostel: { name: string };
-  requestStatus: number
+  requestStatus: number;
 };
 
 function CheckoutRequests() {
@@ -38,14 +40,14 @@ function CheckoutRequests() {
       cell: ({ row }) => (row.getValue("bookingType") === 1 ? "Free" : "Pay"),
     },
     {
-      accessorKey: "createdUser",
+      accessorKey: "user.name",
       header: "Created By",
-      cell: ({ row }) => row?.original?.createdUser?.name,
+      cell: ({ row }) => row?.original?.user?.name ?? "Unknown",
     },
     {
       accessorKey: "hostel",
       header: "Hostel Name",
-      cell: ({ row }) => row?.original?.hostel?.name,
+      cell: ({ row }) => row?.original?.hostel?.name ?? "Unknown",
     },
     {
       accessorKey: "requestStatus",
@@ -54,18 +56,17 @@ function CheckoutRequests() {
         const status = row.getValue("requestStatus");
         switch (status) {
           case 1:
-            return "Approved";
+            return <Badge variant="secondary">Approved</Badge>;
           case 2:
-            return "Pending";
+            return <Badge variant="default">Pending</Badge>;
           case 3:
-            return "Rejected";
+            return <Badge variant="destructive">Rejected</Badge>;
           default:
-            return "Unknown";
+            return <Badge variant="secondary">Unknown</Badge>;
         }
       },
-    }
+    },
   ];
-  
 
   const [inputVariables, setInputVariables] = useState<{
     listInputLaundryBooking: {
@@ -84,8 +85,6 @@ function CheckoutRequests() {
   const { loading, data, error, refetch } = useQuery(LaundryBooking_List, {
     variables: inputVariables,
   });
-
-  
 
   const changePage = (skip: number) => {
     setInputVariables({

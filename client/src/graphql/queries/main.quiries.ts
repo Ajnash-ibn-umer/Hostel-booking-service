@@ -719,23 +719,38 @@ export const DAMAGE_AND_SPLIT_LIST_QUERY = gql`
   }
 `;
 
-
-export const LaundryBooking_List= gql`
-query List($listInputLaundryBooking: ListInputLaundryBooking!) {
-  LaundryBooking_List(listInputLaundryBooking: $listInputLaundryBooking) {
-    list {
-      _id
-      bookingDate
-      bookingType
-      createdAt
-      requestStatus
-      createdUser {
-        name
-      }
-      hostel {
-        name
+export const LaundryBooking_List = gql`
+  query List($listInputLaundryBooking: ListInputLaundryBooking!) {
+    LaundryBooking_List(listInputLaundryBooking: $listInputLaundryBooking) {
+      list {
+        _id
+        bookingDate
+        bookingType
+        createdAt
+        requestStatus
+        userId
+        hostelId
+        user {
+          name
+        }
+        createdUser {
+          name
+        }
+        hostel {
+          name
+        }
       }
     }
   }
-}
-`
+`;
+
+export const DASHBOARD_STATS = gql`
+  query DashboardStats {
+    DashboardStats {
+      complaintCount
+      paymentCount
+      roomCount
+      userCount
+    }
+  }
+`;
