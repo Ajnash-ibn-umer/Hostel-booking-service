@@ -24,14 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { CHECKOUT_REQUEST_STATUS_UPDATE } from "@/graphql/queries/main.mutations";
-import { CHECKOUT_REQUEST_STATUS } from "./_lib/checkout-req";
-
-export type Payment = {
-  _id: string;
-  amount: number;
-  description: string;
-  createdDate: Date;
-};
+import { CHECKOUT_REQUEST_STATUS, CheckoutRequest } from "./_lib/checkout-req";
 
 function CheckoutRequests() {
   const router = useRouter();
@@ -70,7 +63,7 @@ function CheckoutRequests() {
       });
     }
   };
-  const columns: ColumnDef<Payment>[] = [
+  const columns: ColumnDef<CheckoutRequest>[] = [
     {
       accessorKey: "guestNo",
       header: "Guest No",
@@ -82,14 +75,20 @@ function CheckoutRequests() {
     {
       accessorKey: "vaccateDate",
       header: "Vaccating Date",
-      cell: ({ row }) =>
-        dayjs(row.getValue("vaccateDate")).format("DD/MM/YYYY"),
+      cell: ({ row }) => dayjs(row.original.vaccatingDate).format("DD/MM/YYYY"),
     },
     {
       accessorKey: "createdAt",
       header: "Created Date",
+      cell: ({ row }) => dayjs(row.original.createdAt).format("DD/MM/YYYY"),
+    },
+    {
+      accessorKey: "checkoutApprovalStatus",
+      header: "Status",
       cell: ({ row }) =>
-        dayjs(row.getValue("vaccateDate")).format("DD/MM/YYYY"),
+        CHECKOUT_REQUEST_STATUS[
+          row.getValue("checkoutApprovalStatus") as number
+        ],
     },
     {
       accessorKey: "action",
@@ -111,6 +110,12 @@ function CheckoutRequests() {
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
               <DropdownMenuItem
+                disabled={
+                  row.original.checkoutApprovalStatus >
+                  CHECKOUT_REQUEST_STATUS.PENDING
+                    ? true
+                    : false
+                }
                 onClick={() =>
                   approvalStatusChange(
                     row.original._id,
@@ -118,10 +123,16 @@ function CheckoutRequests() {
                   )
                 }
               >
-              Confirm Checkout
+                Confirm Checkout
               </DropdownMenuItem>
 
               <DropdownMenuItem
+                disabled={
+                  row.original.checkoutApprovalStatus >
+                  CHECKOUT_REQUEST_STATUS.PENDING
+                    ? true
+                    : false
+                }
                 onClick={() =>
                   approvalStatusChange(
                     row.original._id,
@@ -152,7 +163,7 @@ function CheckoutRequests() {
       statusArray: [1],
       limit: 10,
       skip: 0,
-      requestStatus: [1, 2],
+      requestStatus: [1, 2, 3],
       sortOrder: -1,
     },
   });
@@ -188,9 +199,7 @@ function CheckoutRequests() {
       <Breadcrumb pageName="Checkout Requests" />
 
       <div className="flex flex-col gap-10">
-        <div className="flex justify-end ">
-     
-        </div>
+        <div className="flex justify-end "></div>
         <DataTable
           columns={columns}
           data={data?.CHECKOUT_REQUEST_LIST?.list || []}
