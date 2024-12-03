@@ -718,3 +718,24 @@ export const DAMAGE_AND_SPLIT_LIST_QUERY = gql`
     }
   }
 `;
+
+
+export const LaundryBooking_List= gql`
+query List($listInputLaundryBooking: ListInputLaundryBooking!) {
+  LaundryBooking_List(listInputLaundryBooking: $listInputLaundryBooking) {
+    list {
+      _id
+      bookingDate
+      bookingType
+      createdAt
+      requestStatus
+      createdUser {
+        name
+      }
+      hostel {
+        name
+      }
+    }
+  }
+}
+`
