@@ -17,6 +17,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { UserTypes } from 'src/shared/decorators';
 import { USER_TYPES } from 'src/shared/variables/main.variable';
+import { DashboardStats } from './entity/dashboard.entity';
 @UseGuards(AuthGuard)
 @Resolver()
 export class AppResolver {
@@ -53,5 +54,11 @@ export class AppResolver {
     const projection = getProjection(info.fieldNodes[0]);
 
     return await this.appService.listContactUs(dto, projection);
+  }
+
+  @UserTypes([USER_TYPES.ADMIN])
+  @Query(() => DashboardStats, { name: 'DashboardStats' })
+  async dashboard(): Promise<DashboardStats> {
+    return await this.appService.dashboard();
   }
 }

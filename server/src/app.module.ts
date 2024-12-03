@@ -25,6 +25,10 @@ import { MailerModule } from './modules/mailer/mailer.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CheckoutModule } from './modules/checkout/checkout.module';
 import { LaundryModule } from './modules/laundry/laundry.module';
+import { ComplaintRepository } from './modules/complaints/repository/complaints.repository';
+import { UserRepository } from './modules/user/repository/user.repository';
+import { RoomRepository } from './modules/booking/hostels/repositories/room.repository';
+import { PaymentsRepository } from './modules/payments/repositories/payments.repository';
 
 const configService = new ConfigService();
 @Module({
@@ -40,7 +44,13 @@ const configService = new ConfigService();
       {},
     ),
 
-    MongooseModule.forFeature([ModelDefinitions.contactUsModel]),
+    MongooseModule.forFeature([
+      ModelDefinitions.contactUsModel,
+      ModelDefinitions.complaintsModel,
+      ModelDefinitions.paymentsModel,
+      ModelDefinitions.userModel,
+      ModelDefinitions.roomModel,
+    ]),
     JwtModule.register({
       secret: String(configService.get('JWT_ACCESS_TOKEN_SECRET_KEY')),
       signOptions: { expiresIn: configService.get('JWT_ACCESS_TOKEN_EXPIRY') },
@@ -89,6 +99,14 @@ const configService = new ConfigService();
     LaundryModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppResolver, ContactUsRepository],
+  providers: [
+    AppService,
+    AppResolver,
+    ContactUsRepository,
+    ComplaintRepository,
+    UserRepository,
+    RoomRepository,
+    PaymentsRepository,
+  ],
 })
 export class AppModule {}

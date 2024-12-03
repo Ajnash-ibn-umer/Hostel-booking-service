@@ -4,6 +4,7 @@ export enum EMAIL_TEMPLATES {
   BOOKING_APPROVAL = 'booking-approval',
   CHECKIN_CONFIRMED = 'checkin-confirmed',
   BOOKING_SUCCESSFULL = 'booking-successfull',
+  CHECKOUT_CONFIRMED = 'checkout-confirm',
   GENERIC = 'generic',
 }
 @InputType()
