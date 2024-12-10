@@ -5,6 +5,9 @@ import enumToString from 'src/shared/utils/enumTostring';
 
 @InputType()
 export class CreatePaymentInput {
+  @Field(() => String, { nullable: true })
+  _id?: string;
+
   @Field(() => Int, { nullable: true, description: enumToString(VOUCHER_TYPE) })
   voucherType: number;
 

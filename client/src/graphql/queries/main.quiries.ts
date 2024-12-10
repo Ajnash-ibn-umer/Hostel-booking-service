@@ -707,7 +707,13 @@ export const DAMAGE_AND_SPLIT_LIST_QUERY = gql`
           userId
           payed
           user {
+            userNo
             name
+            booking {
+              _id
+              bedName
+            }
+            bookingId
           }
         }
         hostel {

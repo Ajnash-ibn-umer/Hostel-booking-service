@@ -85,6 +85,12 @@ export default function DamageAndSplitDetailsSheet({
                       Username
                     </th>
                     <th className="border border-gray-300 px-4 py-2 text-sm font-medium">
+                      User No
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2 text-sm font-medium">
+                      Bed No
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2 text-sm font-medium">
                       Split Amount
                     </th>
                     <th className="border border-gray-300 px-4 py-2 text-sm font-medium">
@@ -97,6 +103,12 @@ export default function DamageAndSplitDetailsSheet({
                     <tr key={detail._id}>
                       <td className="border border-gray-300 px-4 py-2 text-sm text-gray-500">
                         {detail.user?.name ?? ""}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2 text-sm text-gray-500">
+                        {detail.user?.userNo ?? ""}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2 text-sm text-gray-500">
+                        {detail.user?.booking.bedName ?? ""}
                       </td>
                       <td className="border border-gray-300 px-4 py-2 text-sm text-gray-500">
                         {detail.amount}
