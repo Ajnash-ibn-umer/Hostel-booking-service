@@ -136,7 +136,7 @@ export class CheckoutService {
   }
 
   async checkout(
-    checkout:  ForcedCheckoutInput | CheckoutRequest | any ,
+    checkout: ForcedCheckoutInput | CheckoutRequest | any,
     userId: string,
     session: SessionOption['session'] = null,
   ) {
@@ -183,7 +183,12 @@ export class CheckoutService {
           },
           session,
         );
-
+        const hostelInfo = await this.bedRpo.findOne(
+          { _id: checkout.bedId },
+          { propertyId: 1 },
+          txnSession,
+          ['propertyId'],
+        );
         this.mailService.send({
           subject: `Checkout Request Approved`,
           to: user.email,
@@ -191,6 +196,7 @@ export class CheckoutService {
           context: {
             name: user.name,
             userNumber: user.userNo ?? '',
+            hostelName: (hostelInfo.propertyId as any).name,
             checkOutDate: dayjs(checkout.vaccatingDate as any).format(
               'DD/MM/YYYY',
             ),

@@ -121,7 +121,7 @@ export class LaundryService {
             remark: `Payment for payed laundry booking on ${dayjs(dto.bookingDate).format('DD/MM/YYYY')}`,
             userId: userId,
             // TODO: need to be change
-            payAmount: 30,
+            payAmount: 20,
             paymentStatus: PaymentStatus.PENDING,
             status: STATUS_NAMES.ACTIVE,
             createdAt: startTime,

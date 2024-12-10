@@ -10,6 +10,12 @@ export interface DamageAndSplit {
     amount: number;
     payed: boolean;
     user: {
+      userNo: string;
+      booking: {
+        _id: string;
+        bedName: string;
+      };
+      bookingId: string;
       name: string;
     };
   }[];
