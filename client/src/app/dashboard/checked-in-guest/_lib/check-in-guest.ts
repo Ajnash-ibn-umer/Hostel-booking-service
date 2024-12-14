@@ -1,4 +1,4 @@
-import { Booking } from "../../booking/page";
+import type { Booking } from "../../booking/_lib/enums";
 
 export interface CheckInGuestUserList {
   phoneNumber: string;

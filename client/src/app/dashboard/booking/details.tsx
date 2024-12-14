@@ -11,8 +11,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { format } from "date-fns";
-import { BED_POSITION, BookingStatus, PRICE_BASE_MODE } from "./_lib/enums";
-import { Booking } from "./page";
+import { BED_POSITION, Booking, BookingStatus, PRICE_BASE_MODE } from "./_lib/enums";
 import { EyeOpenIcon } from "@radix-ui/react-icons";
 import { Download } from "lucide-react";
 import dayjs from "dayjs";
@@ -59,7 +58,7 @@ export default function BookingDetailsSheet({
               </div>
               <div>
                 <h4 className="text-sm font-medium">Registration Number</h4>
-                <p className="text-sm text-gray-500">{booking.bookingNumber}</p>
+                <p className="text-sm text-gray-500">{booking.regNo}</p>
               </div>
             </div>
             <div className="space-y-2">
