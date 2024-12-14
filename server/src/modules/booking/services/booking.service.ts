@@ -436,7 +436,6 @@ export class BookingService {
   ): Promise<generalResponse | GraphQLError> {
     const startTime = new Date();
     const txnSession = session ? session : await this.connection.startSession();
-    console.log({ session: session.id });
     !session && (await txnSession.startTransaction());
     try {
       let responseMsg = 'Booking status updated successfully';
