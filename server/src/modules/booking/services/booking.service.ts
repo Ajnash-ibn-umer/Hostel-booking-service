@@ -47,6 +47,7 @@ import { EMAIL_TEMPLATES } from 'src/modules/mailer/dto/create-mailer.input';
 import * as dayjs from 'dayjs';
 import { PaymentsService } from 'src/modules/payments/payments.service';
 import { VOUCHER_TYPE } from 'src/database/models/payments.model';
+import razorpay from 'razorpay';
 @Injectable()
 export class BookingService {
   constructor(
@@ -431,11 +432,12 @@ export class BookingService {
   async bookingApprovalStatusChange(
     dto: AdminBookingStatusChangeInput,
     userId: string,
+    session: mongoose.ClientSession = null,
   ): Promise<generalResponse | GraphQLError> {
     const startTime = new Date();
-    const txnSession = await this.connection.startSession();
-
-    await txnSession.startTransaction();
+    const txnSession = session ? session : await this.connection.startSession();
+    console.log({ session: session.id });
+    !session && (await txnSession.startTransaction());
     try {
       let responseMsg = 'Booking status updated successfully';
       if (dto.bookingIds.length === 0) {
@@ -587,19 +589,19 @@ export class BookingService {
         bookingStatusHistoryEntries,
         txnSession,
       );
-      await txnSession.commitTransaction();
+      !session && (await txnSession.commitTransaction());
       return {
         message: responseMsg,
       };
     } catch (error) {
-      await txnSession.abortTransaction();
+      !session && (await txnSession.abortTransaction());
       throw new GraphQLError(error, {
         extensions: {
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
       });
     } finally {
-      await txnSession.endSession();
+      !session && (await txnSession.endSession());
     }
   }
 
@@ -654,12 +656,14 @@ export class BookingService {
           },
           txnSession,
         );
+
+        await txnSession.commitTransaction();
       }
       console.log('in booking 3');
 
       if (paymentStatus === true) {
         console.log('in booking 4');
-
+        console.log({ sesssion1: txnSession.id });
         const bookingInfo = await this.bookingApprovalStatusChange(
           {
             bookingIds: dto.bookingId,
@@ -669,6 +673,7 @@ export class BookingService {
             remark: `payment successful`,
           },
           null,
+          txnSession,
         );
 
         if (!bookingInfo) {
@@ -714,13 +719,17 @@ export class BookingService {
         //   send notification
         const hostel = await this.hostelRepository.findOne(
           { _id: bookingData.propertyId },
-          { name: 1 },
+          {},
+          txnSession,
         );
         const bookingDate = dayjs(startTime).format('DD/MM/YYYY');
         const totalDays =
           bookingData.totalDays && bookingData.totalDays !== 0
             ? bookingData.totalDays.toString()
             : null;
+
+        await txnSession.commitTransaction();
+
         this.mailService.send({
           subject: `Booking Successful`,
           to: bookingData.email,
@@ -737,7 +746,6 @@ export class BookingService {
           },
         });
       }
-      await txnSession.commitTransaction();
 
       return {
         message: 'Booking status updated successfully',
