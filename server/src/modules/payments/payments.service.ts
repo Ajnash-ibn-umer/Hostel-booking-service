@@ -34,6 +34,9 @@ import { generalResponse } from 'src/shared/graphql/entities/main.entity';
 import { DamageAndSplitRepository } from '../damage_and_split/repositories/damage-and-split.repository';
 import { DamageAndSplitDetailsRepository } from '../damage_and_split/repositories/damage-and-split-details.repository';
 import { AmountStatus } from 'src/database/models/damage-and-split.model';
+import { PAYMENT_STATUS } from 'src/database/models/transaction.model';
+import { PaymentGatewayService } from '../payment-gateway/service/payment-gateway.service';
+import { TranasactionRepository } from 'src/repositories/transaction.repository';
 @Injectable()
 export class PaymentsService {
   constructor(
@@ -42,6 +45,8 @@ export class PaymentsService {
     private schedulerRegistry: SchedulerRegistry,
     private damageAndSplitRepo: DamageAndSplitRepository,
     private damageAndSplitDetailRepo: DamageAndSplitDetailsRepository,
+    private readonly paymentGateWayService: PaymentGatewayService,
+    private readonly transactionRepository: TranasactionRepository,
 
     @InjectConnection()
     private readonly connection: mongoose.Connection,
@@ -323,6 +328,7 @@ export class PaymentsService {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
+      let status = true;
       const payment = await this.paymentRepo.findOneAndUpdate(
         {
           _id: dto.paymentId,
@@ -339,8 +345,36 @@ export class PaymentsService {
       if (!payment) {
         throw new Error('payment not found');
       }
-
-      if (payment.voucherType === VOUCHER_TYPE.DAMAGE_AND_SPLIT) {
+      const transaction = await this.transactionRepository.create(
+        {
+          amount: dto.payedAmount,
+          transactionId: dto.razorPay_orderId,
+          remark: 'payment id ' + dto.paymentId,
+          paymentType: 1,
+          invoiceId: null,
+          paymentStatus: status
+            ? PAYMENT_STATUS.SUCCESS
+            : PAYMENT_STATUS.FAILED,
+          createdAt: startTime,
+          updatedAt: startTime,
+        },
+        session,
+      );
+      if (dto.requestStatus === PaymentStatus.PAYED) {
+        const verifyPayment =
+          await this.paymentGateWayService.verifyPaymentGatewayOrder({
+            order_uuid: dto.order_uuid,
+            razorPay_signature: dto.razorPay_signature,
+            razorPay_orderId: dto.razorPay_orderId,
+            razorPay_paymentId: dto.razorPay_paymentId,
+          });
+        status = verifyPayment.status;
+      }
+      if (
+        status === true &&
+        dto.requestStatus === PaymentStatus.PAYED &&
+        payment.voucherType === VOUCHER_TYPE.DAMAGE_AND_SPLIT
+      ) {
         const damageAndSplit = await this.damageAndSplitRepo.findOne({
           _id: payment.voucherId,
         });

@@ -48,6 +48,7 @@ import * as dayjs from 'dayjs';
 import { PaymentsService } from 'src/modules/payments/payments.service';
 import { VOUCHER_TYPE } from 'src/database/models/payments.model';
 import razorpay from 'razorpay';
+import { PaymentGatewayService } from 'src/modules/payment-gateway/service/payment-gateway.service';
 @Injectable()
 export class BookingService {
   constructor(
@@ -64,6 +65,8 @@ export class BookingService {
     private readonly invoiceRepository: InvoiceRepository,
     private readonly invoiceItemRepository: InvoiceItemRepository,
     private readonly transactionRepository: TranasactionRepository,
+
+    private readonly paymentGateWayService: PaymentGatewayService,
     private readonly counterService: CounterService,
     @InjectConnection()
     private readonly connection: mongoose.Connection,
@@ -615,55 +618,65 @@ export class BookingService {
       paymentStatus = true;
       // TODO: Payment verfication
 
+      const verifyPayment =
+        await this.paymentGateWayService.verifyPaymentGatewayOrder({
+          order_uuid: dto.order_uuid,
+          razorPay_signature: dto.razorPay_signature,
+          razorPay_orderId: dto.razorPay_orderId,
+          razorPay_paymentId: dto.razorPay_paymentId,
+        });
+      paymentStatus = verifyPayment.status;
       // TODO: update admission book form status
-      const count = await this.counterService.getAndIncrementCounter(
-        {
-          entityName: MODEL_NAMES.CONTRACTS,
-        },
-        1,
-        txnSession,
-      );
-
-      const bookingData = await this.bookingRepository.findOneAndUpdate(
-        {
-          _id: dto.bookingId,
-        },
-        {
-          regNo: `${count.prefix}${count.count}`,
-        },
-        txnSession,
-      );
-
-      console.log('in booking');
-
-      if (!bookingData) {
-        throw 'Booking Not Found';
-      }
-      console.log('in booking 2');
-
+      const transactionDetails = {
+        paymentStatus: PAYMENT_STATUS.SUCCESS,
+        remark: 'Booking Payment Sucessfull',
+      };
       if (!paymentStatus) {
-        const transaction = await this.transactionRepository.create(
+        transactionDetails.paymentStatus = PAYMENT_STATUS.FAILED;
+        transactionDetails.remark = 'Payment failed';
+      }
+
+      const transaction = await this.transactionRepository.create(
+        {
+          amount: dto.amount,
+          transactionId: dto.razorPay_orderId,
+          remark: transactionDetails.remark,
+          paymentType: 1,
+          invoiceId: null,
+          paymentStatus: transactionDetails.paymentStatus,
+          createdAt: startTime,
+          updatedAt: startTime,
+        },
+        txnSession,
+      );
+
+      if (paymentStatus === true) {
+        const count = await this.counterService.getAndIncrementCounter(
           {
-            amount: dto.amount,
-            bookingId: dto.bookingId,
-            transactionId: dto.orderId ?? '',
-            remark: 'Payment failed',
-            paymentType: 1,
-            invoiceId: null,
-            paymentStatus: PAYMENT_STATUS.FAILED,
-            createdAt: startTime,
-            updatedAt: startTime,
+            entityName: MODEL_NAMES.CONTRACTS,
+          },
+          1,
+          txnSession,
+        );
+
+        const bookingData = await this.bookingRepository.findOneAndUpdate(
+          {
+            _id: dto.bookingId,
+          },
+          {
+            regNo: `${count.prefix}${count.count}`,
           },
           txnSession,
         );
 
-        await txnSession.commitTransaction();
-      }
-      console.log('in booking 3');
+        console.log('in booking');
 
-      if (paymentStatus === true) {
+        if (!bookingData) {
+          throw 'Booking Not Found';
+        }
+        console.log('in booking 2');
+
         console.log('in booking 4');
-        console.log({ sesssion1: txnSession.id });
         const bookingInfo = await this.bookingApprovalStatusChange(
           {
             bookingIds: dto.bookingId,
@@ -728,8 +741,6 @@ export class BookingService {
             ? bookingData.totalDays.toString()
             : null;
 
-        await txnSession.commitTransaction();
-
         this.mailService.send({
           subject: `Booking Successful`,
           to: bookingData.email,
@@ -746,6 +757,7 @@ export class BookingService {
           },
         });
       }
+      await txnSession.commitTransaction();
 
       return {
         message: 'Booking status updated successfully',

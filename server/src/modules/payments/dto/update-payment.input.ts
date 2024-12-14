@@ -19,4 +19,20 @@ export class UpdatePaymentApprovalStatus {
     description: enumToString(PaymentStatus),
   })
   requestStatus: number;
+
+  @Field(() => String, { nullable: true })
+  order_uuid: string;
+
+  @Field(() => String, { nullable: true })
+  razorPay_orderId: string;
+
+  @Field(() => String, { nullable: true })
+  razorPay_signature: string;
+
+  @Field(() => String, { nullable: true })
+  razorPay_paymentId: string;
+
+  
+  @Field(() => Number, { nullable: false })
+  payedAmount: number;
 }

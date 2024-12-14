@@ -71,7 +71,7 @@ export class PaymentGatewayService {
           verifyPaymentInput.razorPay_signature,
           process.env.RAZOR_PAY_SECRET_KEY,
         );
-
+        console.log({ isValid });
         const hashData = createHmac('sha256', process.env.RAZOR_PAY_SECRET_KEY)
           .update(
             verifyPaymentInput.razorPay_orderId +

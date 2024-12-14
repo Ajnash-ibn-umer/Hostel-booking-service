@@ -117,7 +117,20 @@ export class CheckoutService {
       if (dto.requestStatus === CHECKOUT_APPROVAL_STATUS.APPROVED) {
         await this.checkout(checkout, userId, session);
       }
-
+      if (dto.requestStatus === CHECKOUT_APPROVAL_STATUS.CANCELED) {
+        const checkoutInfo = await this.checkoutRequestRepo.findOne({
+          _id: dto.chequoutRequestId,
+        });
+        await this.contractRepo.findOneAndUpdate(
+          {
+            _id: checkoutInfo.contractId,
+            status: STATUS_NAMES.ACTIVE,
+          },
+          {
+            vaccatStatus: VACCATE_STATUS.IN_CONTRACT,
+          },
+        );
+      }
       await session.commitTransaction();
       return {
         message:
