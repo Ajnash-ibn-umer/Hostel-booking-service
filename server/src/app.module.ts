@@ -11,7 +11,7 @@ import { CounterModule } from './modules/counter/counter.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { LocationModule } from './modules/location/location.module';
 import { GalleryModule } from './modules/gallery/gallery.module';
-import { PaymentGatewayModule } from './modules/payment-gateway/service/payment-gateway.module';
+import { PaymentGatewayModule } from './modules/payment-gateway/payment-gateway.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import ENV from './shared/variables/env.variables';
 import { ModelDefinitions } from './database/modelDefinitions';
