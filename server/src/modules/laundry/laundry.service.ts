@@ -48,6 +48,9 @@ export class LaundryService {
 
     try {
       console.log({ userId });
+      if (!dto.bookingDate) {
+        throw 'Date is required for booking';
+      }
       const userLaundryLimit = await this.contractRepo.findOne({
         userId: userId,
         status: STATUS_NAMES.ACTIVE,

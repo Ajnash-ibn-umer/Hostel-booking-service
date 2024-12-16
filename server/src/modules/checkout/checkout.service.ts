@@ -198,7 +198,7 @@ export class CheckoutService {
         );
         const hostelInfo = await this.bedRpo.findOne(
           { _id: checkout.bedId },
-          { propertyId: 1 },
+          { },
           txnSession,
           ['propertyId'],
         );
