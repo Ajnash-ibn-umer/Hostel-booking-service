@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/MultiSelect/multi-selector";
 import { CalendarIcon } from "lucide-react";
 import { convertToIST } from "@/utils/date";
+import { debounce } from "../../hostels/_lib/util";
 
 type User = {
   value: string;
@@ -148,6 +149,7 @@ const CreateDamageAndSplit: React.FC = () => {
       });
     }
   };
+  const debouncedSubmit = debounce(handleSubmit, 5000);
 
   return (
     <div className="mx-auto max-w-4xl rounded-lg bg-white p-6 shadow-md">
@@ -248,7 +250,7 @@ const CreateDamageAndSplit: React.FC = () => {
         />
 
         {/* Submit Button */}
-        <Button onClick={handleSubmit} className="mt-6 w-full">
+        <Button onClick={debouncedSubmit} className="mt-6 w-full">
           Submit
         </Button>
       </div>
