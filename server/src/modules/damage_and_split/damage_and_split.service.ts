@@ -115,6 +115,7 @@ export class DamageAndSplitService {
     if (dto.searchingText && dto.searchingText !== '') {
       pipeline.push(Search(['description', 'title'], dto.searchingText));
     }
+
     pipeline.push(
       ...MatchList([
         {
