@@ -39,7 +39,7 @@ export class UserResolver {
   @UserTypes([USER_TYPES.ADMIN])
   @Mutation(() => User, { name: 'User_Create' })
   createCustomerUser(@Args('createUserInput') dto: CreateUserInput) {
-    dto['userType'] = USER_TYPES.USER;
+    dto['userType'] = USER_TYPES.ADMIN;
     return this.userService.create(dto);
   }
 
