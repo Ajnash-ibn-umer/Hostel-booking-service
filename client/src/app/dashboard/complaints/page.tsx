@@ -47,6 +47,7 @@ function Complaints() {
       statusArray: [1],
     },
   });
+  
   const approvalStatusChange = async (
     complaintId: string,
     status: number,
