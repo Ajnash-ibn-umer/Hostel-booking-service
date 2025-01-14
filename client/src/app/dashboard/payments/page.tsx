@@ -103,16 +103,21 @@ function Payments() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem
-                    onClick={() =>
-                      approvalStatusChange(
-                        row.original._id,
-                        PAYMENT_STATUS.PAYED,
-                      )
-                    }
-                  >
-                    Approve as Payed
-                  </DropdownMenuItem>
+                  {
+                    <DropdownMenuItem
+                      onClick={() =>
+                        approvalStatusChange(
+                          row.original._id,
+                          PAYMENT_STATUS.PAID,
+                        )
+                      }
+                      disabled={
+                        row.original.paymentStatus === PAYMENT_STATUS.PAID
+                      }
+                    >
+                      Approve as Payed
+                    </DropdownMenuItem>
+                  }
 
                   <DropdownMenuSeparator />
                 </DropdownMenuContent>
@@ -144,7 +149,6 @@ function Payments() {
 
   const { loading, data, error, refetch } = useQuery(PAYMENT_LIST_GQL, {
     variables: inputVariables,
-    
   });
   const changePage = (skip: number) => {
     console.log({ skip });
@@ -172,7 +176,7 @@ function Payments() {
 
       <div className="flex flex-col gap-10">
         <div className="flex justify-end ">
-        <Button
+          <Button
             className="gap-2"
             style={{ background: "green" }}
             onClick={async () => {
