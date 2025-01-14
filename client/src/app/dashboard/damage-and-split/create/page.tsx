@@ -149,7 +149,6 @@ const CreateDamageAndSplit: React.FC = () => {
       });
     }
   };
-  const debouncedSubmit = debounce(handleSubmit, 5000);
 
   return (
     <div className="mx-auto max-w-4xl rounded-lg bg-white p-6 shadow-md">
@@ -250,7 +249,7 @@ const CreateDamageAndSplit: React.FC = () => {
         />
 
         {/* Submit Button */}
-        <Button onClick={debouncedSubmit} className="mt-6 w-full">
+        <Button onClick={debounce(handleSubmit, 3000)} className="mt-6 w-full">
           Submit
         </Button>
       </div>

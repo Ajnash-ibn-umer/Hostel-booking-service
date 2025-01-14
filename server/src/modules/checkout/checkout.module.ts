@@ -8,6 +8,7 @@ import { UserRepository } from '../user/repository/user.repository';
 import { ContractRepository } from 'src/repositories/contract.repository';
 import { BedRepository } from '../booking/hostels/repositories/bed.repository';
 import { MailerService } from '../mailer/mailer.service';
+import { CheckoutController } from './checkout.controller';
 
 @Module({
   providers: [
@@ -27,5 +28,6 @@ import { MailerService } from '../mailer/mailer.service';
       ModelDefinitions.bedModel,
     ]),
   ],
+  controllers: [CheckoutController],
 })
 export class CheckoutModule {}

@@ -35,5 +35,5 @@ export enum VOUCHER_TYPE {
 
 export enum PAYMENT_STATUS {
   PENDING = 0,
-  PAYED = 1,
+  PAID = 1,
 }

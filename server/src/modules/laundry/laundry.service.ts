@@ -102,7 +102,10 @@ export class LaundryService {
         {
           bookingDate: dto.bookingDate,
           timeSlot: dto.timeSlot,
-          requestStatus: LAUNDRY_REQUEST_STATUS.APPROVED,
+          requestStatus:
+            dto.bookingType === LAUNDRY_BOOKING_TYPE.PAYED
+              ? LAUNDRY_REQUEST_STATUS.PENDING
+              : LAUNDRY_REQUEST_STATUS.APPROVED,
           bookingType: dto.bookingType,
           hostelId: userLaundryLimit.propertyId,
           userId: userId,
@@ -236,6 +239,13 @@ export class LaundryService {
         pipeline.push({
           $sort: {
             requestStatus: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 2:
+        pipeline.push({
+          $sort: {
+            bookingDate: dto.sortOrder ?? 1,
           },
         });
         break;
