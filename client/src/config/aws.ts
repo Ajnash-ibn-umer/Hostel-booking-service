@@ -1,8 +1,8 @@
-const S3_BUCKET = process.env.S3_BUCKET || "ajn-p1-2024";
-const REGION = process.env.REGION || "ap-south-1";
-const ACCESS_KEY = process.env.ACCESS_KEY || "AKIAYS2NW4XTFEBTEEND";
+const S3_BUCKET = process.env.S3_BUCKET ;
+const REGION = process.env.REGION ;
+const ACCESS_KEY = process.env.ACCESS_KEY ;
 const SECRET_ACCESS_KEY =
-  process.env.SECRET_ACCESS_KEY || "G+SosLB5lDXIQDR//R+bS78CuMCQTGGKdNNmrARK";
+  process.env.SECRET_ACCESS_KEY ;
 // @ts-ignore
 import { uploadFile } from "react-s3";
 const config = {
