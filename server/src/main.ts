@@ -9,7 +9,7 @@ import next from 'next';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  console.log('to start');
+  console.log('to start 1');
 
   app.setGlobalPrefix('api');
   app.enableCors({
