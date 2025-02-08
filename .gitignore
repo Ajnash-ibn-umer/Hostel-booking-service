@@ -61,5 +61,3 @@ client/package-lock.json
 server/package-lock.json
 client/.env
 client/.env.development
-server/.env.ref
-server/firebase.config.json
