@@ -59,6 +59,6 @@ client/pnpm-lock.yaml
 
 client/package-lock.json
 server/package-lock.json
-
-
+client/.env
+client/.env.development
 
