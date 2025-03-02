@@ -65,15 +65,18 @@ export class DamageAndSplitService {
         const paymentData: CreatePaymentInput[] = [];
 
         dto.splitDetails.forEach((detail) => {
+          const paymentId = new mongoose.Types.ObjectId();
           details.push({
             damageAndSplitId: newDamageAndSplit._id,
             userId: detail.userId,
             amount: detail.amount,
+
             status: STATUS_NAMES.ACTIVE,
             createdAt: new Date(),
           });
 
           paymentData.push({
+            _id: paymentId.toString(),
             voucherType: VOUCHER_TYPE.DAMAGE_AND_SPLIT,
             dueDate: dto.dueDate,
             voucherId: newDamageAndSplit._id,
@@ -112,6 +115,7 @@ export class DamageAndSplitService {
     if (dto.searchingText && dto.searchingText !== '') {
       pipeline.push(Search(['description', 'title'], dto.searchingText));
     }
+
     pipeline.push(
       ...MatchList([
         {
@@ -236,15 +240,29 @@ export class DamageAndSplitService {
       //   });
       // }
 
-      
       if (projection['list']['splitDetails']['user']) {
+        const userPipe = [];
+        if (projection['list']['splitDetails']['user']['booking']) {
+          userPipe.push(
+            ...Lookup({
+              modelName: MODEL_NAMES.BOOKING,
+              params: { id: '$bookingId' },
+              project: responseFormat(
+                projection['list']['splitDetails']['user']['booking'],
+              ),
+              conditions: { $_id: '$$id' },
+
+              responseName: 'booking',
+            }),
+          );
+        }
         splitPipe.push(
           ...Lookup({
             modelName: MODEL_NAMES.USER,
             params: { id: '$userId' },
             project: responseFormat(projection['list']['splitDetails']['user']),
             conditions: { $_id: '$$id' },
-
+            innerPipeline: userPipe,
             responseName: 'user',
           }),
         );

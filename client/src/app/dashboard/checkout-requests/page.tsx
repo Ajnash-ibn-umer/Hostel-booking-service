@@ -69,6 +69,10 @@ function CheckoutRequests() {
       header: "Guest No",
     },
     {
+      accessorKey: "guest.name",
+      header: "Guest Name",
+    },
+    {
       accessorKey: "description",
       header: "Reason",
     },

@@ -50,6 +50,12 @@ export class CheckoutService {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
+      const checkVaccatingDate = dayjs(new Date(dto.vaccatingDate));
+      const diffrence = checkVaccatingDate.diff(dayjs(startTime), 'day');
+      console.log({ diffrence });
+      if (diffrence < 15) {
+        throw 'Vaccating date must be at least 15 days greater than the start time';
+      }
       const newCheckoutRequest = await this.checkoutRequestRepo.create(
         {
           bedId: dto.bedId,
@@ -114,10 +120,23 @@ export class CheckoutService {
       if (!checkout) {
         throw new Error('checkout not found');
       }
-      if (dto.requestStatus === CHECKOUT_APPROVAL_STATUS.APPROVED) {
-        await this.checkout(checkout, userId, session);
+      // if (dto.requestStatus === CHECKOUT_APPROVAL_STATUS.APPROVED) {
+      //   await this.checkout(checkout, userId, session);
+      // }
+      if (dto.requestStatus === CHECKOUT_APPROVAL_STATUS.CANCELED) {
+        const checkoutInfo = await this.checkoutRequestRepo.findOne({
+          _id: dto.chequoutRequestId,
+        });
+        await this.contractRepo.findOneAndUpdate(
+          {
+            _id: checkoutInfo.contractId,
+            status: STATUS_NAMES.ACTIVE,
+          },
+          {
+            vaccatStatus: VACCATE_STATUS.IN_CONTRACT,
+          },
+        );
       }
-
       await session.commitTransaction();
       return {
         message:
@@ -136,7 +155,7 @@ export class CheckoutService {
   }
 
   async checkout(
-    checkout:  ForcedCheckoutInput | CheckoutRequest | any ,
+    checkout: ForcedCheckoutInput | CheckoutRequest | any,
     userId: string,
     session: SessionOption['session'] = null,
   ) {
@@ -183,14 +202,20 @@ export class CheckoutService {
           },
           session,
         );
-
+        const hostelInfo = await this.bedRpo.findOne(
+          { _id: checkout.bedId },
+          {},
+          txnSession,
+          ['propertyId'],
+        );
         this.mailService.send({
-          subject: `Checkout Request Approved`,
+          subject: `Checkout Process Completed Successfully`,
           to: user.email,
           template: EMAIL_TEMPLATES.CHECKOUT_CONFIRMED,
           context: {
             name: user.name,
             userNumber: user.userNo ?? '',
+            hostelName: (hostelInfo.propertyId as any).name,
             checkOutDate: dayjs(checkout.vaccatingDate as any).format(
               'DD/MM/YYYY',
             ),
@@ -206,6 +231,50 @@ export class CheckoutService {
       }
     });
   }
+
+  async checkoutProcessingJob() {
+    const startTime = new Date();
+    try {
+      console.log({
+        d: new Date(startTime.setHours(0, 0, 0)).toISOString(),
+        d2: new Date().setUTCHours(0, 0, 0,0),
+      });
+      const checkoutRequests: any = await this.checkoutRequestRepo.aggregate([
+        {
+          $match: {
+            checkoutApprovalStatus: CHECKOUT_APPROVAL_STATUS.APPROVED,
+            status: STATUS_NAMES.ACTIVE,
+          },
+        },
+        // TODO: filter want to update
+        {
+          $match: {
+            vaccatingDate: {
+              $gte: new Date().setUTCHours(0, 0, 0,0),
+              $lt: new Date().setUTCHours(23, 59, 59,999),
+            },
+          },
+        },
+      ]);
+      console.log({ checkoutRequests });
+      // checkoutRequests.forEach(async (checkoutRequest) => {
+      //   try {
+      //     await this.checkout(checkoutRequest, checkoutRequest.createdUserId);
+      //   } catch (error) {
+      //     console.error(
+      //       `Error processing checkout request: ${checkoutRequest._id}, Error: ${error.message}`,
+      //     );
+      //   }
+      // });
+    } catch (error) {
+      throw new GraphQLError(error, {
+        extensions: {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      });
+    }
+  }
+
   async listCheckoutRequests(
     dto: ListInputCheckoutRequest,
     projection: Record<string, any>,

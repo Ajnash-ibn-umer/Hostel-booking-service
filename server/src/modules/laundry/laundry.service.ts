@@ -48,6 +48,9 @@ export class LaundryService {
 
     try {
       console.log({ userId });
+      if (!dto.bookingDate) {
+        throw 'Date is required for booking';
+      }
       const userLaundryLimit = await this.contractRepo.findOne({
         userId: userId,
         status: STATUS_NAMES.ACTIVE,
@@ -99,7 +102,10 @@ export class LaundryService {
         {
           bookingDate: dto.bookingDate,
           timeSlot: dto.timeSlot,
-          requestStatus: LAUNDRY_REQUEST_STATUS.APPROVED,
+          requestStatus:
+            dto.bookingType === LAUNDRY_BOOKING_TYPE.PAYED
+              ? LAUNDRY_REQUEST_STATUS.PENDING
+              : LAUNDRY_REQUEST_STATUS.APPROVED,
           bookingType: dto.bookingType,
           hostelId: userLaundryLimit.propertyId,
           userId: userId,
@@ -121,7 +127,7 @@ export class LaundryService {
             remark: `Payment for payed laundry booking on ${dayjs(dto.bookingDate).format('DD/MM/YYYY')}`,
             userId: userId,
             // TODO: need to be change
-            payAmount: 30,
+            payAmount: 20,
             paymentStatus: PaymentStatus.PENDING,
             status: STATUS_NAMES.ACTIVE,
             createdAt: startTime,
@@ -233,6 +239,13 @@ export class LaundryService {
         pipeline.push({
           $sort: {
             requestStatus: dto.sortOrder ?? 1,
+          },
+        });
+        break;
+      case 2:
+        pipeline.push({
+          $sort: {
+            bookingDate: dto.sortOrder ?? 1,
           },
         });
         break;

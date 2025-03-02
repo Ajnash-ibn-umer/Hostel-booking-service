@@ -73,12 +73,14 @@ function CheckoutRequests() {
       limit: number;
       skip: number;
       sortOrder: number;
+      sortType: number;
     };
   }>({
     listInputLaundryBooking: {
       limit: 10,
       skip: 0,
       sortOrder: -1,
+      sortType: 2,
     },
   });
 

@@ -95,7 +95,7 @@ CheckoutRequestSchema.index({ room_id: 1 });
 CheckoutRequestSchema.index({ roomTypeId: 1 });
 CheckoutRequestSchema.index({ availability_status: 1 });
 CheckoutRequestSchema.index(
-  { userId: 1 },
+  { guestId: 1 },
   {
     unique: true,
     partialFilterExpression: { status: { $lt: 2 }, checkoutApprovalStatus: 1 },

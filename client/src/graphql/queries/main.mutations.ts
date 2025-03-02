@@ -335,3 +335,28 @@ export const CHECKOUT_FORCED = gql`
     }
   }
 `;
+
+export const PAYMENT_ORDER_CREATION = gql`
+  mutation Payment_gateway_Order_Create($orderInput: CreateOrderInput!) {
+    Payment_gateway_Order_Create(orderInput: $orderInput) {
+      order_id
+      order_status
+    }
+  }
+`;
+
+export const PAYMENT_VERIFICATION = gql`
+  mutation Verify_Payment_Gateway_Order(
+    $verifyPaymentGatewayInput: VerifyPaymentGatewayInput!
+  ) {
+    Verify_Payment_Gateway_Order(
+      VerifyPaymentGatewayInput: $verifyPaymentGatewayInput
+    ) {
+      message
+      payedAmount
+      status
+      transactionDate
+      transactionId
+    }
+  }
+`;

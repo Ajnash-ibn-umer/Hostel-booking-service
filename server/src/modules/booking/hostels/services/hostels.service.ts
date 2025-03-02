@@ -647,6 +647,36 @@ export class HostelsService {
 
       if (projection['list']['rooms']) {
         const roomPipeLine = [];
+        switch (dto.sortType) {
+          case 0:
+            roomPipeLine.push({
+              $sort: {
+                createdAt: dto.sortOrder ?? 1,
+              },
+            });
+            break;
+          case 1:
+            roomPipeLine.push({
+              $sort: {
+                name: dto.sortOrder ?? 1,
+              },
+            });
+            break;
+          case 2:
+            roomPipeLine.push({
+              $sort: {
+                status: dto.sortOrder ?? 1,
+              },
+            });
+            break;
+          default:
+            roomPipeLine.push({
+              $sort: {
+                name: dto.sortOrder ?? 1,
+              },
+            });
+            break;
+        }
         if (projection['list']['rooms']['roomType']) {
           roomPipeLine.push(
             ...Lookup({

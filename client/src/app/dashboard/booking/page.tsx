@@ -46,6 +46,7 @@ import {
   BookingStatus,
   PRICE_BASE_MODE,
 } from "./_lib/enums";
+import type { Booking } from "./_lib/enums";
 import { EyeOpenIcon } from "@radix-ui/react-icons";
 import BookingDetailsSheet from "./details";
 import { Badge } from "@/components/ui/badge";
@@ -60,46 +61,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 
-export type Booking = {
-  _id: string;
-  arrivalTime: Date;
-  basePrice: number;
-  bedId: string;
-  bedName: string;
-  bookingNumber: string;
-  bookingStatus: BookingStatus;
-  canteenFacility: boolean;
-  laudryFacility: boolean;
-  email: string;
-  name: string;
-  phone: string;
-  propertyId: string;
-  regNo: string;
-  netAmount: number;
-  roomId: string;
-  securityDeposit: number;
-  bedPosition: number;
-  idProofDocUrls: string[];
-  selectedPaymentBase: string;
-  status: number;
-  createdAt: Date;
-  checkInDate: Date;
-  checkOutDate: Date;
-  address: string;
-  bloodGroup: string;
-  city: string;
-  companyName: string;
-  dob: Date;
-  emergencyName: string;
-  emergencyMobile: string;
-  emergenyRelation: string;
-  jobTitle: string;
-  userRemark: string;
-  property: {
-    name: string;
-    _id: string;
-  };
-};
 import { Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import dynamic from "next/dynamic";
 import MembershipPDF from "./pdf-form";
