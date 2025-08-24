@@ -3,7 +3,7 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DataTable } from "../../../components/Datatables/data-table";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -65,7 +65,7 @@ function HostelList() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const [inputVariables, setInputVariables] = useState({
+  const [inputVariables, setInputVariables] = useState(() => ({
     listInputHostel: {
       statusArray: [1],
       limit: 10,
@@ -82,17 +82,18 @@ function HostelList() {
       priceRangeFilter: null,
       propertyNumberFilter: null,
     },
-  });
+  }));
 
   const { loading, data, error, refetch } = useQuery(HOSTEL_LIST_DASHBOARD, {
     variables: inputVariables,
   });
 
-  const hostelColumns: ColumnDef<HostelListInterface>[] = [
-    {
-      accessorKey: "name",
-      header: "Name",
-    },
+  const hostelColumns = useMemo<ColumnDef<HostelListInterface>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Name",
+      },
     {
       accessorKey: "propertyNo",
       header: "Property Number",
@@ -179,18 +180,25 @@ function HostelList() {
         );
       },
     },
-  ];
+    ],
+    [router, refetch],
+  );
 
-  const changePage = (skip: number) => {
-    console.log({ skip });
-    setInputVariables({
-      listInputHostel: {
-        ...inputVariables.listInputHostel,
-        skip: skip || 0,
-      },
-    });
-    refetch(inputVariables);
-  };
+  const changePage = useCallback(
+    (skip: number) => {
+      setInputVariables((prev) => {
+        const updated = {
+          listInputHostel: {
+            ...prev.listInputHostel,
+            skip: skip || 0,
+          },
+        };
+        refetch(updated);
+        return updated;
+      });
+    },
+    [refetch],
+  );
 
   useEffect(() => {
     if (error) {

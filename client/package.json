@@ -2,7 +2,7 @@
   "name": "free-nextadmin-nextjs",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://locahost:8000",
+  "proxy": "http://localhost:8000",
   "scripts": {
     "dev": "next dev ",
     "build": "next build",
