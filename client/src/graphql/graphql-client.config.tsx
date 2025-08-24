@@ -42,26 +42,24 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 const httpLink = new HttpLink({
   uri: `${variables.backend_url}/${variables.api_endpoint}`,
 });
+
 const authLink = setContext((_, { headers }) => {
-  // get the authentication token from local storage if it exists
-  const token = localStorage.getItem("authToken");
-  // return the headers to the context so httpLink can read them
+  const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+
   return {
     headers: {
       ...headers,
-      authorization: token ? `${token}` : "222",
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
   };
 });
-const link = ApolloLink.from([ errorLink, httpLink]);
+
+const link = ApolloLink.from([errorLink, httpLink]);
+
 export const GraphqlClient = new ApolloClient({
-  ssrMode: true,
-  uri: `${variables.backend_url}/${variables.api_endpoint}`,
+  ssrMode: typeof window === "undefined",
   cache: new InMemoryCache(),
   link: concat(authLink, link),
-  // headers: {
-  //   Authorization: `${typeof window !== "undefined" && localStorage.getItem("authToken")}`,
-  // },
 });
 
 const ApolloAppProvider = ({ children }: any) => {

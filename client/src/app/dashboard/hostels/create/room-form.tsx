@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,7 @@ interface FileWithPreview extends File {
   preview: string;
 }
 
-export default function RoomCreationForm({
+function RoomCreationForm({
   amenityData,
   roomTypeData,
   form,
@@ -60,7 +60,25 @@ export default function RoomCreationForm({
 }: RoomCreationProps) {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
 
-  const addRoom = () => {
+  const amenityOptions = useMemo(
+    () =>
+      amenityData?.Amenity_List?.list?.map((amenity: any) => ({
+        value: amenity._id,
+        label: amenity.name,
+      })) ?? [],
+    [amenityData],
+  );
+
+  const roomTypeOptions = useMemo(
+    () =>
+      roomTypeData?.RoomType_List?.list?.map((loc: any) => ({
+        value: loc._id,
+        label: loc.name,
+      })) ?? [],
+    [roomTypeData],
+  );
+
+  const addRoom = useCallback(() => {
     setHostel((prev: { rooms: any }) => ({
       ...prev,
       rooms: [
@@ -76,84 +94,90 @@ export default function RoomCreationForm({
         },
       ],
     }));
-  };
+  }, [setHostel]);
 
-  const addBed = (roomIndex: number) => {
-    setHostel((prev) => ({
-      ...prev,
-      rooms: prev.rooms.map((room, idx) =>
-        idx === roomIndex
-          ? {
-              ...room,
-              beds: [
-                ...room.beds,
-                {
-                  name: "",
-                  code: "",
-                  availabilityStatus: 0,
-                  bedPosition: 0,
-                  floor: "",
-                  paymentBase: 0,
-                  roomTypeId: "",
-                },
-              ],
-            }
-          : room,
-      ),
-    }));
-  };
+  const addBed = useCallback(
+    (roomIndex: number) => {
+      setHostel((prev) => ({
+        ...prev,
+        rooms: prev.rooms.map((room, idx) =>
+          idx === roomIndex
+            ? {
+                ...room,
+                beds: [
+                  ...room.beds,
+                  {
+                    name: "",
+                    code: "",
+                    availabilityStatus: 0,
+                    bedPosition: 0,
+                    floor: "",
+                    paymentBase: 0,
+                    roomTypeId: "",
+                  },
+                ],
+              }
+            : room,
+        ),
+      }));
+    },
+    [setHostel],
+  );
 
-  const updateRoom = (
-    index: number,
-    field: keyof Room,
-    value: string | File[] | string[],
-  ) => {
-    setHostel((prev) => ({
-      ...prev,
-      rooms: prev.rooms.map((room, idx) =>
-        idx === index ? { ...room, [field]: value } : room,
-      ),
-    }));
-  };
+  const updateRoom = useCallback(
+    (index: number, field: keyof Room, value: string | File[] | string[]) => {
+      setHostel((prev) => ({
+        ...prev,
+        rooms: prev.rooms.map((room, idx) =>
+          idx === index ? { ...room, [field]: value } : room,
+        ),
+      }));
+    },
+    [setHostel],
+  );
 
-  const updateBed = (
-    roomIndex: number,
-    bedIndex: number,
-    field: keyof Bed,
-    value: string,
-  ) => {
-    setHostel((prev) => ({
-      ...prev,
-      rooms: prev.rooms.map((room, rIdx) =>
-        rIdx === roomIndex
-          ? {
-              ...room,
-              beds: room.beds.map((bed, bIdx) =>
-                bIdx === bedIndex ? { ...bed, [field]: value } : bed,
-              ),
-            }
-          : room,
-      ),
-    }));
-  };
+  const updateBed = useCallback(
+    (roomIndex: number, bedIndex: number, field: keyof Bed, value: string) => {
+      setHostel((prev) => ({
+        ...prev,
+        rooms: prev.rooms.map((room, rIdx) =>
+          rIdx === roomIndex
+            ? {
+                ...room,
+                beds: room.beds.map((bed, bIdx) =>
+                  bIdx === bedIndex ? { ...bed, [field]: value } : bed,
+                ),
+              }
+            : room,
+        ),
+      }));
+    },
+    [setHostel],
+  );
 
-  const removeRoom = (index: number) => {
-    setHostel((prev) => ({
-      ...prev,
-      rooms: prev.rooms.filter((_, idx) => idx !== index),
-    }));
-  };
+  const removeRoom = useCallback(
+    (index: number) => {
+      setHostel((prev) => ({
+        ...prev,
+        rooms: prev.rooms.filter((_, idx) => idx !== index),
+      }));
+    },
+    [setHostel],
+  );
 
-  const removeBed = (roomIndex: number, bedIndex: number) => {
-    setHostel((prev) => ({
-      ...prev,
-      rooms: prev.rooms.map((room, rIdx) =>
-        rIdx === roomIndex
-          ? { ...room, beds: room.beds.filter((_, bIdx) => bIdx !== bedIndex) }
-          : room,
-      ),
-    }));
-  };
+  const removeBed = useCallback(
+    (roomIndex: number, bedIndex: number) => {
+      setHostel((prev) => ({
+        ...prev,
+        rooms: prev.rooms.map((room, rIdx) =>
+          rIdx === roomIndex
+            ? { ...room, beds: room.beds.filter((_, bIdx) => bIdx !== bedIndex) }
+            : room,
+        ),
+      }));
+    },
+    [setHostel],
+  );
 
   return (
     <>
@@ -232,15 +256,7 @@ export default function RoomCreationForm({
                             onChange={(val: string[]) => {
                               updateRoom(roomIndex, "aminityIds", val);
                             }}
-                            values={
-                              amenityData &&
-                              amenityData.Amenity_List?.list.map(
-                                (amenity: any) => ({
-                                  value: amenity._id,
-                                  label: amenity.name,
-                                }),
-                              )
-                            }
+                            values={amenityOptions}
                           />
                         </div>
                         <div>
@@ -264,18 +280,11 @@ export default function RoomCreationForm({
                               />
                             </SelectTrigger>
                             <SelectContent>
-                              {roomTypeData &&
-                                roomTypeData.RoomType_List?.list &&
-                                roomTypeData.RoomType_List?.list.length > 0 &&
-                                roomTypeData.RoomType_List?.list.map(
-                                  (loc: any) => {
-                                    return (
-                                      <SelectItem value={loc._id}>
-                                        {loc.name}
-                                      </SelectItem>
-                                    );
-                                  },
-                                )}
+                              {roomTypeOptions.map((loc) => (
+                                <SelectItem key={loc.value} value={loc.value}>
+                                  {loc.label}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>
@@ -430,3 +439,5 @@ export default function RoomCreationForm({
     </>
   );
 }
+
+export default memo(RoomCreationForm);

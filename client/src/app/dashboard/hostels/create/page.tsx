@@ -26,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import Selector from "@/components/MultiSelector/multiSelector";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@apollo/client";
@@ -301,8 +301,6 @@ function CreateHostelForm() {
     variables: roomTypeinputVariables,
   });
 
-  // console.log({ locationData });
-
   const {
     register,
     handleSubmit,
@@ -346,6 +344,33 @@ function CreateHostelForm() {
       // ],
     },
   });
+
+  const categoryOptions = useMemo(
+    () =>
+      catData?.PropertyCategory_List?.list?.map((cat: any) => ({
+        value: cat._id,
+        label: cat.name,
+      })) ?? [],
+    [catData],
+  );
+
+  const locationOptions = useMemo(
+    () =>
+      locationData?.Location_List?.list?.map((loc: any) => ({
+        value: loc._id,
+        label: loc.name,
+      })) ?? [],
+    [locationData],
+  );
+
+  const amenityOptions = useMemo(
+    () =>
+      amenityData?.Amenity_List?.list?.map((amenity: any) => ({
+        value: amenity._id,
+        label: amenity.name,
+      })) ?? [],
+    [amenityData],
+  );
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -423,7 +448,6 @@ function CreateHostelForm() {
 
       setIsLoading(false);
 
-      console.log({ data });
       if (data && data.Hostel_Create) {
         router.push("/dashboard/hostels");
       } else {
@@ -596,19 +620,11 @@ function CreateHostelForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {catData &&
-                                    catData.PropertyCategory_List?.list &&
-                                    catData.PropertyCategory_List?.list.length >
-                                      0 &&
-                                    catData.PropertyCategory_List?.list.map(
-                                      (cat: any) => {
-                                        return (
-                                          <SelectItem value={cat._id}>
-                                            {cat.name}
-                                          </SelectItem>
-                                        );
-                                      },
-                                    )}
+                                  {categoryOptions.map((cat) => (
+                                    <SelectItem key={cat.value} value={cat.value}>
+                                      {cat.label}
+                                    </SelectItem>
+                                  ))}
                                 </SelectContent>
                               </Select>
                             </FormControl>
@@ -638,19 +654,11 @@ function CreateHostelForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {locationData &&
-                                    locationData.Location_List?.list &&
-                                    locationData.Location_List?.list.length >
-                                      0 &&
-                                    locationData.Location_List?.list.map(
-                                      (loc: any) => {
-                                        return (
-                                          <SelectItem value={loc._id}>
-                                            {loc.name}
-                                          </SelectItem>
-                                        );
-                                      },
-                                    )}
+                                  {locationOptions.map((loc) => (
+                                    <SelectItem key={loc.value} value={loc.value}>
+                                      {loc.label}
+                                    </SelectItem>
+                                  ))}
                                 </SelectContent>
                               </Select>
                             </FormControl>
@@ -731,20 +739,11 @@ function CreateHostelForm() {
                           <FormItem>
                             <FormLabel>Amenities</FormLabel>
                             <FormControl>
-                              {amenityData &&
-                                amenityData.Amenity_List?.list &&
-                                amenityData.Amenity_List?.list.length > 0 && (
-                                  <MultiSelect
-                                    selectedValues={field.value as any}
-                                    onChange={field.onChange}
-                                    values={amenityData.Amenity_List?.list.map(
-                                      (amenity: any) => ({
-                                        value: amenity._id,
-                                        label: amenity.name,
-                                      }),
-                                    )}
-                                  />
-                                )}
+                              <MultiSelect
+                                selectedValues={field.value as any}
+                                onChange={field.onChange}
+                                values={amenityOptions}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
